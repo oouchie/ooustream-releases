@@ -46,11 +46,12 @@ export default async function DashboardPage() {
   }
 
   // Calculate days until expiration (placeholder - actual logic depends on your data)
-  const statusColor = {
+  const statusColors: Record<string, string> = {
     Active: "badge-active",
     Inactive: "badge-inactive",
     Expired: "badge-expired",
-  }[customer.status] || "badge-inactive";
+  };
+  const statusColor = statusColors[customer.status as string] || "badge-inactive";
 
   return (
     <div className="space-y-8 animate-fadeIn">
