@@ -4,8 +4,12 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { SupportTicket, TICKET_STATUSES, TICKET_CATEGORIES } from "@/types";
 
+type TicketWithCustomer = SupportTicket & {
+  customer?: { id: string; name: string; email: string; phone?: string } | null;
+};
+
 export default function AdminTicketsPage() {
-  const [tickets, setTickets] = useState<SupportTicket[]>([]);
+  const [tickets, setTickets] = useState<TicketWithCustomer[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
 
