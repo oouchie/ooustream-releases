@@ -4,7 +4,7 @@ import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "react-hot-toast";
-import { SupportTicket, TicketMessage, TICKET_CATEGORIES, TICKET_STATUSES } from "@/types";
+import { SupportTicketWithCustomer, TicketMessage, TICKET_CATEGORIES, TICKET_STATUSES } from "@/types";
 
 export default function AdminTicketDetailPage({
   params,
@@ -13,7 +13,7 @@ export default function AdminTicketDetailPage({
 }) {
   const { id } = use(params);
   const router = useRouter();
-  const [ticket, setTicket] = useState<SupportTicket & { customer?: { name: string; email: string; phone?: string } } | null>(null);
+  const [ticket, setTicket] = useState<SupportTicketWithCustomer | null>(null);
   const [messages, setMessages] = useState<TicketMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [replyText, setReplyText] = useState("");

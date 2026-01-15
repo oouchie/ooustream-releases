@@ -34,6 +34,16 @@ export interface SupportTicket {
   updated_at: string;
 }
 
+// Support Ticket with joined Customer data (for admin views)
+export interface SupportTicketWithCustomer extends SupportTicket {
+  customer?: {
+    id: string;
+    name: string;
+    email: string;
+    phone?: string;
+  } | null;
+}
+
 export type TicketCategory =
   | 'connection_issue'
   | 'buffering'
