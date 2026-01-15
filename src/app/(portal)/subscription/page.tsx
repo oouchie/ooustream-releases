@@ -27,17 +27,19 @@ export default async function SubscriptionPage() {
     );
   }
 
-  const statusColor = {
+  const statusColors: Record<string, string> = {
     Active: "badge-active",
     Inactive: "badge-inactive",
     Expired: "badge-expired",
-  }[customer.status] || "badge-inactive";
+  };
+  const statusColor = statusColors[customer.status as string] || "badge-inactive";
 
-  const statusBg = {
+  const statusBgs: Record<string, string> = {
     Active: "bg-[#22c55e]/10 border-[#22c55e]/30",
     Inactive: "bg-[#f59e0b]/10 border-[#f59e0b]/30",
     Expired: "bg-[#ef4444]/10 border-[#ef4444]/30",
-  }[customer.status] || "bg-[#f59e0b]/10 border-[#f59e0b]/30";
+  };
+  const statusBg = statusBgs[customer.status as string] || "bg-[#f59e0b]/10 border-[#f59e0b]/30";
 
   return (
     <div className="space-y-8 animate-fadeIn">
