@@ -32,10 +32,15 @@ export default function AdminAnnouncementsPage() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    title: string;
+    content: string;
+    type: "maintenance" | "outage" | "update" | "promo";
+    is_active: boolean;
+  }>({
     title: "",
     content: "",
-    type: "update" as const,
+    type: "update",
     is_active: true,
   });
   const [submitting, setSubmitting] = useState(false);
