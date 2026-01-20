@@ -236,6 +236,52 @@ export default async function DashboardPage() {
           </Link>
         </div>
       </div>
+
+      {/* Tutorial Videos */}
+      <div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-[#f1f5f9]">
+            Tutorial Videos
+          </h2>
+          <Link href="/tutorials" className="text-sm text-[#6366f1] hover:underline">
+            View All
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <Link href="/tutorials/getting-started" className="card card-hover group">
+            <div className="aspect-video bg-[#1e293b] rounded-lg mb-3 flex items-center justify-center relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#6366f1]/20 to-[#8b5cf6]/20" />
+              <svg className="w-12 h-12 text-[#6366f1] group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+            <h3 className="font-medium text-[#f1f5f9]">Getting Started</h3>
+            <p className="text-sm text-[#94a3b8] mt-1">How to set up your IPTV service</p>
+          </Link>
+
+          <Link href="/tutorials/apps" className="card card-hover group">
+            <div className="aspect-video bg-[#1e293b] rounded-lg mb-3 flex items-center justify-center relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#22c55e]/20 to-[#16a34a]/20" />
+              <svg className="w-12 h-12 text-[#22c55e] group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+            <h3 className="font-medium text-[#f1f5f9]">Recommended Apps</h3>
+            <p className="text-sm text-[#94a3b8] mt-1">Best apps for your device</p>
+          </Link>
+
+          <Link href="/tutorials/troubleshooting" className="card card-hover group">
+            <div className="aspect-video bg-[#1e293b] rounded-lg mb-3 flex items-center justify-center relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#f59e0b]/20 to-[#d97706]/20" />
+              <svg className="w-12 h-12 text-[#f59e0b] group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+            <h3 className="font-medium text-[#f1f5f9]">Troubleshooting</h3>
+            <p className="text-sm text-[#94a3b8] mt-1">Fix common streaming issues</p>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

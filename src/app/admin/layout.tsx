@@ -56,7 +56,7 @@ export default function AdminLayout({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-8">
-              <Link href="/admin/tickets" className="flex items-center gap-2">
+              <Link href="/admin" className="flex items-center gap-2">
                 <span className="text-xl font-bold bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] bg-clip-text text-transparent">
                   Oostream
                 </span>
@@ -65,6 +65,12 @@ export default function AdminLayout({
                 </span>
               </Link>
               <nav className="hidden md:flex items-center gap-6">
+                <Link
+                  href="/admin"
+                  className="text-[#94a3b8] hover:text-[#f1f5f9] transition-colors"
+                >
+                  Dashboard
+                </Link>
                 <Link
                   href="/admin/tickets"
                   className="text-[#94a3b8] hover:text-[#f1f5f9] transition-colors"
@@ -79,12 +85,25 @@ export default function AdminLayout({
                 </Link>
               </nav>
             </div>
-            <button
-              onClick={handleLogout}
-              className="text-[#94a3b8] hover:text-[#f1f5f9] transition-colors text-sm"
-            >
-              Logout
-            </button>
+            <div className="flex items-center gap-4">
+              <a
+                href={process.env.NEXT_PUBLIC_CRM_URL || "https://oostream-crm.vercel.app"}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-4 py-2 bg-[#6366f1] hover:bg-[#5558e3] text-white text-sm font-medium rounded-lg transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                Go to CRM
+              </a>
+              <button
+                onClick={handleLogout}
+                className="text-[#94a3b8] hover:text-[#f1f5f9] transition-colors text-sm"
+              >
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </header>

@@ -29,7 +29,7 @@ export default function AdminLoginPage() {
         return;
       }
 
-      router.push("/admin/tickets");
+      router.push("/admin");
     } catch {
       setError("An error occurred. Please try again.");
     } finally {
