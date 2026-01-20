@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Oostream Customer Portal",
+  title: "Ooustream Customer Portal",
   description: "Manage your IPTV subscription, view credentials, and get support",
 };
 

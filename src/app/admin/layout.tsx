@@ -58,7 +58,7 @@ export default function AdminLayout({
             <div className="flex items-center gap-8">
               <Link href="/admin" className="flex items-center gap-2">
                 <span className="text-xl font-bold bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] bg-clip-text text-transparent">
-                  Oostream
+                  Ooustream
                 </span>
                 <span className="text-xs bg-[#6366f1] text-white px-2 py-0.5 rounded">
                   Admin

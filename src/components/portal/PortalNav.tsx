@@ -69,7 +69,7 @@ export default function PortalNav({ customerName }: { customerName: string }) {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <span className="text-xl font-bold bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] bg-clip-text text-transparent">
-              Oostream
+              Ooustream
             </span>
           </Link>
 

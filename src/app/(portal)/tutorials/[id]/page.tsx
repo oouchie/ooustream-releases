@@ -17,7 +17,7 @@ interface TutorialContent {
 const tutorialData: Record<string, TutorialContent> = {
   "getting-started": {
     id: "getting-started",
-    title: "Getting Started with Oostream",
+    title: "Getting Started with Ooustream",
     description: "Learn how to set up your IPTV service on any device in just a few minutes.",
     category: "Setup",
     duration: "5:30",
@@ -63,7 +63,7 @@ const tutorialData: Record<string, TutorialContent> = {
       },
       {
         title: "Step 4: Configure the App",
-        content: "Enter your Oostream credentials and start streaming.",
+        content: "Enter your Ooustream credentials and start streaming.",
       },
     ],
     relatedTutorials: ["getting-started", "tivimate-setup", "buffering-fix"],

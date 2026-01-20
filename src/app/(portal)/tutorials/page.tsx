@@ -16,7 +16,7 @@ interface Tutorial {
 const tutorials: Tutorial[] = [
   {
     id: "getting-started",
-    title: "Getting Started with Oostream",
+    title: "Getting Started with Ooustream",
     description: "Learn how to set up your IPTV service on any device in just a few minutes.",
     category: "Setup",
     duration: "5:30",
@@ -109,7 +109,7 @@ export default function TutorialsPage() {
           Tutorial Videos
         </h1>
         <p className="text-[#94a3b8] mt-1">
-          Learn how to get the most out of your Oostream service
+          Learn how to get the most out of your Ooustream service
         </p>
       </div>
 

@@ -47,7 +47,7 @@ function VerifyContent() {
       <div className="w-full max-w-md text-center">
         {/* Logo */}
         <h1 className="text-3xl font-bold bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] bg-clip-text text-transparent mb-8">
-          Oostream
+          Ooustream
         </h1>
 
         <div className="card">

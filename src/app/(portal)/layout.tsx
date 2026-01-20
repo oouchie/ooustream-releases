@@ -20,7 +20,7 @@ export default async function PortalLayout({
         <div className="max-w-6xl mx-auto">{children}</div>
       </main>
       <footer className="border-t border-[#334155] py-4 text-center text-sm text-[#94a3b8]">
-        <p>&copy; {new Date().getFullYear()} Oostream. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} Ooustream. All rights reserved.</p>
       </footer>
     </div>
   );

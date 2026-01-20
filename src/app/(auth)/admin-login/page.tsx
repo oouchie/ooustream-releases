@@ -43,7 +43,7 @@ export default function AdminLoginPage() {
         {/* Logo/Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] bg-clip-text text-transparent">
-            Oostream
+            Ooustream
           </h1>
           <p className="text-[#94a3b8] mt-2">Admin Portal</p>
         </div>

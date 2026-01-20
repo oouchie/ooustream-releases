@@ -91,9 +91,9 @@ export async function sendMagicLinkEmail(
 
   try {
     await resend.emails.send({
-      from: 'Oostream <noreply@ooustick.com>',
+      from: 'Ooustream <noreply@ooustick.com>',
       to: email,
-      subject: 'Your Oostream Login Link',
+      subject: 'Your Ooustream Login Link',
       html: `
         <!DOCTYPE html>
         <html>
@@ -104,13 +104,13 @@ export async function sendMagicLinkEmail(
         <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px;">
           <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
             <div style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 30px; text-align: center;">
-              <h1 style="color: white; margin: 0; font-size: 28px;">Oostream</h1>
+              <h1 style="color: white; margin: 0; font-size: 28px;">Ooustream</h1>
               <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">Customer Portal</p>
             </div>
             <div style="padding: 30px;">
               <p style="font-size: 16px; color: #333;">Hi ${customerName},</p>
               <p style="font-size: 16px; color: #666; line-height: 1.6;">
-                Click the button below to log in to your Oostream customer portal. This link will expire in 15 minutes.
+                Click the button below to log in to your Ooustream customer portal. This link will expire in 15 minutes.
               </p>
               <div style="text-align: center; margin: 30px 0;">
                 <a href="${verifyUrl}" style="display: inline-block; background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); color: white; text-decoration: none; padding: 14px 40px; border-radius: 8px; font-weight: bold; font-size: 16px;">
@@ -123,7 +123,7 @@ export async function sendMagicLinkEmail(
             </div>
             <div style="background-color: #f8f8f8; padding: 20px; text-align: center; border-top: 1px solid #eee;">
               <p style="font-size: 12px; color: #999; margin: 0;">
-                &copy; ${new Date().getFullYear()} Oostream. All rights reserved.
+                &copy; ${new Date().getFullYear()} Ooustream. All rights reserved.
               </p>
             </div>
           </div>
@@ -174,7 +174,7 @@ export async function sendMagicLinkSMS(
         body: new URLSearchParams({
           To: formattedPhone,
           From: fromNumber,
-          Body: `Your Oostream login link (expires in 15 min): ${verifyUrl}`,
+          Body: `Your Ooustream login link (expires in 15 min): ${verifyUrl}`,
         }),
       }
     );
