@@ -160,7 +160,7 @@ export default function AdminDashboardPage() {
           </Link>
 
           <a
-            href={process.env.NEXT_PUBLIC_CRM_URL || "https://oostream-crm.vercel.app"}
+            href={process.env.NEXT_PUBLIC_CRM_URL || "https://ooustream-crm.vercel.app"}
             target="_blank"
             rel="noopener noreferrer"
             className="card card-hover"

@@ -87,7 +87,7 @@ export default function AdminLayout({
             </div>
             <div className="flex items-center gap-4">
               <a
-                href={process.env.NEXT_PUBLIC_CRM_URL || "https://oostream-crm.vercel.app"}
+                href={process.env.NEXT_PUBLIC_CRM_URL || "https://ooustream-crm.vercel.app"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 px-4 py-2 bg-[#6366f1] hover:bg-[#5558e3] text-white text-sm font-medium rounded-lg transition-colors"
