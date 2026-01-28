@@ -1,6 +1,14 @@
 import { redirect } from "next/navigation";
+import { getCustomerSession } from "@/lib/auth";
 
-export default function Home() {
-  // Redirect to login page - auth middleware will handle routing
-  redirect("/login");
+export default async function Home() {
+  const session = await getCustomerSession();
+
+  if (session) {
+    // User is logged in - redirect to dashboard
+    redirect("/subscription");
+  } else {
+    // Not logged in - redirect to login
+    redirect("/login");
+  }
 }
