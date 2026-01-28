@@ -1,8 +1,15 @@
 import { createServerClient } from './supabase';
-import { Resend } from 'resend';
+import sgMail from '@sendgrid/mail';
 import crypto from 'crypto';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize SendGrid
+let _sgInitialized = false;
+const initSendGrid = () => {
+  if (!_sgInitialized) {
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
+    _sgInitialized = true;
+  }
+};
 
 // Generate secure random token
 export function generateToken(): string {
@@ -90,8 +97,10 @@ export async function sendMagicLinkEmail(
   const verifyUrl = `${portalUrl}/verify?token=${token}`;
 
   try {
-    await resend.emails.send({
-      from: 'Ooustream <noreply@ooustick.com>',
+    initSendGrid();
+
+    await sgMail.send({
+      from: process.env.EMAIL_FROM || 'Ooustream <oouchie@1865freemoney.com>',
       to: email,
       subject: 'Your Ooustream Login Link',
       html: `
@@ -134,6 +143,7 @@ export async function sendMagicLinkEmail(
 
     return { success: true };
   } catch (error) {
+    console.error('SendGrid error:', error);
     return { success: false, error: String(error) };
   }
 }
@@ -143,6 +153,11 @@ export async function sendMagicLinkSMS(
   phone: string,
   token: string
 ): Promise<{ success: boolean; error?: string }> {
+  // SMS disabled until approved - set SMS_ENABLED=true to enable
+  if (process.env.SMS_ENABLED !== 'true') {
+    return { success: false, error: 'SMS is disabled' };
+  }
+
   const portalUrl = process.env.NEXT_PUBLIC_PORTAL_URL || 'http://localhost:3001';
   const verifyUrl = `${portalUrl}/verify?token=${token}`;
 
