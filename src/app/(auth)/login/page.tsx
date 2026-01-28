@@ -197,11 +197,17 @@ export default function LoginPage() {
             </form>
           )}
 
-          {/* Admin Link */}
-          <div className="mt-6 pt-6 border-t border-[#334155] text-center">
+          {/* Admin & Reseller Links */}
+          <div className="mt-6 pt-6 border-t border-[#334155] text-center space-y-2">
+            <Link
+              href="/reseller-login"
+              className="block text-sm text-[#94a3b8] hover:text-[#6366f1] transition-colors"
+            >
+              Reseller Login
+            </Link>
             <Link
               href="/admin-login"
-              className="text-sm text-[#94a3b8] hover:text-[#6366f1] transition-colors"
+              className="block text-sm text-[#94a3b8] hover:text-[#6366f1] transition-colors"
             >
               Admin Login
             </Link>
