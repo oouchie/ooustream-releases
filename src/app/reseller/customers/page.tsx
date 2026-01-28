@@ -76,28 +76,60 @@ export default function ResellerCustomersPage() {
         </Link>
       </div>
 
-      {/* Filters */}
+      {/* Search & Filters */}
       <div className="card">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
+        <div className="flex flex-col gap-4">
+          {/* Search Bar */}
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <svg className="w-5 h-5 text-[#6366f1]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name, email, or username..."
-              className="input w-full"
+              placeholder="Search customers by name, email, or username..."
+              className="input w-full pl-12 py-3 text-lg bg-[#1e293b] border-2 border-[#334155] focus:border-[#6366f1] rounded-xl"
             />
+            {search && (
+              <button
+                onClick={() => setSearch("")}
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-[#94a3b8] hover:text-[#f1f5f9]"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
           </div>
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            className="input md:w-40"
-          >
-            <option value="">All Status</option>
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
-            <option value="Expired">Expired</option>
-          </select>
+
+          {/* Filters Row */}
+          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+            <span className="text-sm text-[#94a3b8]">Filter by:</span>
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="input py-2 px-4 min-w-[150px]"
+            >
+              <option value="">All Status</option>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+              <option value="Expired">Expired</option>
+            </select>
+            {(search || status) && (
+              <button
+                onClick={() => {
+                  setSearch("");
+                  setStatus("");
+                }}
+                className="text-sm text-[#6366f1] hover:text-[#8b5cf6] transition-colors"
+              >
+                Clear all filters
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
