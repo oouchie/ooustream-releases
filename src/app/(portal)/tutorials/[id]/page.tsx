@@ -15,6 +15,44 @@ interface TutorialContent {
 }
 
 const tutorialData: Record<string, TutorialContent> = {
+  "ooustream-tutorial-pt1": {
+    id: "ooustream-tutorial-pt1",
+    title: "Ooustream Setup Tutorial - Part 1",
+    description: "Complete guide to getting started with Ooustream. Learn everything you need to know to set up your service.",
+    category: "Setup",
+    duration: "Video",
+    videoUrl: "https://www.youtube.com/embed/3qa4cgaLdIg",
+    steps: [
+      {
+        title: "Watch the Full Tutorial",
+        content: "This video covers everything you need to get started with Ooustream.",
+      },
+      {
+        title: "Continue to Part 2",
+        content: "After watching this video, proceed to Part 2 for advanced setup options.",
+      },
+    ],
+    relatedTutorials: ["ooustream-tutorial-pt2", "firestick-setup", "apps"],
+  },
+  "ooustream-tutorial-pt2": {
+    id: "ooustream-tutorial-pt2",
+    title: "Ooustream Setup Tutorial - Part 2",
+    description: "Continue your setup with advanced features and tips for the best streaming experience.",
+    category: "Setup",
+    duration: "Video",
+    videoUrl: "https://www.youtube.com/embed/NiG6f0aTptQ",
+    steps: [
+      {
+        title: "Advanced Configuration",
+        content: "This video covers advanced settings and optimization tips.",
+      },
+      {
+        title: "Get the Best Experience",
+        content: "Learn how to get the most out of your Ooustream subscription.",
+      },
+    ],
+    relatedTutorials: ["ooustream-tutorial-pt1", "troubleshooting", "buffering-fix"],
+  },
   "getting-started": {
     id: "getting-started",
     title: "Getting Started with Ooustream",

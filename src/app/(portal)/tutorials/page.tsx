@@ -15,6 +15,24 @@ interface Tutorial {
 
 const tutorials: Tutorial[] = [
   {
+    id: "ooustream-tutorial-pt1",
+    title: "Ooustream Setup Tutorial - Part 1",
+    description: "Complete guide to getting started with Ooustream. Learn everything you need to know to set up your service.",
+    category: "Setup",
+    duration: "Video",
+    videoUrl: "https://www.youtube.com/embed/3qa4cgaLdIg",
+    thumbnail: "https://img.youtube.com/vi/3qa4cgaLdIg/maxresdefault.jpg",
+  },
+  {
+    id: "ooustream-tutorial-pt2",
+    title: "Ooustream Setup Tutorial - Part 2",
+    description: "Continue your setup with advanced features and tips for the best streaming experience.",
+    category: "Setup",
+    duration: "Video",
+    videoUrl: "https://www.youtube.com/embed/NiG6f0aTptQ",
+    thumbnail: "https://img.youtube.com/vi/NiG6f0aTptQ/maxresdefault.jpg",
+  },
+  {
     id: "getting-started",
     title: "Getting Started with Ooustream",
     description: "Learn how to set up your IPTV service on any device in just a few minutes.",
@@ -140,16 +158,36 @@ export default function TutorialsPage() {
           >
             {/* Thumbnail */}
             <div className="aspect-video bg-[#1e293b] rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
-              <div className={`absolute inset-0 bg-gradient-to-br ${getCategoryColor(tutorial.category).split(" ")[0]} ${getCategoryColor(tutorial.category).split(" ")[1]}`} />
-              <svg
-                className={`w-16 h-16 ${getCategoryColor(tutorial.category).split(" ")[2]} group-hover:scale-110 transition-transform`}
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="M8 5v14l11-7z" />
-              </svg>
+              {tutorial.thumbnail ? (
+                <>
+                  <img
+                    src={tutorial.thumbnail}
+                    alt={tutorial.title}
+                    className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors" />
+                  <svg
+                    className="w-16 h-16 text-white drop-shadow-lg group-hover:scale-110 transition-transform z-10"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </>
+              ) : (
+                <>
+                  <div className={`absolute inset-0 bg-gradient-to-br ${getCategoryColor(tutorial.category).split(" ")[0]} ${getCategoryColor(tutorial.category).split(" ")[1]}`} />
+                  <svg
+                    className={`w-16 h-16 ${getCategoryColor(tutorial.category).split(" ")[2]} group-hover:scale-110 transition-transform`}
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </>
+              )}
               {/* Duration Badge */}
-              <span className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+              <span className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded z-10">
                 {tutorial.duration}
               </span>
             </div>
