@@ -77,9 +77,11 @@ export default function PortalNav({ customerName }: { customerName: string }) {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <span className="text-xl font-bold bg-gradient-to-r from-[#00d4ff] to-[#7c3aed] bg-clip-text text-transparent">
-              Ooustream
-            </span>
+            <img
+              src="/logo-full-on-dark.png"
+              alt="Ooustream"
+              className="h-8 w-auto"
+            />
           </Link>
 
           {/* Desktop Nav */}
