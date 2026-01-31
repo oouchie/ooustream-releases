@@ -33,6 +33,15 @@ const tutorials: Tutorial[] = [
     thumbnail: "https://img.youtube.com/vi/3qa4cgaLdIg/maxresdefault.jpg",
   },
   {
+    id: "downloading-aurora",
+    title: "Downloading Aurora",
+    description: "Learn how to download and install the Aurora app for the best streaming experience.",
+    category: "Apps",
+    duration: "Video",
+    videoUrl: "https://www.youtube.com/embed/60FI37J-vao",
+    thumbnail: "https://img.youtube.com/vi/60FI37J-vao/maxresdefault.jpg",
+  },
+  {
     id: "getting-started",
     title: "Getting Started with Ooustream",
     description: "Learn how to set up your IPTV service on any device in just a few minutes.",
