@@ -121,6 +121,18 @@ export default async function SubscriptionPage() {
                 })}
               </span>
             </div>
+            <div className="flex justify-between py-3 border-b border-[#334155]">
+              <span className="text-[#94a3b8]">Expiration Date</span>
+              <span className="font-medium text-[#f1f5f9]">
+                {customer.expiry_date
+                  ? new Date(customer.expiry_date).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })
+                  : "Not set"}
+              </span>
+            </div>
             <div className="flex justify-between py-3">
               <span className="text-[#94a3b8]">Credentials</span>
               <span className="font-medium text-[#f1f5f9]">

@@ -45,7 +45,13 @@ export default async function DashboardPage() {
     );
   }
 
-  // Calculate days until expiration (placeholder - actual logic depends on your data)
+  // Calculate days until expiration
+  const expiryDate = customer.expiry_date ? new Date(customer.expiry_date) : null;
+  const today = new Date();
+  const daysUntilExpiry = expiryDate
+    ? Math.ceil((expiryDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+    : null;
+
   const statusColors: Record<string, string> = {
     Active: "badge-active",
     Inactive: "badge-inactive",
@@ -104,7 +110,7 @@ export default async function DashboardPage() {
       )}
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Account Status */}
         <div className="card">
           <div className="flex items-center justify-between">
@@ -115,6 +121,31 @@ export default async function DashboardPage() {
               </p>
             </div>
             <span className={`badge ${statusColor}`}>{customer.status}</span>
+          </div>
+        </div>
+
+        {/* Expiration Date */}
+        <div className={`card ${daysUntilExpiry !== null && daysUntilExpiry <= 7 ? 'border-[#ef4444]/50 bg-[#ef4444]/5' : daysUntilExpiry !== null && daysUntilExpiry <= 14 ? 'border-[#f59e0b]/50 bg-[#f59e0b]/5' : ''}`}>
+          <div>
+            <p className="text-sm text-[#94a3b8]">Expires</p>
+            {expiryDate ? (
+              <>
+                <p className="text-2xl font-bold text-[#f1f5f9] mt-1">
+                  {expiryDate.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </p>
+                <p className={`text-sm mt-1 ${daysUntilExpiry !== null && daysUntilExpiry <= 0 ? 'text-[#ef4444]' : daysUntilExpiry !== null && daysUntilExpiry <= 7 ? 'text-[#ef4444]' : daysUntilExpiry !== null && daysUntilExpiry <= 14 ? 'text-[#f59e0b]' : 'text-[#22c55e]'}`}>
+                  {daysUntilExpiry !== null && daysUntilExpiry <= 0
+                    ? 'Expired'
+                    : `${daysUntilExpiry} days remaining`}
+                </p>
+              </>
+            ) : (
+              <p className="text-2xl font-bold text-[#94a3b8] mt-1">—</p>
+            )}
           </div>
         </div>
 
@@ -140,7 +171,7 @@ export default async function DashboardPage() {
             {ticketCount > 0 && (
               <Link
                 href="/support"
-                className="text-sm text-[#6366f1] hover:underline"
+                className="text-sm text-[#00d4ff] hover:underline"
               >
                 View
               </Link>
