@@ -182,10 +182,10 @@ export default function HelpPage() {
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <a
           href="#faq"
-          className="card hover:border-[#6366f1] transition-colors text-center"
+          className="card hover:border-[#00d4ff] transition-colors text-center"
         >
           <svg
-            className="w-8 h-8 mx-auto mb-2 text-[#6366f1]"
+            className="w-8 h-8 mx-auto mb-2 text-[#00d4ff]"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -201,7 +201,7 @@ export default function HelpPage() {
         </a>
         <a
           href="#guides"
-          className="card hover:border-[#6366f1] transition-colors text-center"
+          className="card hover:border-[#00d4ff] transition-colors text-center"
         >
           <svg
             className="w-8 h-8 mx-auto mb-2 text-[#22c55e]"
@@ -220,7 +220,7 @@ export default function HelpPage() {
         </a>
         <a
           href="/tutorials"
-          className="card hover:border-[#6366f1] transition-colors text-center"
+          className="card hover:border-[#00d4ff] transition-colors text-center"
         >
           <svg
             className="w-8 h-8 mx-auto mb-2 text-[#ef4444]"
@@ -245,7 +245,7 @@ export default function HelpPage() {
         </a>
         <a
           href="/support/new"
-          className="card hover:border-[#6366f1] transition-colors text-center"
+          className="card hover:border-[#00d4ff] transition-colors text-center"
         >
           <svg
             className="w-8 h-8 mx-auto mb-2 text-[#f59e0b]"
@@ -264,7 +264,7 @@ export default function HelpPage() {
         </a>
         <a
           href="/credentials"
-          className="card hover:border-[#6366f1] transition-colors text-center"
+          className="card hover:border-[#00d4ff] transition-colors text-center"
         >
           <svg
             className="w-8 h-8 mx-auto mb-2 text-[#ec4899]"
@@ -293,9 +293,9 @@ export default function HelpPage() {
           {faqSections.map((section) => (
             <div key={section.title} className="card">
               <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-lg bg-[#6366f1]/20">
+                <div className="p-2 rounded-lg bg-[#00d4ff]/20">
                   <svg
-                    className="w-5 h-5 text-[#6366f1]"
+                    className="w-5 h-5 text-[#00d4ff]"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -319,11 +319,11 @@ export default function HelpPage() {
                   return (
                     <div
                       key={idx}
-                      className="border border-[#334155] rounded-lg overflow-hidden"
+                      className="border border-[#2a2a3a] rounded-lg overflow-hidden"
                     >
                       <button
                         onClick={() => toggleFAQ(faqId)}
-                        className="w-full flex items-center justify-between p-4 text-left hover:bg-[#1e293b] transition-colors"
+                        className="w-full flex items-center justify-between p-4 text-left hover:bg-[#12121a] transition-colors"
                       >
                         <span className="font-medium text-[#f1f5f9]">
                           {item.question}
@@ -374,8 +374,8 @@ export default function HelpPage() {
               }
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                 activeGuide === guide.name
-                  ? "bg-[#6366f1] text-white"
-                  : "bg-[#1e293b] text-[#94a3b8] hover:text-[#f1f5f9] hover:bg-[#334155]"
+                  ? "bg-[#00d4ff] text-white"
+                  : "bg-[#12121a] text-[#94a3b8] hover:text-[#f1f5f9] hover:bg-[#2a2a3a]"
               }`}
             >
               {guide.name}
@@ -420,8 +420,8 @@ export default function HelpPage() {
                   <div className="space-y-4 mb-6">
                     {guide.steps.map((step, idx) => (
                       <div key={idx} className="flex gap-4">
-                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#6366f1]/20 flex items-center justify-center">
-                          <span className="text-sm font-bold text-[#6366f1]">
+                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#00d4ff]/20 flex items-center justify-center">
+                          <span className="text-sm font-bold text-[#00d4ff]">
                             {idx + 1}
                           </span>
                         </div>
@@ -431,7 +431,7 @@ export default function HelpPage() {
                   </div>
 
                   {/* Recommended Apps */}
-                  <div className="pt-4 border-t border-[#334155]">
+                  <div className="pt-4 border-t border-[#2a2a3a]">
                     <h4 className="text-sm font-medium text-[#94a3b8] mb-3">
                       Recommended Apps
                     </h4>
@@ -452,7 +452,7 @@ export default function HelpPage() {
         )}
 
         {!activeGuide && (
-          <div className="card bg-[#334155] text-center py-8">
+          <div className="card bg-[#2a2a3a] text-center py-8">
             <svg
               className="w-12 h-12 mx-auto mb-4 text-[#94a3b8]"
               fill="none"
@@ -474,7 +474,7 @@ export default function HelpPage() {
       </section>
 
       {/* Still Need Help */}
-      <div className="card bg-gradient-to-r from-[#6366f1]/20 to-[#22c55e]/20 border-[#6366f1]/30">
+      <div className="card bg-gradient-to-r from-[#00d4ff]/20 to-[#22c55e]/20 border-[#00d4ff]/30">
         <div className="text-center">
           <h3 className="text-lg font-semibold text-[#f1f5f9] mb-2">
             Still need help?

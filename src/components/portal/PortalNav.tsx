@@ -72,12 +72,12 @@ export default function PortalNav({ customerName }: { customerName: string }) {
   };
 
   return (
-    <nav className="bg-[#1e293b] border-b border-[#334155]">
+    <nav className="bg-[#12121a] border-b border-[#2a2a3a]">
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <span className="text-xl font-bold bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] bg-clip-text text-transparent">
+            <span className="text-xl font-bold bg-gradient-to-r from-[#00d4ff] to-[#7c3aed] bg-clip-text text-transparent">
               Ooustream
             </span>
           </Link>
@@ -93,8 +93,8 @@ export default function PortalNav({ customerName }: { customerName: string }) {
                   href={item.href}
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     isActive
-                      ? "bg-[#6366f1]/20 text-[#6366f1]"
-                      : "text-[#94a3b8] hover:text-[#f1f5f9] hover:bg-[#334155]"
+                      ? "bg-[#00d4ff]/20 text-[#00d4ff]"
+                      : "text-[#94a3b8] hover:text-[#f1f5f9] hover:bg-[#1a1a24]"
                   }`}
                 >
                   <item.icon className="w-4 h-4" />
@@ -145,8 +145,8 @@ export default function PortalNav({ customerName }: { customerName: string }) {
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors ${
                     isActive
-                      ? "bg-[#6366f1]/20 text-[#6366f1]"
-                      : "text-[#94a3b8] hover:text-[#f1f5f9] hover:bg-[#334155]"
+                      ? "bg-[#00d4ff]/20 text-[#00d4ff]"
+                      : "text-[#94a3b8] hover:text-[#f1f5f9] hover:bg-[#1a1a24]"
                   }`}
                 >
                   <item.icon className="w-5 h-5" />

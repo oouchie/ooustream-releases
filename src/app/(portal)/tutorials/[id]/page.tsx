@@ -183,13 +183,13 @@ export default function TutorialPage() {
   const getCategoryColor = (category: string) => {
     switch (category) {
       case "Setup":
-        return "text-[#6366f1] bg-[#6366f1]/20";
+        return "text-[#00d4ff] bg-[#00d4ff]/20";
       case "Apps":
         return "text-[#22c55e] bg-[#22c55e]/20";
       case "Support":
         return "text-[#f59e0b] bg-[#f59e0b]/20";
       default:
-        return "text-[#6366f1] bg-[#6366f1]/20";
+        return "text-[#00d4ff] bg-[#00d4ff]/20";
     }
   };
 
@@ -225,7 +225,7 @@ export default function TutorialPage() {
 
       {/* Video Player Placeholder */}
       <div className="card p-0 overflow-hidden">
-        <div className="aspect-video bg-[#1e293b] flex items-center justify-center">
+        <div className="aspect-video bg-[#12121a] flex items-center justify-center">
           {tutorial.videoUrl ? (
             <iframe
               src={tutorial.videoUrl}
@@ -252,8 +252,8 @@ export default function TutorialPage() {
             {tutorial.steps.map((step, index) => (
               <div key={index} className="card">
                 <div className="flex gap-4">
-                  <div className="w-8 h-8 rounded-full bg-[#6366f1]/20 flex items-center justify-center flex-shrink-0">
-                    <span className="text-sm font-semibold text-[#6366f1]">{index + 1}</span>
+                  <div className="w-8 h-8 rounded-full bg-[#00d4ff]/20 flex items-center justify-center flex-shrink-0">
+                    <span className="text-sm font-semibold text-[#00d4ff]">{index + 1}</span>
                   </div>
                   <div>
                     <h3 className="font-medium text-[#f1f5f9]">{step.title}</h3>
@@ -288,7 +288,7 @@ export default function TutorialPage() {
       )}
 
       {/* Help CTA */}
-      <div className="card bg-gradient-to-r from-[#6366f1]/10 to-[#8b5cf6]/10 border-[#6366f1]/30">
+      <div className="card bg-gradient-to-r from-[#00d4ff]/10 to-[#7c3aed]/10 border-[#00d4ff]/30">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div>
             <h3 className="font-semibold text-[#f1f5f9]">Still need help?</h3>
