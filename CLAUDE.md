@@ -7,6 +7,14 @@ Customer-facing portal and reseller management system.
 - Supabase (shared with CRM)
 - SendGrid (email)
 - JWT (customer sessions)
+- Tailwind CSS
+
+## Design
+- **Primary color**: Cyan #00d4ff
+- **Secondary color**: Purple #7c3aed
+- **Background**: Near-black #0a0a0f
+- **Fonts**: Space Grotesk (headings), JetBrains Mono (code)
+- Dark theme with glow effects
 
 ## Portals
 
@@ -15,8 +23,9 @@ Customer-facing portal and reseller management system.
 - Username lookup login
 - View subscription status
 - View credentials
+- **Expiry date with countdown** (days remaining, color-coded warnings)
 - Support tickets
-- Tutorial videos
+- Tutorial videos (YouTube embeds)
 
 ### Admin Portal (/admin)
 - Password: `ADMIN_PASSWORD` env var
@@ -57,14 +66,15 @@ SMS_ENABLED=false
 - `/reseller-login` - Reseller login (select reseller + password)
 
 ### Customer (protected)
-- `/` - Redirects to /subscription if logged in
-- `/subscription` - Account status
+- `/` - Dashboard with expiry date, status, quick actions
+- `/subscription` - Account status and plan details
 - `/credentials` - View login credentials
 - `/support` - Ticket list
 - `/support/new` - Create ticket
 - `/support/[id]` - View ticket
 - `/help` - FAQ and guides
-- `/tutorials` - Video tutorials
+- `/tutorials` - Video tutorials (YouTube embeds)
+- `/tutorials/[id]` - Individual tutorial
 
 ### Admin (protected)
 - `/admin` - Dashboard
@@ -79,20 +89,39 @@ SMS_ENABLED=false
 - `/reseller/customers/[id]` - View customer + send buttons
 - `/reseller/customers/[id]/edit` - Edit customer
 
+## Tutorial Videos
+- Ooustream Setup Tutorial - Part 1 (YouTube)
+- Ooustream Setup Tutorial - Part 2 (YouTube)
+- Downloading Aurora (YouTube)
+- Plus placeholder guides for setup, apps, troubleshooting
+
 ## Auth Flow
 1. Customer clicks magic link from email
 2. `/verify?token=xxx` validates token
 3. JWT session cookie set (7 days)
-4. Redirected to `/subscription`
+4. Redirected to dashboard
 
 ## Database (shared with CRM)
 Uses same Supabase instance as CRM:
-- customers
+- customers (with expiry_date)
 - magic_links
 - support_tickets
 - ticket_messages
 - service_announcements
 - audit_logs
+
+## Brand Assets (public/)
+- favicon.ico, icon-192.png, icon-512.png
+- apple-touch-icon.png
+- logo-full-on-dark.png, logo-mark-transparent.png
+- og-image.png
+
+## Email Templates
+All emails include logo and use brand gradient (#00d4ff to #7c3aed):
+- Magic link login
+- Credentials
+- Portal access
+- Welcome emails
 
 ## Deployment
 - Vercel
