@@ -21,7 +21,7 @@ const tutorialData: Record<string, TutorialContent> = {
     description: "Complete guide to getting started with Ooustream. Learn everything you need to know to set up your service.",
     category: "Setup",
     duration: "Video",
-    videoUrl: "https://www.youtube.com/embed/3qa4cgaLdIg",
+    videoUrl: "https://www.youtube.com/embed/NiG6f0aTptQ",
     steps: [
       {
         title: "Watch the Full Tutorial",
@@ -40,7 +40,7 @@ const tutorialData: Record<string, TutorialContent> = {
     description: "Continue your setup with advanced features and tips for the best streaming experience.",
     category: "Setup",
     duration: "Video",
-    videoUrl: "https://www.youtube.com/embed/NiG6f0aTptQ",
+    videoUrl: "https://www.youtube.com/embed/3qa4cgaLdIg",
     steps: [
       {
         title: "Advanced Configuration",
