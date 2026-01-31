@@ -80,7 +80,7 @@ export default function PortalNav({ customerName }: { customerName: string }) {
             <img
               src="/logo-full-on-dark.png"
               alt="Ooustream"
-              className="h-8 w-auto"
+              className="h-12 w-auto"
             />
           </Link>
 
