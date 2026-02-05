@@ -113,7 +113,7 @@ export async function sendMagicLinkEmail(
         <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px;">
           <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
             <div style="background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%); padding: 30px; text-align: center;">
-              <img src="https://portal.ooustick.com/logo-full-on-dark.png" alt="Ooustream" style="height: 40px; width: auto;" />
+              <img src="https://ooustick.com/logo-full-on-dark.png" alt="Ooustick" style="height: 60px; width: auto;" />
               <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">Customer Portal</p>
             </div>
             <div style="padding: 30px;">
