@@ -26,6 +26,12 @@ export default function ResellerEditCustomerPage() {
     username_4: "",
     password_4: "",
     notes: "",
+    expiry_date: "",
+    billing_type: "manual",
+    billing_period: "monthly",
+    custom_price_monthly: "",
+    custom_price_6month: "",
+    custom_price_yearly: "",
   });
 
   useEffect(() => {
@@ -52,6 +58,12 @@ export default function ResellerEditCustomerPage() {
           username_4: data.username_4 || "",
           password_4: data.password_4 || "",
           notes: data.notes || "",
+          expiry_date: data.expiry_date || "",
+          billing_type: data.billing_type || "manual",
+          billing_period: data.billing_period || "monthly",
+          custom_price_monthly: data.custom_price_monthly ? String(data.custom_price_monthly / 100) : "",
+          custom_price_6month: data.custom_price_6month ? String(data.custom_price_6month / 100) : "",
+          custom_price_yearly: data.custom_price_yearly ? String(data.custom_price_yearly / 100) : "",
         });
       } else {
         router.push("/reseller/customers");
@@ -69,11 +81,20 @@ export default function ResellerEditCustomerPage() {
     setSaving(true);
     setError("");
 
+    // Convert prices from dollars to cents
+    const submitData = {
+      ...form,
+      custom_price_monthly: form.custom_price_monthly ? Math.round(parseFloat(form.custom_price_monthly) * 100) : null,
+      custom_price_6month: form.custom_price_6month ? Math.round(parseFloat(form.custom_price_6month) * 100) : null,
+      custom_price_yearly: form.custom_price_yearly ? Math.round(parseFloat(form.custom_price_yearly) * 100) : null,
+      expiry_date: form.expiry_date || null,
+    };
+
     try {
       const res = await fetch(`/api/reseller/customers/${params.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(submitData),
       });
 
       if (res.ok) {
@@ -282,6 +303,105 @@ export default function ResellerEditCustomerPage() {
                   onChange={handleChange}
                   className="input w-full"
                 />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Billing Settings */}
+        <div>
+          <h2 className="text-lg font-semibold text-[#f1f5f9] mb-4">Billing Settings</h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <label className="label">Expiry Date</label>
+              <input
+                type="date"
+                name="expiry_date"
+                value={form.expiry_date}
+                onChange={handleChange}
+                className="input w-full"
+              />
+            </div>
+            <div>
+              <label className="label">Billing Type</label>
+              <select
+                name="billing_type"
+                value={form.billing_type}
+                onChange={handleChange}
+                className="input w-full"
+              >
+                <option value="manual">Manual (Pay when expiring)</option>
+                <option value="auto">Auto-Renew (Stripe subscription)</option>
+              </select>
+            </div>
+            <div>
+              <label className="label">Billing Period</label>
+              <select
+                name="billing_period"
+                value={form.billing_period}
+                onChange={handleChange}
+                className="input w-full"
+              >
+                <option value="monthly">Monthly ($20)</option>
+                <option value="6month">6 Months ($90)</option>
+                <option value="yearly">Yearly ($170)</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Custom Pricing */}
+          <div className="mt-4 p-4 bg-[#0f172a] rounded-lg">
+            <p className="text-sm text-[#94a3b8] mb-3">
+              Custom pricing (leave blank for standard rates). Enter amounts in dollars.
+            </p>
+            <div className="grid gap-4 md:grid-cols-3">
+              <div>
+                <label className="label">Monthly Price</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94a3b8]">$</span>
+                  <input
+                    type="number"
+                    name="custom_price_monthly"
+                    value={form.custom_price_monthly}
+                    onChange={handleChange}
+                    placeholder="20.00"
+                    step="0.01"
+                    min="0"
+                    className="input w-full pl-7"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="label">6-Month Price</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94a3b8]">$</span>
+                  <input
+                    type="number"
+                    name="custom_price_6month"
+                    value={form.custom_price_6month}
+                    onChange={handleChange}
+                    placeholder="90.00"
+                    step="0.01"
+                    min="0"
+                    className="input w-full pl-7"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="label">Yearly Price</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#94a3b8]">$</span>
+                  <input
+                    type="number"
+                    name="custom_price_yearly"
+                    value={form.custom_price_yearly}
+                    onChange={handleChange}
+                    placeholder="170.00"
+                    step="0.01"
+                    min="0"
+                    className="input w-full pl-7"
+                  />
+                </div>
               </div>
             </div>
           </div>

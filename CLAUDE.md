@@ -5,6 +5,7 @@ Customer-facing portal and reseller management system.
 ## Tech Stack
 - Next.js 16 (App Router)
 - Supabase (shared with CRM)
+- Stripe (payments)
 - SendGrid (email)
 - JWT (customer sessions)
 - Tailwind CSS
@@ -24,6 +25,8 @@ Customer-facing portal and reseller management system.
 - View subscription status
 - View credentials
 - **Expiry date with countdown** (days remaining, color-coded warnings)
+- **Billing page** - Pay via Stripe Checkout
+- Payment history
 - Support tickets
 - Tutorial videos (YouTube embeds)
 
@@ -39,13 +42,22 @@ Customer-facing portal and reseller management system.
 - Prime: password `prime2024`
 - Dashboard with their customer stats
 - Full customer management (add, edit, view)
+- **Set billing settings and custom pricing**
 - Send credentials and portal access emails
 - Only see their own customers
+
+## Payment System
+- **Stripe Checkout** for payments
+- **Pricing**: $20/month, $90/6-months, $170/year
+- **Custom pricing**: Resellers can set discounted prices per customer
+- **Billing types**: Auto-renew (subscription) or Manual (one-time)
+- **Webhook**: `/api/webhooks/stripe` handles payment completion
 
 ## Environment Variables
 ```
 SUPABASE_URL=
 SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
 JWT_SECRET=
 ADMIN_PASSWORD=oostream2024
 SENDGRID_API_KEY=
@@ -55,6 +67,11 @@ NEXT_PUBLIC_CRM_URL=https://ooustream-crm.vercel.app
 RESELLER_SHUN_PASSWORD=shun2024
 RESELLER_PRIME_PASSWORD=prime2024
 SMS_ENABLED=false
+
+# Stripe
+STRIPE_SECRET_KEY=sk_live_...
+STRIPE_PUBLISHABLE_KEY=pk_live_...
+STRIPE_WEBHOOK_SECRET=whsec_...
 ```
 
 ## Routes
@@ -68,6 +85,10 @@ SMS_ENABLED=false
 ### Customer (protected)
 - `/` - Dashboard with expiry date, status, quick actions
 - `/subscription` - Account status and plan details
+- `/billing` - Make payment via Stripe
+- `/billing/history` - Payment history
+- `/billing/success` - Payment success page
+- `/billing/cancel` - Payment cancelled page
 - `/credentials` - View login credentials
 - `/support` - Ticket list
 - `/support/new` - Create ticket
@@ -103,7 +124,8 @@ SMS_ENABLED=false
 
 ## Database (shared with CRM)
 Uses same Supabase instance as CRM:
-- customers (with expiry_date)
+- customers (with expiry_date, billing fields, custom prices)
+- payments (Stripe payment records)
 - magic_links
 - support_tickets
 - ticket_messages

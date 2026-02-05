@@ -21,18 +21,34 @@ interface Customer {
   password_4: string | null;
   notes: string | null;
   created_at: string;
+  expiry_date: string | null;
+  billing_type: string;
+  billing_period: string;
+  custom_price_monthly: number | null;
+  custom_price_6month: number | null;
+  custom_price_yearly: number | null;
+}
+
+interface Payment {
+  id: string;
+  amount: number;
+  status: string;
+  billing_period: string;
+  created_at: string;
 }
 
 export default function ResellerCustomerDetailPage() {
   const router = useRouter();
   const params = useParams();
   const [customer, setCustomer] = useState<Customer | null>(null);
+  const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
     fetchCustomer();
+    fetchBilling();
   }, [params.id]);
 
   const fetchCustomer = async () => {
@@ -49,6 +65,18 @@ export default function ResellerCustomerDetailPage() {
       router.push("/reseller/customers");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchBilling = async () => {
+    try {
+      const res = await fetch(`/api/reseller/customers/${params.id}/billing`);
+      if (res.ok) {
+        const data = await res.json();
+        setPayments(data.payments || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch billing:", error);
     }
   };
 
@@ -234,6 +262,100 @@ export default function ResellerCustomerDetailPage() {
             )}
           </div>
         </div>
+      </div>
+
+      {/* Billing Info */}
+      <div className="card">
+        <h2 className="text-lg font-semibold text-[#f1f5f9] mb-4">Billing Information</h2>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="bg-[#1e293b] p-4 rounded-lg">
+            <p className="text-sm text-[#94a3b8] mb-1">Expiry Date</p>
+            <p className="text-[#f1f5f9] font-medium">
+              {customer.expiry_date
+                ? new Date(customer.expiry_date).toLocaleDateString()
+                : "Not set"}
+            </p>
+            {customer.expiry_date && (
+              <p className={`text-xs mt-1 ${
+                new Date(customer.expiry_date) < new Date()
+                  ? "text-[#ef4444]"
+                  : new Date(customer.expiry_date) < new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+                    ? "text-[#f59e0b]"
+                    : "text-[#22c55e]"
+              }`}>
+                {new Date(customer.expiry_date) < new Date()
+                  ? "Expired"
+                  : `${Math.ceil((new Date(customer.expiry_date).getTime() - Date.now()) / (1000 * 60 * 60 * 24))} days left`}
+              </p>
+            )}
+          </div>
+          <div className="bg-[#1e293b] p-4 rounded-lg">
+            <p className="text-sm text-[#94a3b8] mb-1">Billing Type</p>
+            <p className="text-[#f1f5f9] font-medium capitalize">
+              {customer.billing_type || "Manual"}
+            </p>
+          </div>
+          <div className="bg-[#1e293b] p-4 rounded-lg">
+            <p className="text-sm text-[#94a3b8] mb-1">Billing Period</p>
+            <p className="text-[#f1f5f9] font-medium">
+              {customer.billing_period === "6month"
+                ? "6 Months"
+                : customer.billing_period === "yearly"
+                  ? "Yearly"
+                  : "Monthly"}
+            </p>
+          </div>
+          <div className="bg-[#1e293b] p-4 rounded-lg">
+            <p className="text-sm text-[#94a3b8] mb-1">Custom Pricing</p>
+            {customer.custom_price_monthly || customer.custom_price_6month || customer.custom_price_yearly ? (
+              <div className="text-xs text-[#f1f5f9] space-y-1">
+                {customer.custom_price_monthly && (
+                  <p>Monthly: ${(customer.custom_price_monthly / 100).toFixed(2)}</p>
+                )}
+                {customer.custom_price_6month && (
+                  <p>6-Month: ${(customer.custom_price_6month / 100).toFixed(2)}</p>
+                )}
+                {customer.custom_price_yearly && (
+                  <p>Yearly: ${(customer.custom_price_yearly / 100).toFixed(2)}</p>
+                )}
+              </div>
+            ) : (
+              <p className="text-[#94a3b8]">Standard rates</p>
+            )}
+          </div>
+        </div>
+
+        {/* Recent Payments */}
+        {payments.length > 0 && (
+          <div className="mt-6">
+            <h3 className="text-sm font-medium text-[#94a3b8] mb-3">Recent Payments</h3>
+            <div className="space-y-2">
+              {payments.slice(0, 5).map((payment) => (
+                <div
+                  key={payment.id}
+                  className="flex items-center justify-between p-3 bg-[#1e293b] rounded-lg"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className={`w-2 h-2 rounded-full ${
+                      payment.status === "succeeded" ? "bg-[#22c55e]" :
+                      payment.status === "failed" ? "bg-[#ef4444]" : "bg-[#f59e0b]"
+                    }`} />
+                    <span className="text-[#f1f5f9]">
+                      ${(payment.amount / 100).toFixed(2)}
+                    </span>
+                    <span className="text-sm text-[#94a3b8]">
+                      {payment.billing_period === "6month" ? "6 months" :
+                       payment.billing_period === "yearly" ? "1 year" : "1 month"}
+                    </span>
+                  </div>
+                  <span className="text-sm text-[#94a3b8]">
+                    {new Date(payment.created_at).toLocaleDateString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Credentials */}

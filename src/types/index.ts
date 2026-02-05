@@ -17,6 +17,41 @@ export interface Customer {
   notes: string | null;
   created_at: string;
   updated_at: string;
+  // Billing fields
+  expiry_date: string | null;
+  reseller: string | null;
+  billing_type: 'auto' | 'manual';
+  billing_period: BillingPeriod;
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+  custom_price_monthly: number | null;
+  custom_price_6month: number | null;
+  custom_price_yearly: number | null;
+  auto_renew_enabled: boolean;
+}
+
+export type BillingPeriod = 'monthly' | '6month' | 'yearly';
+
+export type PaymentStatus = 'pending' | 'processing' | 'succeeded' | 'failed' | 'refunded';
+
+// Payment record
+export interface Payment {
+  id: string;
+  customer_id: string;
+  stripe_checkout_session_id: string | null;
+  stripe_payment_intent_id: string | null;
+  stripe_invoice_id: string | null;
+  amount: number;
+  currency: string;
+  status: PaymentStatus;
+  billing_period: BillingPeriod;
+  period_start: string | null;
+  period_end: string | null;
+  payment_type: 'one_time' | 'subscription';
+  description: string | null;
+  failure_reason: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 // Support Ticket
