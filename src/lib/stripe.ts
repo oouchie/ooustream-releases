@@ -71,7 +71,7 @@ export async function createCheckoutSession({
   const session = await stripe.checkout.sessions.create({
     customer: stripeCustomerId,
     customer_email: stripeCustomerId ? undefined : customerEmail,
-    payment_method_types: ['card'],
+    // Let Stripe show all enabled payment methods (Card, Cash App, Apple Pay, etc.)
     line_items: [
       {
         price_data: {
