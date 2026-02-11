@@ -361,6 +361,18 @@ export default function ResellerCustomerDetailPage() {
       {/* Credentials */}
       <div className="card">
         <h2 className="text-lg font-semibold text-[#f1f5f9] mb-4">Login Credentials</h2>
+
+        {/* Playlist URL */}
+        <div className="bg-[#0f172a] border border-[#00d4ff]/30 p-4 rounded-lg mb-4">
+          <div className="flex justify-between items-center">
+            <div>
+              <p className="text-sm text-[#94a3b8] mb-1">Playlist URL</p>
+              <p className="text-[#00d4ff] font-mono">https://flarecoral.com</p>
+            </div>
+            <span className="text-xs text-[#00d4ff] bg-[#00d4ff]/10 px-2 py-1 rounded">All accounts</span>
+          </div>
+        </div>
+
         {credentials.length > 0 ? (
           <div className="grid gap-4 md:grid-cols-2">
             {credentials.map((cred, i) => (

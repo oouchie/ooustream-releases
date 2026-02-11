@@ -62,7 +62,10 @@ export async function GET() {
       });
     }
 
-    return NextResponse.json({ credentials });
+    return NextResponse.json({
+      credentials,
+      playlistUrl: "https://flarecoral.com",
+    });
   } catch (error) {
     console.error("Credentials fetch error:", error);
     return NextResponse.json(

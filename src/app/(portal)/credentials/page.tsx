@@ -11,6 +11,7 @@ interface Credential {
 
 export default function CredentialsPage() {
   const [credentials, setCredentials] = useState<Credential[]>([]);
+  const [playlistUrl, setPlaylistUrl] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [showPasswords, setShowPasswords] = useState<Record<number, boolean>>({});
 
@@ -25,6 +26,9 @@ export default function CredentialsPage() {
 
       if (data.credentials) {
         setCredentials(data.credentials);
+      }
+      if (data.playlistUrl) {
+        setPlaylistUrl(data.playlistUrl);
       }
     } catch (error) {
       console.error("Failed to fetch credentials:", error);
@@ -107,6 +111,45 @@ export default function CredentialsPage() {
           Send to Email
         </button>
       </div>
+
+      {/* Playlist URL */}
+      {playlistUrl && (
+        <div className="card border-[#00d4ff]/30 bg-[#00d4ff]/5">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="font-medium text-[#f1f5f9]">Playlist URL</h3>
+            <span className="text-xs text-[#00d4ff] bg-[#00d4ff]/10 px-2 py-1 rounded">
+              Required for all apps
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex-1 bg-[#0f172a] border border-[#334155] rounded-lg px-4 py-3 font-mono text-[#00d4ff]">
+              {playlistUrl}
+            </div>
+            <button
+              onClick={() => copyToClipboard(playlistUrl, "Playlist URL")}
+              className="p-3 bg-[#334155] hover:bg-[#475569] rounded-lg transition-colors"
+              title="Copy playlist URL"
+            >
+              <svg
+                className="w-5 h-5 text-[#94a3b8]"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                />
+              </svg>
+            </button>
+          </div>
+          <p className="text-xs text-[#94a3b8] mt-2">
+            Enter this URL as the server/playlist URL in your IPTV app
+          </p>
+        </div>
+      )}
 
       {/* Credentials List */}
       {credentials.length === 0 ? (

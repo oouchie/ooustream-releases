@@ -88,6 +88,12 @@ export async function POST(
 
               <p style="color: #4b5563;">Here are your login credentials as requested:</p>
 
+              <div style="background-color: #f0fdff; padding: 16px; border-radius: 8px; margin-bottom: 16px; border: 1px solid #00d4ff;">
+                <p style="margin: 0 0 4px 0; font-weight: 600; color: #374151;">Playlist URL</p>
+                <p style="margin: 0; color: #00838f; font-family: monospace; font-size: 16px; word-break: break-all;">https://flarecoral.com</p>
+                <p style="margin: 4px 0 0 0; color: #6b7280; font-size: 12px;">Enter this as the server/playlist URL in your IPTV app</p>
+              </div>
+
               ${credentialsHtml}
 
               <p style="color: #4b5563; margin-top: 20px;">
