@@ -1,0 +1,12 @@
+{                                                                                                                                                    
+    "version": "1.0.0",                                                                                                                                    "versionCode": 1,                                                                                                                                  
+    "releaseDate": "2025-02-07",                                                                                                                           "changelog": [                                                                                                                                           "Initial release",                                                                                                                               
+      "Live TV with EPG support",
+      "Movies and Series streaming",
+      "Favorites with long-press",
+      "Fire TV optimized"
+    ],
+    "downloadUrl": "https://github.com/oouchie/ooustream-releases/releases/download/v1.0.0/ooustream-v1.0.0.apk",
+    "mandatory": false,
+    "minVersion": "1.0.0"
+  }
