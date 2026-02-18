@@ -206,6 +206,39 @@ This is a known issue being actively fixed. When a customer clicks play on a mov
 3. Live TV should still work. Use that while the VOD fix is being pushed
 4. They can also watch VOD through IPTV Smarters as a temporary backup
 
+=== Storage Permission Denied in Downloader ===
+If Downloader shows "Storage permission required to save a file":
+The customer accidentally denied storage permission when Downloader first asked. Common — people hit deny out of habit.
+1. Hit the house button on the remote
+2. Go to Settings > Applications > Manage Installed Applications
+3. Find Downloader > Clear Data
+4. Launch Downloader again
+5. When it asks for storage permission, tap ALLOW this time
+6. Then re-enter the download code **3171512**
+
+=== "Audio Format Not Supported" / No Sound on Channels ===
+If channels play video but no audio, or customer sees "Audio format not supported":
+1. Update the Ooustream app: open app > Settings > Check for Update
+2. If the app says "up to date" but the version is old, try again in a few minutes — the update may still be propagating
+3. If still no sound after updating, some specific channels may have audio codec issues being worked on
+4. As a temporary fix, use IPTV Smarters with the same credentials — it handles more audio formats
+5. If the issue persists, create a support ticket with the specific channels affected
+
+=== Wrong Settings (Device vs App) ===
+Customers often go to the DEVICE settings (Firestick Settings) instead of the OOUSTREAM APP settings.
+- The Ooustream app update is INSIDE the app itself, not in Firestick Settings
+- App Settings: Open Ooustream > look for Settings on the same row as Live TV, Movies buttons
+- Device Settings: This is for Firestick system stuff (WiFi, Developer Options, etc.) — NOT for app updates
+- If they send a screenshot of generic device settings, redirect them to open the Ooustream app first
+
+=== Channels Crashing / Jumping to Amazon Home ===
+If clicking certain channels kicks the customer all the way back to the Amazon home screen (not just the app home):
+1. This is an app crash. Ask them to go to Ooustream Settings > Crash Logs
+2. Have them screenshot the crash logs and send them — ask for clear, readable pictures
+3. They can scroll down in crash logs for more details
+4. While the crash is being fixed, direct them to IPTV Smarters as backup with the same credentials and playlist URL
+5. Let them know the team is actively working on fixes
+
 === Security Warning: "Not Allowed to Install Unknown Apps" ===
 When updating the Ooustream app, Firestick may show a security warning.
 1. Go to Firestick Settings (not app settings) and allow unknown sources for the Ooustream app
