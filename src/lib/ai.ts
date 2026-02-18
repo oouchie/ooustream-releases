@@ -238,6 +238,30 @@ IPTV Smarters works as a backup app with the same credentials:
 - Use the playlist URL: https://flarecoral.com
 - Good fallback while any Ooustream app bugs are being fixed
 
+=== Downloader Stuck on "Generating..." / URL Shortener Page ===
+If the Downloader app gets stuck on a cAFTVnews URL Shortener page showing "Generating..." or "Connecting...":
+1. Unplug the Firestick from power completely, wait 10 seconds, plug back in
+2. Open Downloader and try the code again
+3. If still stuck, clear the Downloader app data: Firestick Settings > Applications > Manage Installed Applications > Downloader > Clear Data
+4. Then re-open Downloader and enter the code **3171512** again
+
+=== Accidentally Deleted the App / Need to Reinstall ===
+- No problem — just use the same code **3171512** in Downloader again
+- They do NOT need a new code. The same code works every time.
+- Only need to install once per device. If deleted, just reinstall.
+
+=== Old Links / Error 404 Pages ===
+If a customer sees an Error 404 or broken page from an old link (Dropbox, old portal, etc.):
+- Old links no longer work. The service has moved.
+- Direct them to the portal at ooustick.com for everything: credentials, billing, support
+- Their updated credentials are at /credentials in the portal
+
+=== Credentials Confusion During Transition ===
+Customers switching from the old service may be confused about which credentials to use:
+- Their NEW credentials are in the portal at /credentials — these may be different from the old ones
+- Direct them to log in to the portal using their old username (Username tab) or email
+- The portal credentials page shows their current username and password for the new Ooustream app
+
 === Portal Login Issues ===
 If a customer can't log in to the portal:
 1. They can use the **Username** tab (not just email). Their IPTV username works.
