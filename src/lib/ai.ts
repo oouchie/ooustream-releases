@@ -5,6 +5,11 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 });
 
+export interface CustomerCredential {
+  username: string;
+  password: string;
+}
+
 export interface CustomerContext {
   name: string;
   email: string;
@@ -14,6 +19,7 @@ export interface CustomerContext {
   days_until_expiry: number | null;
   has_credentials: boolean;
   credential_count: number;
+  credentials: CustomerCredential[];
   billing_type: string;
   billing_period: string;
 }
@@ -25,19 +31,21 @@ export async function buildCustomerContext(
   const { data: customer } = await supabase
     .from("customers")
     .select(
-      "name, email, status, service_type, expiry_date, billing_type, billing_period, username_1, username_2, username_3, username_4"
+      "name, email, status, service_type, expiry_date, billing_type, billing_period, username_1, password_1, username_2, password_2, username_3, password_3, username_4, password_4"
     )
     .eq("id", customerId)
     .single();
 
   if (!customer) throw new Error("Customer not found");
 
-  const credentialCount = [
-    customer.username_1,
-    customer.username_2,
-    customer.username_3,
-    customer.username_4,
-  ].filter(Boolean).length;
+  const credentials: CustomerCredential[] = [
+    { username: customer.username_1, password: customer.password_1 },
+    { username: customer.username_2, password: customer.password_2 },
+    { username: customer.username_3, password: customer.password_3 },
+    { username: customer.username_4, password: customer.password_4 },
+  ].filter((c): c is CustomerCredential => Boolean(c.username && c.password));
+
+  const credentialCount = credentials.length;
 
   const expiryDate = customer.expiry_date
     ? new Date(customer.expiry_date)
@@ -55,6 +63,7 @@ export async function buildCustomerContext(
     days_until_expiry: daysUntilExpiry,
     has_credentials: credentialCount > 0,
     credential_count: credentialCount,
+    credentials,
     billing_type: customer.billing_type || "manual",
     billing_period: customer.billing_period || "monthly",
   };
@@ -93,6 +102,7 @@ CUSTOMER CONTEXT:
 - Expiry Date: ${expiryFormatted}
 - Days Until Expiry: ${expiryStatus}
 - Has Credentials: ${ctx.has_credentials ? `Yes (${ctx.credential_count} set${ctx.credential_count > 1 ? "s" : ""})` : "No"}
+${ctx.credentials.length > 0 ? ctx.credentials.map((c, i) => `- Credential Set ${i + 1}: Username: ${c.username} | Password: ${c.password}`).join("\n") : ""}
 - Billing Type: ${ctx.billing_type}
 
 KNOWLEDGE BASE:
@@ -174,14 +184,24 @@ Recommended apps: VLC Media Player, IPTV Smarters, MyIPTV Player
 
 == Switching to the New Ooustream App ==
 IMPORTANT: This is the #1 priority instruction for customers transitioning to the new app.
-1. Watch the full setup video ALL THE WAY TO THE END: https://youtu.be/XIsThctDUxI
-   - Do NOT skip ahead. The video contains critical steps that must be followed in order.
-2. Immediately after the video ends, open the Downloader app on your device.
-3. In the URL bar of the Downloader app, enter the download code: 3171512
-4. This will download and install the new Ooustream app.
-5. Open the new app and enter your credentials from the portal.
-- If the customer has trouble, remind them to watch the ENTIRE video first before entering the code.
-- Credentials for the new app may be different from the old ones. Always direct customers to check /credentials in the portal for their latest username and password.
+When a customer mentions switching, new app, transition, updating, or migrating — IMMEDIATELY respond with the full walkthrough including their credentials. Use markdown links for the video URL so it is tappable.
+
+Your response MUST include:
+1. Their credentials displayed clearly (use the credential sets from CUSTOMER CONTEXT above)
+2. A clickable video link: [Watch the Setup Video](https://youtu.be/XIsThctDUxI)
+3. The download code: **3171512**
+4. Step-by-step instructions
+
+WALKTHROUGH STEPS:
+1. First, here are your new credentials (show each credential set with username and password)
+2. Watch this setup video ALL THE WAY TO THE END — do not skip ahead: [Watch the Setup Video](https://youtu.be/XIsThctDUxI)
+3. Immediately after the video ends, open the Downloader app on your device
+4. In the URL bar of the Downloader app, enter the download code: **3171512**
+5. This will download and install the new Ooustream app
+6. Open the new app and enter the credentials shown above
+
+- EMPHASIZE: They must watch the ENTIRE video before entering the code
+- Their credentials for the new app are shown above from their account — these may be different from the old app
 
 == Tutorial Videos ==
 - "Switching to New Ooustream App": https://youtu.be/XIsThctDUxI

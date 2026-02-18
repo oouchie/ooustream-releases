@@ -117,6 +117,58 @@ export default function AIChatWidget() {
     }
   };
 
+  // Render markdown-ish text: links, bold, and code
+  const renderMarkdown = (text: string) => {
+    // Split by markdown patterns and build React elements
+    const parts: (string | JSX.Element)[] = [];
+    let remaining = text;
+    let key = 0;
+
+    while (remaining.length > 0) {
+      // Find the next markdown pattern
+      const linkMatch = remaining.match(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/);
+      const boldMatch = remaining.match(/\*\*([^*]+)\*\*/);
+
+      // Find which comes first
+      const linkIdx = linkMatch ? remaining.indexOf(linkMatch[0]) : Infinity;
+      const boldIdx = boldMatch ? remaining.indexOf(boldMatch[0]) : Infinity;
+
+      if (linkIdx === Infinity && boldIdx === Infinity) {
+        // No more patterns — push remaining text
+        parts.push(remaining);
+        break;
+      }
+
+      if (linkIdx <= boldIdx && linkMatch) {
+        // Link comes first
+        if (linkIdx > 0) parts.push(remaining.substring(0, linkIdx));
+        parts.push(
+          <a
+            key={key++}
+            href={linkMatch[2]}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#00d4ff] underline hover:text-[#00b8d9]"
+          >
+            {linkMatch[1]}
+          </a>
+        );
+        remaining = remaining.substring(linkIdx + linkMatch[0].length);
+      } else if (boldMatch) {
+        // Bold comes first
+        if (boldIdx > 0) parts.push(remaining.substring(0, boldIdx));
+        parts.push(
+          <strong key={key++} className="font-semibold text-[#f1f5f9]">
+            {boldMatch[1]}
+          </strong>
+        );
+        remaining = remaining.substring(boldIdx + boldMatch[0].length);
+      }
+    }
+
+    return parts;
+  };
+
   return (
     <div className="card overflow-hidden border-[#7c3aed]/30 bg-gradient-to-r from-[#7c3aed]/5 to-[#00d4ff]/5">
       {/* Header — always visible */}
@@ -175,9 +227,9 @@ export default function AIChatWidget() {
                 </p>
                 <div className="flex flex-wrap justify-center gap-2 mt-4">
                   {[
+                    "I'm switching to the new app",
                     "How do I set up my Firestick?",
                     "Why is my stream buffering?",
-                    "When does my subscription expire?",
                   ].map((q) => (
                     <button
                       key={q}
@@ -211,7 +263,7 @@ export default function AIChatWidget() {
                     </div>
                   )}
                   <div className="text-sm whitespace-pre-wrap leading-relaxed">
-                    {msg.content}
+                    {msg.role === "assistant" ? renderMarkdown(msg.content) : msg.content}
                   </div>
                 </div>
               </div>
