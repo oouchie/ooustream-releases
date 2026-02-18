@@ -120,7 +120,7 @@ export default function AIChatWidget() {
   // Render markdown-ish text: links, bold, and code
   const renderMarkdown = (text: string) => {
     // Split by markdown patterns and build React elements
-    const parts: (string | JSX.Element)[] = [];
+    const parts: (string | React.ReactElement)[] = [];
     let remaining = text;
     let key = 0;
 
