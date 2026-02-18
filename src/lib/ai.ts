@@ -172,7 +172,19 @@ Recommended apps: VLC Media Player, IPTV Smarters, MyIPTV Player
 - After expiration, credentials stay the same - just renew to reactivate
 - Payment history available at /billing/history
 
+== Switching to the New Ooustream App ==
+IMPORTANT: This is the #1 priority instruction for customers transitioning to the new app.
+1. Watch the full setup video ALL THE WAY TO THE END: https://youtu.be/XIsThctDUxI
+   - Do NOT skip ahead. The video contains critical steps that must be followed in order.
+2. Immediately after the video ends, open the Downloader app on your device.
+3. In the URL bar of the Downloader app, enter the download code: 3171512
+4. This will download and install the new Ooustream app.
+5. Open the new app and enter your existing credentials (same username and password).
+- If the customer has trouble, remind them to watch the ENTIRE video first before entering the code.
+- Their existing credentials (username/password) stay the same — no changes needed.
+
 == Tutorial Videos ==
+- "Switching to New Ooustream App": https://youtu.be/XIsThctDUxI
 - "Ooustream Setup Tutorial - Part 1": /tutorials/ooustream-setup-1
 - "Ooustream Setup Tutorial - Part 2": /tutorials/ooustream-setup-2
 - "Downloading Aurora": /tutorials/downloading-aurora
