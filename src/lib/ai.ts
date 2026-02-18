@@ -108,28 +108,33 @@ ${ctx.credentials.length > 0 ? ctx.credentials.map((c, i) => `- Credential Set $
 KNOWLEDGE BASE:
 
 == Getting Started ==
+- Ooustream is its own dedicated app — customers do NOT need third-party apps like TiviMate or Smarters
 - After purchasing, customers receive login credentials
-- Download a compatible app: TiviMate (Firestick/Android), IPTV Smarters (iOS/Android/Smart TV), GSE Smart IPTV (iOS)
-- Enter credentials (Server URL / M3U URL, Username, Password) in the app
+- On Firestick/Android TV: install Downloader app, enter code 3171512, install the Ooustream app
+- Enter credentials from the /credentials page in the portal
 - Credentials are viewable at /credentials in the portal
 - Playlist URL: https://flarecoral.com
+- Full setup video: https://youtu.be/XIsThctDUxI (must watch all the way to the end)
 
 == Supported Devices ==
 Amazon Firestick, Android TV/Box, Android Phone/Tablet, iPhone/iPad, Smart TVs (Samsung, LG), Windows/Mac computers
 
 == Device Setup: Firestick ==
-1. Go to Find > Search, search for "Downloader"
-2. Install Downloader, enable Unknown Sources in Settings > My Fire TV > Developer Options
-3. Open Downloader, enter download URL for TiviMate or preferred app
-4. Install the APK, open app, enter M3U URL or Xtream Codes credentials
-Recommended apps: TiviMate, IPTV Smarters Pro, OTT Navigator
+1. Watch the full setup video: https://youtu.be/XIsThctDUxI
+2. Go to Find > Search, search for "Downloader" and install it
+3. Enable Unknown Sources in Settings > My Fire TV > Developer Options
+4. Open Downloader, enter code 3171512 in the URL bar
+5. Install the Ooustream app when download completes
+6. Open Ooustream and enter your credentials from the /credentials page
+Recommended app: Ooustream (our own dedicated app)
 
 == Device Setup: Android TV/Box ==
-1. Open Google Play Store
-2. Search for TiviMate or IPTV Smarters
-3. Install, open, select Xtream Codes or M3U URL
-4. Enter your credentials
-Recommended apps: TiviMate, IPTV Smarters Pro, Perfect Player
+1. Watch the full setup video: https://youtu.be/XIsThctDUxI
+2. Install "Downloader" from the Google Play Store
+3. Open Downloader, enter code 3171512 in the URL bar
+4. Install the Ooustream app when download completes
+5. Open Ooustream and enter your credentials from the /credentials page
+Recommended app: Ooustream (our own dedicated app)
 
 == Device Setup: iPhone/iPad ==
 1. Open App Store

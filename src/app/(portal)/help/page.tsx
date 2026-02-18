@@ -19,9 +19,9 @@ const faqSections: FAQSection[] = [
     icon: "M13 10V3L4 14h7v7l9-11h-7z",
     items: [
       {
-        question: "How do I set up my IPTV service?",
+        question: "How do I set up Ooustream?",
         answer:
-          "After purchasing your subscription, you'll receive login credentials. Download a compatible app on your device (we recommend TiviMate for Firestick/Android or IPTV Smarters for iOS), then enter your credentials to start watching.",
+          "Ooustream has its own dedicated app! On Firestick/Android TV: install the Downloader app, enter code 3171512, and install the Ooustream app. Then enter your credentials from the Credentials page in this portal. Watch the full setup video for a step-by-step walkthrough: https://youtu.be/XIsThctDUxI — make sure to watch all the way to the end before entering the code.",
       },
       {
         question: "What devices are supported?",
@@ -96,27 +96,28 @@ const deviceGuides: DeviceGuide[] = [
     name: "Amazon Firestick",
     icon: "M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
     steps: [
+      "Watch the full setup video before starting: https://youtu.be/XIsThctDUxI",
       "From the home screen, go to 'Find' then 'Search'",
       "Search for 'Downloader' and install it",
-      "Open Downloader and enable 'Unknown Sources' when prompted",
-      "Enter the download URL for TiviMate or your preferred app",
-      "Install the downloaded APK file",
-      "Open the app and enter your M3U URL or Xtream Codes credentials",
+      "Open Downloader and enable 'Unknown Sources' when prompted (Settings > My Fire TV > Developer Options)",
+      "In the Downloader URL bar, enter the code: 3171512",
+      "Install the Ooustream app when the download completes",
+      "Open Ooustream and enter your credentials from the Credentials page in this portal",
     ],
-    recommendedApps: ["TiviMate", "IPTV Smarters Pro", "OTT Navigator"],
+    recommendedApps: ["Ooustream"],
   },
   {
     name: "Android TV / Box",
     icon: "M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
     steps: [
-      "Open the Google Play Store on your device",
-      "Search for 'TiviMate' or 'IPTV Smarters'",
-      "Install your chosen app",
-      "Open the app and select 'Xtream Codes' or 'M3U URL'",
-      "Enter your credentials (Server URL, Username, Password)",
+      "Watch the full setup video before starting: https://youtu.be/XIsThctDUxI",
+      "Install the 'Downloader' app from the Google Play Store",
+      "Open Downloader and in the URL bar, enter the code: 3171512",
+      "Install the Ooustream app when the download completes",
+      "Open Ooustream and enter your credentials from the Credentials page in this portal",
       "Wait for channels to load and start watching",
     ],
-    recommendedApps: ["TiviMate", "IPTV Smarters Pro", "Perfect Player"],
+    recommendedApps: ["Ooustream"],
   },
   {
     name: "iPhone / iPad",
