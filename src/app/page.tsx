@@ -172,6 +172,14 @@ const DEVICES = [
   },
 ];
 
+const SCREENSHOTS = [
+  { src: "/screenshots/app-home.jpg", label: "Home", description: "Featured content & quick browse" },
+  { src: "/screenshots/app-livetv.jpg", label: "Live TV", description: "10,000+ channels with EPG guide" },
+  { src: "/screenshots/app-movies.jpg", label: "Movies", description: "Huge on-demand movie library" },
+  { src: "/screenshots/app-series.jpg", label: "Series", description: "Binge-worthy TV shows" },
+  { src: "/screenshots/app-trending.jpg", label: "Trending", description: "What's popular right now" },
+];
+
 const STEPS = [
   {
     number: "01",
@@ -636,6 +644,144 @@ function ContactForm() {
   );
 }
 
+// ─── App Showcase ─────────────────────────────────────────────────────────────
+
+function AppShowcase() {
+  const { ref, visible } = useScrollReveal();
+  const [active, setActive] = useState(0);
+
+  return (
+    <section id="showcase" className="py-24 px-4" style={{ borderTop: "1px solid #1a1a24" }}>
+      <div className="max-w-6xl mx-auto">
+        <div
+          ref={ref}
+          className="transition-all duration-700"
+          style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(32px)" }}
+        >
+          {/* Header */}
+          <div className="text-center mb-14">
+            <span
+              className="inline-block text-xs font-mono font-semibold tracking-widest uppercase mb-4 px-3 py-1 rounded-full"
+              style={{
+                color: "#7c3aed",
+                background: "rgba(124,58,237,0.08)",
+                border: "1px solid rgba(124,58,237,0.2)",
+              }}
+            >
+              App Preview
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#f1f5f9] mb-4">
+              See It in{" "}
+              <span className="gradient-text">Action</span>
+            </h2>
+            <p className="text-[#94a3b8] text-lg max-w-xl mx-auto">
+              A premium streaming experience built for your TV. Browse channels, movies, and series with ease.
+            </p>
+          </div>
+
+          {/* Tabs */}
+          <div className="flex flex-wrap justify-center gap-2 mb-8">
+            {SCREENSHOTS.map((s, i) => (
+              <button
+                key={s.label}
+                onClick={() => setActive(i)}
+                className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200"
+                style={
+                  active === i
+                    ? {
+                        background: "linear-gradient(135deg, rgba(0,212,255,0.15), rgba(124,58,237,0.15))",
+                        border: "1px solid rgba(0,212,255,0.4)",
+                        color: "#00d4ff",
+                        boxShadow: "0 0 20px rgba(0,212,255,0.1)",
+                      }
+                    : {
+                        background: "rgba(30,41,59,0.5)",
+                        border: "1px solid #334155",
+                        color: "#94a3b8",
+                      }
+                }
+              >
+                {s.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Screenshot Display */}
+          <div className="relative">
+            {/* TV frame */}
+            <div
+              className="relative mx-auto rounded-2xl overflow-hidden"
+              style={{
+                maxWidth: 900,
+                border: "3px solid #2a2a3a",
+                boxShadow: "0 0 80px rgba(0,212,255,0.08), 0 40px 80px rgba(0,0,0,0.5)",
+                background: "#0a0a0f",
+              }}
+            >
+              {/* Screenshot images - crossfade */}
+              <div className="relative" style={{ aspectRatio: "16/10" }}>
+                {SCREENSHOTS.map((s, i) => (
+                  <Image
+                    key={s.label}
+                    src={s.src}
+                    alt={`Ooustream IPTV - ${s.label}`}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 900px"
+                    className="object-cover transition-opacity duration-500"
+                    style={{ opacity: active === i ? 1 : 0 }}
+                    priority={i === 0}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Stand / base decoration */}
+            <div className="flex justify-center mt-[-1px]">
+              <div
+                style={{
+                  width: 200,
+                  height: 4,
+                  background: "linear-gradient(90deg, transparent, #2a2a3a, transparent)",
+                  borderRadius: "0 0 4px 4px",
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Caption */}
+          <div className="text-center mt-6">
+            <p className="text-[#f1f5f9] font-semibold text-lg">{SCREENSHOTS[active].label}</p>
+            <p className="text-[#64748b] text-sm">{SCREENSHOTS[active].description}</p>
+          </div>
+
+          {/* Feature highlights from the app */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
+            {[
+              { label: "AI Recommendations", desc: "Personalized content just for you" },
+              { label: "Binge Mode", desc: "Auto-play next episode" },
+              { label: "Continue Watching", desc: "Pick up where you left off" },
+              { label: "Voice Search", desc: "Find anything instantly" },
+            ].map((feat, i) => (
+              <div
+                key={feat.label}
+                className="text-center p-4 rounded-xl transition-all duration-300"
+                style={{
+                  background: "rgba(30,41,59,0.3)",
+                  border: "1px solid #1e293b",
+                  animationDelay: `${i * 80}ms`,
+                }}
+              >
+                <p className="text-sm font-semibold text-[#f1f5f9] mb-1">{feat.label}</p>
+                <p className="text-xs text-[#64748b]">{feat.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ─── Section Reveal Wrapper ───────────────────────────────────────────────────
 
 interface RevealProps {
@@ -1001,6 +1147,9 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* ── App Showcase ──────────────────────────────────────────────────────── */}
+      <AppShowcase />
 
       {/* ── Devices ──────────────────────────────────────────────────────────── */}
       <section id="devices" className="py-24 px-4">
