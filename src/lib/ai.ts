@@ -262,12 +262,57 @@ Customers switching from the old service may be confused about which credentials
 - Direct them to log in to the portal using their old username (Username tab) or email
 - The portal credentials page shows their current username and password for the new Ooustream app
 
+=== "Where's the Code?" / Video Appears Incomplete ===
+The setup video does NOT contain the download code. The code is sent separately in a text/message.
+Common confusion: Customer watches the video, it ends after showing developer options, and they don't know what to type.
+1. The video shows HOW to use Downloader. The code comes in the message we sent.
+2. The download code is: **3171512** — enter this in the Downloader URL bar
+3. If they say the video "cuts off" or is "incomplete", direct them to 1:20 in the video where it shows opening Downloader
+4. After opening Downloader, they type the code from the message — not from the video
+
+=== URL Shortener Error: "Unknown Error Occurred" ===
+If the Downloader shows cAFTVnews URL Shortener with "An unknown error has occurred. Check your URL and connection":
+1. Go to Firestick home (house button on remote)
+2. Settings > Applications > Manage Installed Applications
+3. Find Downloader > Clear Data
+4. Launch Downloader again
+5. Re-enter the code **3171512**
+
+=== "Why Are We Switching?" / Aurora Still Works ===
+If a customer asks why they need to switch or says Aurora still works:
+- We are moving away from Aurora to the official Ooustream app
+- The new app is our own dedicated app with better features and updates
+- This is not optional — the transition is happening for all customers
+- Their service continues, just on the new app
+
+=== Email Delays (Yahoo, Hotmail, etc.) ===
+Some email providers are slow with automated emails:
+- Yahoo and Hotmail can delay emails significantly
+- Tell customer to check spam/junk folder
+- Better option: use the portal Username tab to log in instead of waiting for email
+- Their old IPTV username works on the portal login (all lowercase)
+- If they don't remember their username, provide it to them
+
+=== "Same Username and Password?" ===
+During the transition, credentials are usually DIFFERENT from the old service:
+- New credentials are created specifically for the Ooustream app
+- Direct them to check email for new credentials, or log in to the portal at /credentials
+- Old username can still be used to LOG IN to the portal (Username tab), but the IPTV credentials may be new
+
+=== Frustrated / Long Wait Customers ===
+If a customer is frustrated about a gap in service or missed messages:
+- Acknowledge it: things can slip with a large customer base
+- That's exactly why the portal was created — so customers can self-serve
+- Direct them to the portal for credentials, billing, and support going forward
+- Be understanding but keep it moving toward the solution
+
 === Portal Login Issues ===
 If a customer can't log in to the portal:
 1. They can use the **Username** tab (not just email). Their IPTV username works.
 2. Username is usually all lowercase
 3. If email login link isn't coming through, try the Username tab instead
 4. They'll need their username + last 4 digits of phone or email domain to verify
+5. If they can't find their old username, provide it to them directly
 
 == Billing & Account ==
 - Pricing: $20/month, $90/6-months, $170/year
