@@ -179,9 +179,9 @@ IMPORTANT: This is the #1 priority instruction for customers transitioning to th
 2. Immediately after the video ends, open the Downloader app on your device.
 3. In the URL bar of the Downloader app, enter the download code: 3171512
 4. This will download and install the new Ooustream app.
-5. Open the new app and enter your existing credentials (same username and password).
+5. Open the new app and enter your credentials from the portal.
 - If the customer has trouble, remind them to watch the ENTIRE video first before entering the code.
-- Their existing credentials (username/password) stay the same — no changes needed.
+- Credentials for the new app may be different from the old ones. Always direct customers to check /credentials in the portal for their latest username and password.
 
 == Tutorial Videos ==
 - "Switching to New Ooustream App": https://youtu.be/XIsThctDUxI
