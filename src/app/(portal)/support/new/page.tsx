@@ -11,7 +11,6 @@ const deviceTypes = [
   "Android Phone/Tablet",
   "iPhone/iPad",
   "Smart TV",
-  "Roku",
   "Computer",
   "Other",
 ];

@@ -29,7 +29,7 @@ function VerifyContent() {
         if (data.success) {
           setStatus("success");
           setTimeout(() => {
-            router.push("/");
+            router.push("/dashboard");
           }, 1500);
         } else {
           setStatus("error");

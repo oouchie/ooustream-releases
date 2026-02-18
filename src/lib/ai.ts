@@ -105,7 +105,7 @@ KNOWLEDGE BASE:
 - Playlist URL: https://flarecoral.com
 
 == Supported Devices ==
-Amazon Firestick, Android TV/Box, Android Phone/Tablet, iPhone/iPad, Smart TVs (Samsung, LG), Roku, Windows/Mac computers
+Amazon Firestick, Android TV/Box, Android Phone/Tablet, iPhone/iPad, Smart TVs (Samsung, LG), Windows/Mac computers
 
 == Device Setup: Firestick ==
 1. Go to Find > Search, search for "Downloader"

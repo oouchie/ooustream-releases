@@ -148,3 +148,32 @@ All emails include logo and use brand gradient (#00d4ff to #7c3aed):
 ## Deployment
 - Vercel
 - URL: https://ooustreamportal.vercel.app
+
+## Planned: AI Support System
+
+### Goal
+Integrate AI into the ticket system for instant customer support.
+
+### Approach (Option 1 + 2 Combined)
+
+**AI Chat Assistant (Pre-Ticket)** - on `/support` page:
+- Chatbot resolves issues before a ticket is created
+- Answers common questions (setup, apps, troubleshooting, billing)
+- Pulls customer account data (expiry, status, credentials) for personalized answers
+- Only creates a ticket if AI can't resolve, passing conversation as context
+
+**AI Auto-Reply on Ticket Creation**:
+- When customer submits a ticket, AI immediately posts a first reply
+- Includes relevant troubleshooting steps based on issue description
+- Links to matching tutorial videos
+- Account-specific info (e.g., "Your subscription expires in 3 days")
+- Ticket stays open for human follow-up if needed
+
+### Future Considerations
+- **AI-Assisted Admin Responses**: Draft replies for admins to edit and send
+- **Smart Triage**: Auto-categorize tickets (billing, technical, setup, account), auto-resolve simple ones, prioritize urgent ones
+
+### Tech Approach
+- Claude API or OpenAI with system prompt loaded with service knowledge
+- Feed customer context from Supabase (account data, subscription status)
+- Knowledge base: setup guides, common issues, troubleshooting steps, tutorial links

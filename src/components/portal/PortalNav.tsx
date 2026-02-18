@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 const navItems = [
-  { href: "/", label: "Dashboard", icon: HomeIcon },
+  { href: "/dashboard", label: "Dashboard", icon: HomeIcon },
   { href: "/subscription", label: "Subscription", icon: CreditCardIcon },
   { href: "/billing", label: "Billing", icon: BillingIcon },
   { href: "/credentials", label: "Credentials", icon: KeyIcon },
@@ -85,7 +85,7 @@ export default function PortalNav({ customerName }: { customerName: string }) {
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/dashboard" className="flex items-center gap-2">
             <img
               src="/logo-full-on-dark.png"
               alt="Ooustream"
@@ -97,7 +97,7 @@ export default function PortalNav({ customerName }: { customerName: string }) {
           <div className="hidden md:flex items-center gap-1">
             {navItems.map((item) => {
               const isActive = pathname === item.href ||
-                (item.href !== "/" && pathname.startsWith(item.href));
+                (pathname.startsWith(item.href));
               return (
                 <Link
                   key={item.href}
@@ -148,7 +148,7 @@ export default function PortalNav({ customerName }: { customerName: string }) {
           <div className="md:hidden py-4 border-t border-[#334155]">
             {navItems.map((item) => {
               const isActive = pathname === item.href ||
-                (item.href !== "/" && pathname.startsWith(item.href));
+                (pathname.startsWith(item.href));
               return (
                 <Link
                   key={item.href}

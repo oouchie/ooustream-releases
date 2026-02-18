@@ -67,7 +67,7 @@ export default function LoginPage() {
         return;
       }
 
-      router.push("/");
+      router.push("/dashboard");
     } catch {
       setError("An error occurred. Please try again.");
     } finally {

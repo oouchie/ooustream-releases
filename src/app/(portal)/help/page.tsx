@@ -26,7 +26,7 @@ const faqSections: FAQSection[] = [
       {
         question: "What devices are supported?",
         answer:
-          "Our service works on Amazon Firestick, Android TV boxes, Android phones/tablets, iPhones/iPads, Smart TVs (Samsung, LG, etc.), Roku devices, and computers (Windows/Mac).",
+          "Our service works on Amazon Firestick, Android TV boxes, Android phones/tablets, iPhones/iPads, Smart TVs (Samsung, LG, etc.), and computers (Windows/Mac).",
       },
       {
         question: "How do I find my login credentials?",

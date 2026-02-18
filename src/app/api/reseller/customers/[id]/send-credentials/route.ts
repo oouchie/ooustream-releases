@@ -80,7 +80,7 @@ export async function POST(
           </head>
           <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
-              <img src="https://ooustick.com/logo-full-on-dark.png" alt="Ooustick" style="height: 60px; width: auto;" />
+              <img src="https://ooustick.com/logo-iptv.png" alt="Ooustick" style="height: 120px; width: auto;" />
             </div>
 
             <div style="background-color: white; padding: 30px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 10px 10px;">
