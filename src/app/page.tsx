@@ -163,18 +163,10 @@ const DEVICES = [
     ),
   },
   {
-    name: "Smart TV",
+    name: "Android Phone",
     icon: (
       <svg viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8">
-        <path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z" />
-      </svg>
-    ),
-  },
-  {
-    name: "Computer",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" className="w-8 h-8">
-        <path d="M20 18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z" />
+        <path d="M16 1H8C6.34 1 5 2.34 5 4v16c0 1.66 1.34 3 3 3h8c1.66 0 3-1.34 3-3V4c0-1.66-1.34-3-3-3zm-2 20h-4v-1h4v1zm3.25-3H6.75V4h10.5v14z" />
       </svg>
     ),
   },
@@ -583,8 +575,7 @@ function ContactForm() {
                     <option value="Firestick">Amazon Firestick</option>
                     <option value="Android TV">Android TV / Box</option>
                     <option value="iPhone/iPad">iPhone / iPad</option>
-                    <option value="Smart TV">Smart TV</option>
-                    <option value="Computer">Computer (Windows/Mac)</option>
+                    <option value="Android Phone">Android Phone/Tablet</option>
                     <option value="Other">Other</option>
                   </select>
                 </div>
@@ -1031,13 +1022,13 @@ export default function LandingPage() {
               <span className="gradient-text">All Your Devices</span>
             </h2>
             <p className="text-[#94a3b8] text-lg max-w-xl mx-auto">
-              One subscription. Stream on Firestick, Android, iPhone, Smart TV, and more.
+              One subscription. Stream on Firestick, Android TV, iPhone, and Android devices.
             </p>
           </Reveal>
 
           {/* Devices — horizontal scroll on mobile, grid on desktop */}
           <Reveal>
-            <div className="flex md:grid md:grid-cols-6 gap-4 overflow-x-auto pb-4 md:pb-0 scrollbar-thin">
+            <div className="flex md:grid md:grid-cols-4 gap-4 overflow-x-auto pb-4 md:pb-0 scrollbar-thin">
               {DEVICES.map((device, i) => (
                 <div
                   key={device.name}

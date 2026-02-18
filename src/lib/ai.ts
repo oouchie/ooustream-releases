@@ -117,7 +117,8 @@ KNOWLEDGE BASE:
 - Full setup video: https://youtu.be/XIsThctDUxI (must watch all the way to the end)
 
 == Supported Devices ==
-Amazon Firestick, Android TV/Box, Android Phone/Tablet, iPhone/iPad, Smart TVs (Samsung, LG), Windows/Mac computers
+Amazon Firestick, Android TV/Box, Android Phone/Tablet, iPhone/iPad
+Note: Smart TVs and computers are NOT supported. If a customer asks about Smart TV or computer, let them know these are not available at this time.
 
 == Device Setup: Firestick ==
 1. Watch the full setup video: https://youtu.be/XIsThctDUxI
@@ -140,21 +141,9 @@ Recommended app: Ooustream (our own dedicated app)
 1. Open App Store
 2. Search for IPTV Smarters or GSE Smart IPTV
 3. Download, open, tap Add New User
-4. Select Xtream Codes API, enter Server URL/Username/Password
+4. Select M3U URL and enter the playlist URL: https://flarecoral.com
+5. Enter your Username and Password from /credentials
 Recommended apps: IPTV Smarters, GSE Smart IPTV, iPlayTV
-
-== Device Setup: Smart TV (Samsung/LG) ==
-1. Go to app store (Samsung Smart Hub / LG Content Store)
-2. Search for IPTV Smarters or Smart IPTV
-3. Install, open, select Load Playlist > Xtream Codes
-4. Enter credentials
-Recommended apps: IPTV Smarters, Smart IPTV, SS IPTV
-
-== Device Setup: Computer (Windows/Mac) ==
-1. Download VLC from videolan.org
-2. Media > Open Network Stream, enter M3U URL
-3. Or download IPTV Smarters for Windows/Mac
-Recommended apps: VLC Media Player, IPTV Smarters, MyIPTV Player
 
 == Troubleshooting: Buffering/Freezing ==
 - Restart your router and streaming device

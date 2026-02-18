@@ -10,8 +10,6 @@ const deviceTypes = [
   "Android Box",
   "Android Phone/Tablet",
   "iPhone/iPad",
-  "Smart TV",
-  "Computer",
   "Other",
 ];
 

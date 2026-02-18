@@ -26,7 +26,7 @@ const faqSections: FAQSection[] = [
       {
         question: "What devices are supported?",
         answer:
-          "Our service works on Amazon Firestick, Android TV boxes, Android phones/tablets, iPhones/iPads, Smart TVs (Samsung, LG, etc.), and computers (Windows/Mac).",
+          "Our service works on Amazon Firestick, Android TV boxes, Android phones/tablets, and iPhones/iPads.",
       },
       {
         question: "How do I find my login credentials?",
@@ -127,37 +127,11 @@ const deviceGuides: DeviceGuide[] = [
       "Search for 'IPTV Smarters' or 'GSE Smart IPTV'",
       "Download and install the app",
       "Open the app and tap 'Add New User' or '+'",
-      "Select 'Xtream Codes API'",
-      "Enter your Server URL, Username, and Password",
+      "Select 'M3U URL' and enter the playlist URL: https://flarecoral.com",
+      "Enter your Username and Password from the Credentials page in this portal",
       "Tap 'Add User' and wait for channels to load",
     ],
     recommendedApps: ["IPTV Smarters", "GSE Smart IPTV", "iPlayTV"],
-  },
-  {
-    name: "Smart TV (Samsung/LG)",
-    icon: "M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
-    steps: [
-      "Go to your TV's app store (Samsung: Smart Hub, LG: LG Content Store)",
-      "Search for 'IPTV Smarters' or 'Smart IPTV'",
-      "Install the app",
-      "Open the app and select 'Load Playlist'",
-      "Choose 'Xtream Codes' and enter your credentials",
-      "Save and wait for the channel list to populate",
-    ],
-    recommendedApps: ["IPTV Smarters", "Smart IPTV", "SS IPTV"],
-  },
-  {
-    name: "Computer (Windows/Mac)",
-    icon: "M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
-    steps: [
-      "Download VLC Media Player from videolan.org",
-      "Open VLC and go to Media > Open Network Stream",
-      "Enter your M3U URL and click Play",
-      "Alternatively, download IPTV Smarters for Windows/Mac",
-      "Enter your Xtream Codes credentials",
-      "Navigate channels using the playlist panel",
-    ],
-    recommendedApps: ["VLC Media Player", "IPTV Smarters", "MyIPTV Player"],
   },
 ];
 
