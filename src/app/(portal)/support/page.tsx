@@ -2,6 +2,7 @@ import { getCustomerSession } from "@/lib/auth";
 import { createServerClient } from "@/lib/supabase";
 import Link from "next/link";
 import { TICKET_CATEGORIES, TICKET_STATUSES } from "@/types";
+import AIChatWidget from "@/components/support/AIChatWidget";
 
 async function getTickets(customerId: string) {
   const supabase = createServerClient();
@@ -48,6 +49,9 @@ export default async function SupportPage() {
           New Ticket
         </Link>
       </div>
+
+      {/* AI Chat Assistant */}
+      <AIChatWidget />
 
       {/* Tickets List */}
       {tickets.length === 0 ? (

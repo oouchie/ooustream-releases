@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCustomerSession } from "@/lib/auth";
 import { createServerClient } from "@/lib/supabase";
+import { generateTicketAutoReply } from "@/lib/ai";
 
 // GET - List tickets for current customer
 export async function GET() {
@@ -83,6 +84,14 @@ export async function POST(request: NextRequest) {
       sender_name: session.name,
       message: description,
     });
+
+    // Fire-and-forget AI auto-reply
+    generateTicketAutoReply(ticket.id, session.customerId, {
+      subject,
+      category,
+      device_type,
+      description,
+    }).catch((err) => console.error("AI auto-reply error:", err));
 
     return NextResponse.json({ success: true, ticket });
   } catch (error) {

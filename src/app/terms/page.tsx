@@ -98,7 +98,7 @@ export default function TermsPage() {
             <strong>To opt out:</strong> Reply STOP to any message. You will receive a confirmation and no further SMS messages.
           </p>
           <p className="text-gray-300 mt-2">
-            <strong>For help:</strong> Reply HELP or contact support@ooustick.com.
+            <strong>For help:</strong> Reply HELP or contact info@ooustick.com.
           </p>
 
           <h2 className="text-xl font-semibold text-white mt-8">5. Acceptable Use</h2>
@@ -167,7 +167,7 @@ export default function TermsPage() {
             If you have questions about these Terms of Service, please contact us:
           </p>
           <ul className="list-none text-gray-300 space-y-1">
-            <li>Email: support@ooustick.com</li>
+            <li>Email: info@ooustick.com</li>
             <li>Website: ooustick.com</li>
           </ul>
         </div>

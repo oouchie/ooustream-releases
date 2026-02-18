@@ -177,7 +177,7 @@ export default async function SubscriptionPage() {
               </div>
               <div>
                 <p className="text-sm text-[#94a3b8]">Email</p>
-                <p className="font-medium text-[#f1f5f9]">support@ooustick.com</p>
+                <p className="font-medium text-[#f1f5f9]">info@ooustick.com</p>
               </div>
             </div>
             <div className="flex items-center gap-3 p-4 bg-[#0f172a] rounded-lg">
@@ -198,7 +198,7 @@ export default async function SubscriptionPage() {
               </div>
               <div>
                 <p className="text-sm text-[#94a3b8]">Text/Call</p>
-                <p className="font-medium text-[#f1f5f9]">(678) 680-6598</p>
+                <p className="font-medium text-[#f1f5f9]">(323) 539-7508</p>
               </div>
             </div>
           </div>

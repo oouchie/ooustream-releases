@@ -128,7 +128,7 @@ export default function PrivacyPage() {
             If you have questions about this Privacy Policy or your personal data, please contact us:
           </p>
           <ul className="list-none text-gray-300 space-y-1">
-            <li>Email: support@ooustick.com</li>
+            <li>Email: info@ooustick.com</li>
             <li>Website: ooustick.com</li>
           </ul>
         </div>
