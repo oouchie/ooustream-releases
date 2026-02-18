@@ -743,9 +743,9 @@ export default function LandingPage() {
               <Image
                 src="/logo-iptv.png"
                 alt="Ooustream"
-                width={160}
-                height={40}
-                className="h-10 w-auto"
+                width={240}
+                height={60}
+                className="h-14 w-auto"
                 priority
               />
             </a>
@@ -1295,9 +1295,9 @@ export default function LandingPage() {
               <Image
                 src="/logo-iptv.png"
                 alt="Ooustream"
-                width={140}
-                height={36}
-                className="h-9 w-auto mb-4"
+                width={200}
+                height={50}
+                className="h-12 w-auto mb-4"
               />
               <p className="text-[#64748b] text-sm leading-relaxed">
                 Premium IPTV streaming with thousands of channels, on-demand content, and live sports.
