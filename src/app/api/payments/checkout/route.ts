@@ -34,6 +34,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Customer not found' }, { status: 404 });
     }
 
+    // Block reseller customers from paying through the portal
+    if (customer.reseller) {
+      return NextResponse.json(
+        { error: 'Please contact your reseller to make payments' },
+        { status: 403 }
+      );
+    }
+
     // Get or create Stripe customer
     const stripeCustomerId = await getOrCreateStripeCustomer(
       customer.id,

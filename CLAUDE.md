@@ -40,6 +40,8 @@ Customer-facing portal and reseller management system.
 ### Reseller Portal (/reseller)
 - Shun: password `shun2024`
 - Prime: password `prime2024`
+- JK: password `jk2024`
+- Evan: password `evan2024`
 - Dashboard with their customer stats
 - Full customer management (add, edit, view)
 - **Set billing settings and custom pricing**
@@ -69,6 +71,8 @@ NEXT_PUBLIC_PORTAL_URL=https://ooustreamportal.vercel.app
 NEXT_PUBLIC_CRM_URL=https://ooustream-crm.vercel.app
 RESELLER_SHUN_PASSWORD=shun2024
 RESELLER_PRIME_PASSWORD=prime2024
+RESELLER_JK_PASSWORD=jk2024
+RESELLER_EVAN_PASSWORD=evan2024
 SMS_ENABLED=false
 
 # Stripe

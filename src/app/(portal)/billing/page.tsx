@@ -11,6 +11,7 @@ interface CustomerBilling {
   expiry_date: string | null;
   billing_period: BillingPeriod;
   plan_type: PlanType;
+  reseller: string | null;
   custom_price_monthly: number | null;
   custom_price_6month: number | null;
   custom_price_yearly: number | null;
@@ -98,6 +99,42 @@ export default function BillingPage() {
     return (
       <div className="text-center py-12">
         <p className="text-[#ef4444]">{error}</p>
+      </div>
+    );
+  }
+
+  // Reseller customers cannot pay through the portal
+  if (customer?.reseller) {
+    return (
+      <div className="space-y-8 animate-fadeIn">
+        <div>
+          <h1 className="text-2xl font-bold text-[#f1f5f9]">Billing</h1>
+          <p className="text-[#94a3b8] mt-1">
+            Manage your subscription and payments
+          </p>
+        </div>
+
+        <div className="card text-center py-12">
+          <div className="text-5xl mb-4">
+            <svg className="w-16 h-16 mx-auto text-[#7c3aed]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-semibold text-[#f1f5f9] mb-2">
+            Contact Your Reseller
+          </h2>
+          <p className="text-[#94a3b8] max-w-md mx-auto">
+            Your account is managed by a reseller. Please contact them directly to make payments or renew your subscription.
+          </p>
+          <div className="mt-6">
+            <Link
+              href="/support/new"
+              className="text-[#00d4ff] hover:underline text-sm"
+            >
+              Need help? Open a support ticket
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }

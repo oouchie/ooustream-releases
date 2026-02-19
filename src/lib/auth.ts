@@ -12,6 +12,8 @@ const RESELLER_SESSION_DURATION = 24 * 60 * 60 * 1000; // 24 hours for resellers
 const RESELLERS: Record<string, string> = {
   'Shun': 'RESELLER_SHUN_PASSWORD',
   'Prime': 'RESELLER_PRIME_PASSWORD',
+  'JK': 'RESELLER_JK_PASSWORD',
+  'Evan': 'RESELLER_EVAN_PASSWORD',
 };
 
 export interface ResellerSession {

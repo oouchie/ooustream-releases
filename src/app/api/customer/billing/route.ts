@@ -21,6 +21,7 @@ export async function GET() {
         billing_type,
         billing_period,
         plan_type,
+        reseller,
         custom_price_monthly,
         custom_price_6month,
         custom_price_yearly,
