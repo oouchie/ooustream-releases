@@ -29,6 +29,7 @@ export default function ResellerEditCustomerPage() {
     expiry_date: "",
     billing_type: "manual",
     billing_period: "monthly",
+    plan_type: "standard",
     custom_price_monthly: "",
     custom_price_6month: "",
     custom_price_yearly: "",
@@ -61,6 +62,7 @@ export default function ResellerEditCustomerPage() {
           expiry_date: data.expiry_date || "",
           billing_type: data.billing_type || "manual",
           billing_period: data.billing_period || "monthly",
+          plan_type: data.plan_type || "standard",
           custom_price_monthly: data.custom_price_monthly ? String(data.custom_price_monthly / 100) : "",
           custom_price_6month: data.custom_price_6month ? String(data.custom_price_6month / 100) : "",
           custom_price_yearly: data.custom_price_yearly ? String(data.custom_price_yearly / 100) : "",
@@ -342,9 +344,21 @@ export default function ResellerEditCustomerPage() {
                 onChange={handleChange}
                 className="input w-full"
               >
-                <option value="monthly">Monthly ($20)</option>
-                <option value="6month">6 Months ($90)</option>
-                <option value="yearly">Yearly ($170)</option>
+                <option value="monthly">Monthly ({form.plan_type === "pro" ? "$35" : "$20"})</option>
+                <option value="6month">6 Months ({form.plan_type === "pro" ? "$175" : "$90"})</option>
+                <option value="yearly">Yearly ({form.plan_type === "pro" ? "$335" : "$170"})</option>
+              </select>
+            </div>
+            <div>
+              <label className="label">Plan Type</label>
+              <select
+                name="plan_type"
+                value={form.plan_type}
+                onChange={handleChange}
+                className="input w-full"
+              >
+                <option value="standard">Standard (2 connections)</option>
+                <option value="pro">Pro (4 connections)</option>
               </select>
             </div>
           </div>

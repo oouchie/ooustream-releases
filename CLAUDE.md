@@ -48,10 +48,13 @@ Customer-facing portal and reseller management system.
 
 ## Payment System
 - **Stripe Checkout** for payments
-- **Pricing**: $20/month, $90/6-months, $170/year
+- **Plans**:
+  - **Standard** (2 connections): $20/month, $90/6-months, $170/year
+  - **Pro** (4 connections / multiview): $35/month, $175/6-months, $335/year
 - **Custom pricing**: Resellers can set discounted prices per customer
 - **Billing types**: Auto-renew (subscription) or Manual (one-time)
 - **Webhook**: `/api/webhooks/stripe` handles payment completion
+- **Direct Pro checkout**: `/subscribe/pro` for in-app links
 
 ## Environment Variables
 ```
@@ -75,6 +78,9 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 ```
 
 ## Routes
+
+### Public
+- `/subscribe/pro` - Direct Pro plan checkout (for in-app links)
 
 ### Auth
 - `/login` - Customer login (magic link or username)

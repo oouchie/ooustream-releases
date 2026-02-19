@@ -7,26 +7,36 @@ import Link from "next/link";
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 type BillingPeriod = "monthly" | "6month" | "yearly";
+type PlanType = "standard" | "pro";
 
-interface PricingTier {
+interface BillingOption {
   period: BillingPeriod;
   label: string;
   price: number;
   perMonth: string;
   badge?: string;
+}
+
+interface PlanTier {
+  planType: PlanType;
+  name: string;
+  tagline: string;
+  connections: number;
   featured?: boolean;
   features: string[];
+  billingOptions: BillingOption[];
 }
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
-const PRICING_TIERS: PricingTier[] = [
+const PLAN_TIERS: PlanTier[] = [
   {
-    period: "monthly",
-    label: "1 Month",
-    price: 20,
-    perMonth: "$20.00/mo",
+    planType: "standard",
+    name: "Standard",
+    tagline: "Perfect for personal use",
+    connections: 2,
     features: [
+      "Up to 2 Connections",
       "10,000+ Live Channels",
       "Full VOD Library",
       "HD & 4K Streaming",
@@ -34,15 +44,21 @@ const PRICING_TIERS: PricingTier[] = [
       "All Devices Supported",
       "24/7 AI Support",
     ],
+    billingOptions: [
+      { period: "monthly", label: "1 Month", price: 20, perMonth: "$20.00/mo" },
+      { period: "6month", label: "6 Months", price: 90, perMonth: "$15.00/mo", badge: "MOST POPULAR" },
+      { period: "yearly", label: "1 Year", price: 170, perMonth: "$14.17/mo", badge: "BEST VALUE" },
+    ],
   },
   {
-    period: "6month",
-    label: "6 Months",
-    price: 90,
-    perMonth: "$15.00/mo",
-    badge: "MOST POPULAR",
+    planType: "pro",
+    name: "Pro",
+    tagline: "Multiview for the whole house",
+    connections: 4,
     featured: true,
     features: [
+      "Up to 4 Connections",
+      "Multiview Panel Support",
       "10,000+ Live Channels",
       "Full VOD Library",
       "HD & 4K Streaming",
@@ -50,20 +66,10 @@ const PRICING_TIERS: PricingTier[] = [
       "All Devices Supported",
       "24/7 AI Support",
     ],
-  },
-  {
-    period: "yearly",
-    label: "1 Year",
-    price: 170,
-    perMonth: "$14.17/mo",
-    badge: "BEST VALUE",
-    features: [
-      "10,000+ Live Channels",
-      "Full VOD Library",
-      "HD & 4K Streaming",
-      "Electronic TV Guide",
-      "All Devices Supported",
-      "24/7 AI Support",
+    billingOptions: [
+      { period: "monthly", label: "1 Month", price: 35, perMonth: "$35.00/mo" },
+      { period: "6month", label: "6 Months", price: 175, perMonth: "$29.17/mo", badge: "MOST POPULAR" },
+      { period: "yearly", label: "1 Year", price: 335, perMonth: "$27.92/mo", badge: "BEST VALUE" },
     ],
   },
 ];
@@ -243,11 +249,13 @@ function useScrollReveal() {
 // ─── Email Modal ──────────────────────────────────────────────────────────────
 
 interface EmailModalProps {
-  tier: PricingTier;
+  planType: PlanType;
+  billingOption: BillingOption;
+  planName: string;
   onClose: () => void;
 }
 
-function EmailModal({ tier, onClose }: EmailModalProps) {
+function EmailModal({ planType, billingOption, planName, onClose }: EmailModalProps) {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -267,7 +275,7 @@ function EmailModal({ tier, onClose }: EmailModalProps) {
         const res = await fetch("/api/payments/public-checkout", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: email.trim(), billingPeriod: tier.period }),
+          body: JSON.stringify({ email: email.trim(), billingPeriod: billingOption.period, planType }),
         });
 
         const data = await res.json();
@@ -286,7 +294,7 @@ function EmailModal({ tier, onClose }: EmailModalProps) {
         setLoading(false);
       }
     },
-    [email, tier.period]
+    [email, billingOption.period, planType]
   );
 
   // Close on backdrop click
@@ -345,12 +353,12 @@ function EmailModal({ tier, onClose }: EmailModalProps) {
             </svg>
           </div>
           <h2 id="modal-title" className="text-xl font-bold text-[#f1f5f9] mb-1">
-            Subscribe - {tier.label}
+            Subscribe - {planName} {billingOption.label}
           </h2>
           <p className="text-[#94a3b8] text-sm">
-            <span className="text-[#00d4ff] font-bold text-lg">${tier.price}</span>
+            <span className="text-[#00d4ff] font-bold text-lg">${billingOption.price}</span>
             {" "}
-            &bull; {tier.perMonth}
+            &bull; {billingOption.perMonth}
           </p>
         </div>
 
@@ -813,7 +821,8 @@ function Reveal({ children, delay = 0, className = "" }: RevealProps) {
 export default function LandingPage() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [selectedTier, setSelectedTier] = useState<PricingTier | null>(null);
+  const [selectedCheckout, setSelectedCheckout] = useState<{ planType: PlanType; billingOption: BillingOption; planName: string } | null>(null);
+  const [selectedPeriods, setSelectedPeriods] = useState<Record<PlanType, number>>({ standard: 1, pro: 1 });
 
   // Detect scroll for sticky header
   useEffect(() => {
@@ -833,9 +842,9 @@ export default function LandingPage() {
 
   // Lock body scroll when menu or modal is open
   useEffect(() => {
-    document.body.style.overflow = menuOpen || selectedTier ? "hidden" : "";
+    document.body.style.overflow = menuOpen || selectedCheckout ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
-  }, [menuOpen, selectedTier]);
+  }, [menuOpen, selectedCheckout]);
 
   const scrollTo = useCallback((id: string) => {
     setMenuOpen(false);
@@ -856,10 +865,12 @@ export default function LandingPage() {
     <div className="min-h-screen" style={{ background: "#0a0a0f" }}>
 
       {/* ── Checkout Email Modal ──────────────────────────────────────────────── */}
-      {selectedTier && (
+      {selectedCheckout && (
         <EmailModal
-          tier={selectedTier}
-          onClose={() => setSelectedTier(null)}
+          planType={selectedCheckout.planType}
+          billingOption={selectedCheckout.billingOption}
+          planName={selectedCheckout.planName}
+          onClose={() => setSelectedCheckout(null)}
         />
       )}
 
@@ -1219,107 +1230,153 @@ export default function LandingPage() {
               Pricing
             </span>
             <h2 className="text-3xl md:text-4xl font-bold text-[#f1f5f9] mb-4">
-              Simple,{" "}
-              <span className="gradient-text">Transparent Pricing</span>
+              Choose Your{" "}
+              <span className="gradient-text">Perfect Plan</span>
             </h2>
             <p className="text-[#94a3b8] text-lg max-w-xl mx-auto">
-              No hidden fees. No contracts. Cancel anytime. All plans include every feature.
+              No hidden fees. No contracts. Cancel anytime. Pick the plan that fits your needs.
             </p>
           </Reveal>
 
-          {/* Pricing cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-            {PRICING_TIERS.map((tier, i) => (
-              <Reveal key={tier.period} delay={i * 100}>
-                <div
-                  className={`relative rounded-2xl p-px transition-all duration-300 ${tier.featured ? "scale-105 md:scale-110 z-10" : ""}`}
-                  style={
-                    tier.featured
-                      ? {
-                          background: "linear-gradient(135deg, #00d4ff, #7c3aed)",
-                          boxShadow: "0 0 60px rgba(0,212,255,0.25), 0 0 100px rgba(124,58,237,0.15)",
-                        }
-                      : {
-                          background: "#2a2a3a",
-                        }
-                  }
-                >
+          {/* Plan cards - side by side */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start max-w-4xl mx-auto">
+            {PLAN_TIERS.map((plan, planIdx) => {
+              const periodIdx = selectedPeriods[plan.planType];
+              const currentOption = plan.billingOptions[periodIdx];
+              return (
+                <Reveal key={plan.planType} delay={planIdx * 150}>
                   <div
-                    className="rounded-[calc(1rem-1px)] p-8 h-full flex flex-col"
-                    style={{ background: tier.featured ? "#12121a" : "#12121a" }}
-                  >
-                    {/* Badge */}
-                    {tier.badge && (
-                      <div className="mb-5">
-                        <span
-                          className="inline-block text-xs font-mono font-bold tracking-widest uppercase px-3 py-1 rounded-full"
-                          style={
-                            tier.featured
-                              ? {
-                                  background: "linear-gradient(135deg, rgba(0,212,255,0.15), rgba(124,58,237,0.15))",
-                                  border: "1px solid rgba(0,212,255,0.3)",
-                                  color: "#00d4ff",
-                                }
-                              : {
-                                  background: "rgba(251,191,36,0.1)",
-                                  border: "1px solid rgba(251,191,36,0.3)",
-                                  color: "#fbbf24",
-                                }
+                    className="relative rounded-2xl p-px transition-all duration-300"
+                    style={
+                      plan.featured
+                        ? {
+                            background: "linear-gradient(135deg, #00d4ff, #7c3aed)",
+                            boxShadow: "0 0 60px rgba(0,212,255,0.25), 0 0 100px rgba(124,58,237,0.15)",
                           }
+                        : {
+                            background: "#2a2a3a",
+                          }
+                    }
+                  >
+                    <div
+                      className="rounded-[calc(1rem-1px)] p-8 h-full flex flex-col"
+                      style={{ background: "#12121a" }}
+                    >
+                      {/* Plan badge */}
+                      {plan.featured && (
+                        <div className="mb-4">
+                          <span
+                            className="inline-block text-xs font-mono font-bold tracking-widest uppercase px-3 py-1 rounded-full"
+                            style={{
+                              background: "linear-gradient(135deg, rgba(0,212,255,0.15), rgba(124,58,237,0.15))",
+                              border: "1px solid rgba(0,212,255,0.3)",
+                              color: "#00d4ff",
+                            }}
+                          >
+                            RECOMMENDED
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Plan name & connections */}
+                      <h3 className="text-2xl font-bold text-[#f1f5f9] mb-1">{plan.name}</h3>
+                      <p className="text-sm text-[#94a3b8] mb-1">{plan.tagline}</p>
+                      <p className="text-xs font-mono mb-6" style={{ color: plan.featured ? "#00d4ff" : "#7c3aed" }}>
+                        {plan.connections} Connections
+                      </p>
+
+                      {/* Billing period selector */}
+                      <div
+                        className="flex rounded-xl p-1 mb-6 gap-1"
+                        style={{ background: "#0a0a0f", border: "1px solid #1a1a24" }}
+                      >
+                        {plan.billingOptions.map((opt, optIdx) => (
+                          <button
+                            key={opt.period}
+                            onClick={() => setSelectedPeriods(prev => ({ ...prev, [plan.planType]: optIdx }))}
+                            className="flex-1 text-xs font-medium py-2.5 px-2 rounded-lg transition-all duration-200 relative"
+                            style={
+                              periodIdx === optIdx
+                                ? {
+                                    background: plan.featured
+                                      ? "linear-gradient(135deg, rgba(0,212,255,0.15), rgba(124,58,237,0.15))"
+                                      : "rgba(124,58,237,0.12)",
+                                    color: "#f1f5f9",
+                                    boxShadow: plan.featured
+                                      ? "0 0 12px rgba(0,212,255,0.15)"
+                                      : "0 0 12px rgba(124,58,237,0.1)",
+                                  }
+                                : {
+                                    color: "#64748b",
+                                  }
+                            }
+                          >
+                            {opt.label}
+                            {opt.badge && periodIdx === optIdx && (
+                              <span
+                                className="absolute -top-2 left-1/2 -translate-x-1/2 text-[9px] font-bold tracking-wider uppercase px-1.5 py-0.5 rounded-full whitespace-nowrap"
+                                style={{
+                                  background: "rgba(251,191,36,0.15)",
+                                  color: "#fbbf24",
+                                  border: "1px solid rgba(251,191,36,0.3)",
+                                }}
+                              >
+                                {opt.badge}
+                              </span>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Price display */}
+                      <div className="mb-2">
+                        <span
+                          className="text-5xl font-bold"
+                          style={{ color: plan.featured ? "#00d4ff" : "#f1f5f9", letterSpacing: "-0.03em" }}
                         >
-                          {tier.badge}
+                          ${currentOption.price}
                         </span>
                       </div>
-                    )}
+                      <p className="text-sm text-[#64748b] mb-8">
+                        {currentOption.perMonth} billed{" "}
+                        {currentOption.period === "monthly" ? "monthly" : currentOption.period === "6month" ? "every 6 months" : "annually"}
+                      </p>
 
-                    {/* Plan name */}
-                    <h3 className="text-xl font-bold text-[#f1f5f9] mb-2">{tier.label}</h3>
+                      {/* Feature list */}
+                      <ul className="space-y-3 mb-8 flex-1" role="list">
+                        {plan.features.map((f) => (
+                          <li key={f} className="flex items-center gap-3 text-sm text-[#94a3b8]">
+                            <svg
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke={plan.featured ? "#00d4ff" : "#22c55e"}
+                              strokeWidth={2.5}
+                              className="w-4 h-4 flex-shrink-0"
+                              aria-hidden="true"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                            </svg>
+                            {f}
+                          </li>
+                        ))}
+                      </ul>
 
-                    {/* Price */}
-                    <div className="mb-2">
-                      <span
-                        className="text-5xl font-bold"
-                        style={{ color: tier.featured ? "#00d4ff" : "#f1f5f9", letterSpacing: "-0.03em" }}
+                      {/* CTA */}
+                      <button
+                        onClick={() => setSelectedCheckout({ planType: plan.planType, billingOption: currentOption, planName: plan.name })}
+                        className={`btn w-full text-sm ${plan.featured ? "btn-primary" : "btn-secondary"}`}
+                        aria-label={`Subscribe to ${plan.name} plan for $${currentOption.price}`}
                       >
-                        ${tier.price}
-                      </span>
+                        Subscribe Now
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                        </svg>
+                      </button>
                     </div>
-                    <p className="text-sm text-[#64748b] mb-8">{tier.perMonth} billed {tier.period === "monthly" ? "monthly" : tier.period === "6month" ? "every 6 months" : "annually"}</p>
-
-                    {/* Feature list */}
-                    <ul className="space-y-3 mb-8 flex-1" role="list">
-                      {tier.features.map((f) => (
-                        <li key={f} className="flex items-center gap-3 text-sm text-[#94a3b8]">
-                          <svg
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke={tier.featured ? "#00d4ff" : "#22c55e"}
-                            strokeWidth={2.5}
-                            className="w-4 h-4 flex-shrink-0"
-                            aria-hidden="true"
-                          >
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                          </svg>
-                          {f}
-                        </li>
-                      ))}
-                    </ul>
-
-                    {/* CTA */}
-                    <button
-                      onClick={() => setSelectedTier(tier)}
-                      className={`btn w-full text-sm ${tier.featured ? "btn-primary" : "btn-secondary"}`}
-                      aria-label={`Subscribe to ${tier.label} plan for $${tier.price}`}
-                    >
-                      Subscribe Now
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                      </svg>
-                    </button>
                   </div>
-                </div>
-              </Reveal>
-            ))}
+                </Reveal>
+              );
+            })}
           </div>
 
           {/* Existing customer callout */}

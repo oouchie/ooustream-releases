@@ -22,6 +22,7 @@ export async function GET(
       name,
       billing_type,
       billing_period,
+      plan_type,
       stripe_customer_id,
       custom_price_monthly,
       custom_price_6month,
@@ -83,6 +84,7 @@ export async function PUT(
     const allowedFields = [
       'billing_type',
       'billing_period',
+      'plan_type',
       'custom_price_monthly',
       'custom_price_6month',
       'custom_price_yearly',

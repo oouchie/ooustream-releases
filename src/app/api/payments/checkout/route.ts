@@ -59,25 +59,29 @@ export async function POST(request: NextRequest) {
     const cancelUrl = `${baseUrl}/billing/cancel`;
 
     // Create checkout session
+    const planType = customer.plan_type || 'standard';
     const checkoutSession = await createCheckoutSession({
       customerId: customer.id,
       stripeCustomerId,
       amount,
       billingPeriod,
+      planType,
       customerEmail: customer.email,
       successUrl,
       cancelUrl,
     });
 
     // Create pending payment record
+    const planLabel = planType === 'pro' ? 'Pro' : 'Standard';
     await supabase.from('payments').insert({
       customer_id: customer.id,
       stripe_checkout_session_id: checkoutSession.id,
       amount,
       status: 'pending',
       billing_period: billingPeriod,
+      plan_type: planType,
       payment_type: 'one_time',
-      description: `OOUStream Service - ${billingPeriod}`,
+      description: `OOUStream ${planLabel} - ${billingPeriod}`,
     });
 
     return NextResponse.json({ url: checkoutSession.url });

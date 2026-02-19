@@ -2,14 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { formatPrice, PERIOD_LABELS, STANDARD_PRICES } from '@/lib/pricing';
-import { BillingPeriod } from '@/types';
+import { formatPrice, PERIOD_LABELS, PLAN_PRICES, PLAN_CONNECTIONS } from '@/lib/pricing';
+import { BillingPeriod, PlanType } from '@/types';
 
 interface CustomerBilling {
   service_type: string;
   status: string;
   expiry_date: string | null;
   billing_period: BillingPeriod;
+  plan_type: PlanType;
   custom_price_monthly: number | null;
   custom_price_6month: number | null;
   custom_price_yearly: number | null;
@@ -40,8 +41,11 @@ export default function BillingPage() {
     }
   }
 
+  const planType: PlanType = customer?.plan_type || 'standard';
+  const basePrices = PLAN_PRICES[planType];
+
   function getPrice(period: BillingPeriod): number {
-    if (!customer) return STANDARD_PRICES[period];
+    if (!customer) return basePrices[period];
 
     const customPrices: Record<BillingPeriod, number | null> = {
       monthly: customer.custom_price_monthly,
@@ -49,12 +53,12 @@ export default function BillingPage() {
       yearly: customer.custom_price_yearly,
     };
 
-    return customPrices[period] ?? STANDARD_PRICES[period];
+    return customPrices[period] ?? basePrices[period];
   }
 
   function hasDiscount(period: BillingPeriod): boolean {
     const price = getPrice(period);
-    return price < STANDARD_PRICES[period];
+    return price < basePrices[period];
   }
 
   async function handleCheckout() {
@@ -122,6 +126,30 @@ export default function BillingPage() {
           View Payment History
         </Link>
       </div>
+
+      {/* Current Plan */}
+      {customer && (
+        <div className="card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-[#94a3b8]">Current Plan</p>
+              <p className="text-2xl font-bold text-[#f1f5f9] mt-1">
+                {planType === 'pro' ? 'Pro' : 'Standard'}
+              </p>
+            </div>
+            <span
+              className="text-xs font-mono font-semibold px-3 py-1.5 rounded-full"
+              style={{
+                background: planType === 'pro' ? 'rgba(124,58,237,0.15)' : 'rgba(0,212,255,0.15)',
+                color: planType === 'pro' ? '#7c3aed' : '#00d4ff',
+                border: `1px solid ${planType === 'pro' ? 'rgba(124,58,237,0.3)' : 'rgba(0,212,255,0.3)'}`,
+              }}
+            >
+              {PLAN_CONNECTIONS[planType]} Connections
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Current Status */}
       {customer && (
@@ -196,7 +224,7 @@ export default function BillingPage() {
                 </p>
                 {discount && (
                   <p className="text-sm text-[#94a3b8] line-through">
-                    {formatPrice(STANDARD_PRICES[period])}
+                    {formatPrice(basePrices[period])}
                   </p>
                 )}
               </button>

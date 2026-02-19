@@ -63,6 +63,7 @@ async function handleCheckoutCompleted(
 ) {
   const customerId = session.metadata?.customer_id;
   const billingPeriod = session.metadata?.billing_period as BillingPeriod;
+  const planType = session.metadata?.plan_type || 'standard';
 
   if (!customerId || !billingPeriod) {
     console.error('Missing metadata in checkout session');
@@ -88,6 +89,7 @@ async function handleCheckoutCompleted(
       stripe_payment_intent_id: session.payment_intent as string,
       period_start: new Date().toISOString().split('T')[0],
       period_end: newExpiry.toISOString().split('T')[0],
+      plan_type: planType,
     })
     .eq('stripe_checkout_session_id', session.id);
 
@@ -98,6 +100,7 @@ async function handleCheckoutCompleted(
       expiry_date: newExpiry.toISOString().split('T')[0],
       status: 'Active',
       billing_period: billingPeriod,
+      plan_type: planType,
     })
     .eq('id', customerId);
 
@@ -110,6 +113,7 @@ async function handleCheckoutCompleted(
     details: {
       amount: session.amount_total,
       billing_period: billingPeriod,
+      plan_type: planType,
       new_expiry: newExpiry.toISOString(),
     },
   });

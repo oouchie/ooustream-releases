@@ -48,6 +48,7 @@ export async function createCheckoutSession({
   stripeCustomerId,
   amount,
   billingPeriod,
+  planType = 'standard',
   customerEmail,
   successUrl,
   cancelUrl,
@@ -56,6 +57,7 @@ export async function createCheckoutSession({
   stripeCustomerId: string;
   amount: number; // in cents
   billingPeriod: 'monthly' | '6month' | 'yearly';
+  planType?: 'standard' | 'pro';
   customerEmail: string;
   successUrl: string;
   cancelUrl: string;
@@ -68,6 +70,8 @@ export async function createCheckoutSession({
     yearly: '1 Year',
   };
 
+  const planLabel = planType === 'pro' ? 'Pro' : 'Standard';
+
   const session = await stripe.checkout.sessions.create({
     customer: stripeCustomerId,
     customer_email: stripeCustomerId ? undefined : customerEmail,
@@ -77,8 +81,8 @@ export async function createCheckoutSession({
         price_data: {
           currency: 'usd',
           product_data: {
-            name: `OOUStream Service - ${periodLabels[billingPeriod]}`,
-            description: `Subscription renewal for ${periodLabels[billingPeriod]}`,
+            name: `OOUStream ${planLabel} - ${periodLabels[billingPeriod]}`,
+            description: `${planLabel} plan (${planType === 'pro' ? '4 connections' : '2 connections'}) for ${periodLabels[billingPeriod]}`,
           },
           unit_amount: amount,
         },
@@ -91,6 +95,7 @@ export async function createCheckoutSession({
     metadata: {
       customer_id: customerId,
       billing_period: billingPeriod,
+      plan_type: planType,
     },
   });
 

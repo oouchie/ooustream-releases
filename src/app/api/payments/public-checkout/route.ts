@@ -1,18 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
-
-// Standard prices in cents
-const STANDARD_PRICES: Record<string, number> = {
-  monthly: 2000,   // $20.00
-  '6month': 9000,  // $90.00
-  yearly: 17000,   // $170.00
-};
-
-const PERIOD_LABELS: Record<string, string> = {
-  monthly: '1 Month',
-  '6month': '6 Months',
-  yearly: '1 Year',
-};
+import { PLAN_PRICES, PERIOD_LABELS } from '@/lib/pricing';
+import { BillingPeriod, PlanType } from '@/types';
 
 function getStripe(): Stripe {
   if (!process.env.STRIPE_SECRET_KEY) {
@@ -27,7 +16,7 @@ function getStripe(): Stripe {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, billingPeriod } = body;
+    const { email, billingPeriod, planType = 'standard' } = body;
 
     if (!email || typeof email !== 'string') {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
@@ -37,6 +26,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid billing period' }, { status: 400 });
     }
 
+    if (!['standard', 'pro'].includes(planType)) {
+      return NextResponse.json({ error: 'Invalid plan type' }, { status: 400 });
+    }
+
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -44,8 +37,9 @@ export async function POST(request: NextRequest) {
     }
 
     const stripe = getStripe();
-    const amount = STANDARD_PRICES[billingPeriod];
+    const amount = PLAN_PRICES[planType as PlanType][billingPeriod as BillingPeriod];
     const baseUrl = process.env.NEXT_PUBLIC_PORTAL_URL || 'http://localhost:3000';
+    const planLabel = planType === 'pro' ? 'Pro' : 'Standard';
 
     const session = await stripe.checkout.sessions.create({
       customer_email: email.toLowerCase().trim(),
@@ -54,8 +48,8 @@ export async function POST(request: NextRequest) {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: `OOUStream Service - ${PERIOD_LABELS[billingPeriod]}`,
-              description: `Premium IPTV subscription for ${PERIOD_LABELS[billingPeriod]}`,
+              name: `OOUStream ${planLabel} - ${PERIOD_LABELS[billingPeriod as BillingPeriod]}`,
+              description: `${planLabel} plan (${planType === 'pro' ? '4 connections' : '2 connections'}) for ${PERIOD_LABELS[billingPeriod as BillingPeriod]}`,
             },
             unit_amount: amount,
           },
@@ -67,6 +61,7 @@ export async function POST(request: NextRequest) {
       cancel_url: `${baseUrl}/#pricing`,
       metadata: {
         billing_period: billingPeriod,
+        plan_type: planType,
         source: 'landing_page',
       },
     });

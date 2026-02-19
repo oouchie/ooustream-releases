@@ -20,6 +20,7 @@ export async function GET() {
         expiry_date,
         billing_type,
         billing_period,
+        plan_type,
         custom_price_monthly,
         custom_price_6month,
         custom_price_yearly,

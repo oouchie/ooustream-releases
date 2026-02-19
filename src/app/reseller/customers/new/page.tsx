@@ -15,6 +15,7 @@ export default function ResellerNewCustomerPage() {
     phone: "",
     service_type: "Cable",
     status: "Active",
+    plan_type: "standard",
     username_1: "",
     password_1: "",
     username_2: "",
@@ -136,6 +137,18 @@ export default function ResellerNewCustomerPage() {
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
                 <option value="Expired">Expired</option>
+              </select>
+            </div>
+            <div>
+              <label className="label">Plan Type</label>
+              <select
+                name="plan_type"
+                value={form.plan_type}
+                onChange={handleChange}
+                className="input w-full"
+              >
+                <option value="standard">Standard (2 connections)</option>
+                <option value="pro">Pro (4 connections)</option>
               </select>
             </div>
           </div>

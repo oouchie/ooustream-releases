@@ -28,9 +28,12 @@ export interface Customer {
   custom_price_6month: number | null;
   custom_price_yearly: number | null;
   auto_renew_enabled: boolean;
+  plan_type: PlanType;
 }
 
 export type BillingPeriod = 'monthly' | '6month' | 'yearly';
+
+export type PlanType = 'standard' | 'pro';
 
 export type PaymentStatus = 'pending' | 'processing' | 'succeeded' | 'failed' | 'refunded';
 
@@ -48,6 +51,7 @@ export interface Payment {
   period_start: string | null;
   period_end: string | null;
   payment_type: 'one_time' | 'subscription';
+  plan_type: PlanType;
   description: string | null;
   failure_reason: string | null;
   created_at: string;
