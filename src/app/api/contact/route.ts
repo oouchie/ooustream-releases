@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import sgMail from '@sendgrid/mail';
+import { createServerClient } from '@/lib/supabase';
+import { sendNewCustomerNotification } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,38 +20,83 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid email address' }, { status: 400 });
     }
 
-    // Send email via SendGrid if configured
-    if (process.env.SENDGRID_API_KEY) {
-      sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+    const supabase = createServerClient();
+    const normalizedEmail = email.toLowerCase().trim();
 
-      const adminEmail = process.env.EMAIL_FROM?.match(/<(.+)>/)?.[1] || 'oouchie@1865freemoney.com';
+    // Check if customer already exists
+    const { data: existing } = await supabase
+      .from('customers')
+      .select('id')
+      .eq('email', normalizedEmail)
+      .single();
 
-      await sgMail.send({
-        to: adminEmail,
-        from: process.env.EMAIL_FROM || 'Ooustream <oouchie@1865freemoney.com>',
-        replyTo: email,
-        subject: `Trial Request / Contact Form - ${name}`,
-        html: `
-          <div style="background:#0a0a0f;color:#f1f5f9;font-family:sans-serif;padding:24px;border-radius:8px;">
-            <h2 style="color:#00d4ff;margin-top:0;">New Trial Request</h2>
-            <table style="width:100%;border-collapse:collapse;">
-              <tr><td style="padding:8px 0;color:#94a3b8;width:120px;">Name:</td><td style="padding:8px 0;">${name}</td></tr>
-              <tr><td style="padding:8px 0;color:#94a3b8;">Email:</td><td style="padding:8px 0;"><a href="mailto:${email}" style="color:#00d4ff;">${email}</a></td></tr>
-              <tr><td style="padding:8px 0;color:#94a3b8;">Phone:</td><td style="padding:8px 0;">${phone || 'Not provided'}</td></tr>
-              <tr><td style="padding:8px 0;color:#94a3b8;">Device:</td><td style="padding:8px 0;">${device || 'Not specified'}</td></tr>
-            </table>
-            <div style="margin-top:16px;">
-              <p style="color:#94a3b8;margin-bottom:8px;">Message:</p>
-              <p style="background:#12121a;padding:16px;border-radius:8px;border-left:3px solid #00d4ff;">${message}</p>
-            </div>
-          </div>
-        `,
+    if (existing) {
+      return NextResponse.json(
+        { error: 'An account with this email already exists. Please log in to the portal.' },
+        { status: 409 }
+      );
+    }
+
+    // Create customer with 24-hour trial expiry
+    const expiryDate = new Date();
+    expiryDate.setHours(expiryDate.getHours() + 24);
+    const expiryStr = expiryDate.toISOString().split('T')[0];
+
+    const { data: customer, error: insertError } = await supabase
+      .from('customers')
+      .insert({
+        name,
+        email: normalizedEmail,
+        phone: phone || '',
+        service_type: 'Cable',
+        status: 'Active',
+        plan_type: 'standard',
+        billing_type: 'manual',
+        billing_period: 'monthly',
+        expiry_date: expiryStr,
+        reseller: null,
+        auto_renew_enabled: false,
+        notes: `24hr trial - Device: ${device || 'Not specified'} - Message: ${message}`,
+      })
+      .select('id')
+      .single();
+
+    if (insertError || !customer) {
+      console.error('Failed to create trial customer:', insertError);
+      return NextResponse.json(
+        { error: 'Failed to create trial. Please try again.' },
+        { status: 500 }
+      );
+    }
+
+    // Log to audit
+    await supabase.from('audit_logs').insert({
+      action: 'trial_signup',
+      table_name: 'customers',
+      record_id: customer.id,
+      performed_by: 'contact_form',
+      details: {
+        name,
+        email: normalizedEmail,
+        phone,
+        device,
+        message,
+        expiry_date: expiryStr,
+      },
+    });
+
+    // Notify admin at info@ooustick.com
+    try {
+      await sendNewCustomerNotification({
+        customerEmail: normalizedEmail,
+        customerName: name,
+        planType: 'standard',
+        billingPeriod: '24hr trial',
+        amount: 0,
+        source: `free trial form — Device: ${device || 'Not specified'}`,
       });
-    } else {
-      // Log to console in development
-      console.log('Contact form submission (SendGrid not configured):', {
-        name, email, phone, device, message,
-      });
+    } catch (err) {
+      console.error('Failed to send trial notification:', err);
     }
 
     return NextResponse.json({ success: true });
