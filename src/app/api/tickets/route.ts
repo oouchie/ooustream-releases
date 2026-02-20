@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCustomerSession } from "@/lib/auth";
 import { createServerClient } from "@/lib/supabase";
 import { generateTicketAutoReply } from "@/lib/ai";
+import { sendSupportTicketNotification } from "@/lib/email";
 
 // GET - List tickets for current customer
 export async function GET() {
@@ -92,6 +93,16 @@ export async function POST(request: NextRequest) {
       device_type,
       description,
     }).catch((err) => console.error("AI auto-reply error:", err));
+
+    // Fire-and-forget admin notification email
+    sendSupportTicketNotification({
+      customerName: session.name,
+      customerEmail: session.email || '',
+      ticketNumber: ticket.ticket_number,
+      subject,
+      category,
+      description,
+    }).catch((err) => console.error("Ticket notification email error:", err));
 
     return NextResponse.json({ success: true, ticket });
   } catch (error) {

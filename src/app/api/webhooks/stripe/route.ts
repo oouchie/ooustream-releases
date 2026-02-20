@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { constructWebhookEvent } from '@/lib/stripe';
 import { createServerClient } from '@/lib/supabase';
-import { calculateNewExpiry, PERIOD_DAYS } from '@/lib/pricing';
+import { calculateNewExpiry } from '@/lib/pricing';
+import { sendWelcomeEmail, sendNewCustomerNotification } from '@/lib/email';
 import { BillingPeriod } from '@/types';
 import Stripe from 'stripe';
 
@@ -61,12 +62,25 @@ async function handleCheckoutCompleted(
   supabase: ReturnType<typeof createServerClient>,
   session: Stripe.Checkout.Session
 ) {
-  const customerId = session.metadata?.customer_id;
   const billingPeriod = session.metadata?.billing_period as BillingPeriod;
   const planType = session.metadata?.plan_type || 'standard';
+  const source = session.metadata?.source;
 
-  if (!customerId || !billingPeriod) {
-    console.error('Missing metadata in checkout session');
+  if (!billingPeriod) {
+    console.error('Missing billing_period in checkout session metadata');
+    return;
+  }
+
+  // Landing page signup — no existing customer
+  if (source === 'landing_page') {
+    await handleLandingPageSignup(supabase, session, billingPeriod, planType);
+    return;
+  }
+
+  // Existing customer checkout (from portal billing page)
+  const customerId = session.metadata?.customer_id;
+  if (!customerId) {
+    console.error('Missing customer_id in checkout session metadata');
     return;
   }
 
@@ -119,6 +133,137 @@ async function handleCheckoutCompleted(
   });
 
   console.log(`Payment successful for customer ${customerId}, new expiry: ${newExpiry}`);
+}
+
+async function handleLandingPageSignup(
+  supabase: ReturnType<typeof createServerClient>,
+  session: Stripe.Checkout.Session,
+  billingPeriod: BillingPeriod,
+  planType: string
+) {
+  const email = (session.customer_details?.email || session.customer_email || '').toLowerCase().trim();
+  const name = session.customer_details?.name || email.split('@')[0];
+  const stripeCustomerId = typeof session.customer === 'string' ? session.customer : null;
+
+  if (!email) {
+    console.error('No email found in landing page checkout session');
+    return;
+  }
+
+  // Check if customer already exists by email
+  const { data: existing } = await supabase
+    .from('customers')
+    .select('id, expiry_date')
+    .eq('email', email)
+    .single();
+
+  const newExpiry = calculateNewExpiry(
+    existing?.expiry_date ? new Date(existing.expiry_date) : null,
+    billingPeriod
+  );
+  const expiryStr = newExpiry.toISOString().split('T')[0];
+
+  let customerId: string;
+
+  if (existing) {
+    // Existing customer — update their record
+    customerId = existing.id;
+    await supabase
+      .from('customers')
+      .update({
+        expiry_date: expiryStr,
+        status: 'Active',
+        billing_period: billingPeriod,
+        plan_type: planType,
+        ...(stripeCustomerId ? { stripe_customer_id: stripeCustomerId } : {}),
+      })
+      .eq('id', customerId);
+  } else {
+    // New customer — create record
+    const { data: newCustomer, error: insertError } = await supabase
+      .from('customers')
+      .insert({
+        name,
+        email,
+        phone: '',
+        service_type: 'Cable',
+        status: 'Active',
+        plan_type: planType,
+        billing_type: 'manual',
+        billing_period: billingPeriod,
+        expiry_date: expiryStr,
+        reseller: null,
+        stripe_customer_id: stripeCustomerId,
+        auto_renew_enabled: false,
+      })
+      .select('id')
+      .single();
+
+    if (insertError || !newCustomer) {
+      console.error('Failed to create customer from landing page:', insertError);
+      return;
+    }
+    customerId = newCustomer.id;
+  }
+
+  // Create payment record
+  await supabase.from('payments').insert({
+    customer_id: customerId,
+    stripe_checkout_session_id: session.id,
+    stripe_payment_intent_id: session.payment_intent as string,
+    amount: session.amount_total || 0,
+    status: 'succeeded',
+    billing_period: billingPeriod,
+    plan_type: planType,
+    payment_type: 'one_time',
+    period_start: new Date().toISOString().split('T')[0],
+    period_end: expiryStr,
+    description: `OOUStream ${planType === 'pro' ? 'Pro' : 'Standard'} - ${billingPeriod}`,
+  });
+
+  // Log to audit
+  await supabase.from('audit_logs').insert({
+    action: existing ? 'payment_received' : 'landing_page_signup',
+    table_name: 'customers',
+    record_id: customerId,
+    performed_by: 'stripe_webhook',
+    details: {
+      amount: session.amount_total,
+      billing_period: billingPeriod,
+      plan_type: planType,
+      new_expiry: newExpiry.toISOString(),
+      source: 'landing_page',
+      is_new_customer: !existing,
+    },
+  });
+
+  // Send emails (don't let email failures break the webhook)
+  try {
+    await sendWelcomeEmail({
+      email,
+      name,
+      planType,
+      billingPeriod,
+      expiryDate: expiryStr,
+    });
+  } catch (err) {
+    console.error('Failed to send welcome email:', err);
+  }
+
+  try {
+    await sendNewCustomerNotification({
+      customerEmail: email,
+      customerName: name,
+      planType,
+      billingPeriod,
+      amount: session.amount_total || 0,
+      source: 'landing page',
+    });
+  } catch (err) {
+    console.error('Failed to send admin notification:', err);
+  }
+
+  console.log(`Landing page ${existing ? 'renewal' : 'signup'} for ${email}, customer ${customerId}, expiry: ${expiryStr}`);
 }
 
 async function handleInvoicePaid(
