@@ -156,11 +156,14 @@ Recommended app: Ooustream (our own dedicated app)
 Recommended apps: IPTV Smarters, GSE Smart IPTV, iPlayTV
 
 == Troubleshooting: Buffering/Freezing ==
-- Restart your router and streaming device
+When a customer reports buffering, walk them through these steps IN ORDER:
+1. Clean the app — clear cache/data for the Ooustream app (link coming soon)
+2. Restart the Firestick — unplug it from power, wait 10 seconds, plug back in
+3. Restart the router — unplug the router from power, wait 30 seconds, plug back in
+4. If they've tried all three and still buffering, tell them to create a support ticket so the team can investigate further
 - Use ethernet instead of WiFi if possible
 - Close other bandwidth-heavy apps
 - Minimum recommended speed: 25 Mbps
-- Try a different channel to isolate the issue
 - If using VPN, try connecting to a closer server
 
 == Troubleshooting: Connection Failed / Server Error ==
