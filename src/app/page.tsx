@@ -4,6 +4,12 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
+declare global {
+  interface Window {
+    fbq?: (...args: unknown[]) => void;
+  }
+}
+
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 type BillingPeriod = "monthly" | "6month" | "yearly";
@@ -286,6 +292,11 @@ function EmailModal({ planType, billingOption, planName, onClose }: EmailModalPr
         }
 
         if (data.url) {
+          window.fbq?.("track", "Lead", {
+            content_name: `${planType} - ${billingOption.period}`,
+            currency: "USD",
+            value: billingOption.price,
+          });
           window.location.href = data.url;
         }
       } catch {
@@ -294,7 +305,7 @@ function EmailModal({ planType, billingOption, planName, onClose }: EmailModalPr
         setLoading(false);
       }
     },
-    [email, billingOption.period, planType]
+    [email, billingOption.period, planType, billingOption.price]
   );
 
   // Close on backdrop click

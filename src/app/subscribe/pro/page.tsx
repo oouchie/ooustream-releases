@@ -4,6 +4,12 @@ import { useState, useCallback, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
+declare global {
+  interface Window {
+    fbq?: (...args: unknown[]) => void;
+  }
+}
+
 type BillingPeriod = "monthly" | "6month" | "yearly";
 
 interface BillingOption {
@@ -68,6 +74,11 @@ export default function ProCheckoutPage() {
         }
 
         if (data.url) {
+          window.fbq?.("track", "Lead", {
+            content_name: `pro - ${selected.period}`,
+            currency: "USD",
+            value: selected.price,
+          });
           window.location.href = data.url;
         }
       } catch {

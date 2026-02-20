@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { getCustomerSession } from '@/lib/auth';
 import { createServerClient } from '@/lib/supabase';
+import { MetaPixelEvent } from './MetaPixelEvent';
 
 export default async function BillingSuccessPage() {
   const session = await getCustomerSession();
@@ -27,6 +28,13 @@ export default async function BillingSuccessPage() {
 
   return (
     <div className="max-w-lg mx-auto py-12 animate-fadeIn">
+      <MetaPixelEvent
+        event="CompleteRegistration"
+        data={{
+          currency: "USD",
+          value: payment ? payment.amount / 100 : undefined,
+        }}
+      />
       <div className="card text-center">
         {/* Success Icon */}
         <div className="w-16 h-16 mx-auto mb-6 rounded-full bg-[#22c55e]/20 flex items-center justify-center">
