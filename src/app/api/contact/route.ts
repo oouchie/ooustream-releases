@@ -56,6 +56,8 @@ export async function POST(request: NextRequest) {
         expiry_date: expiryStr,
         reseller: null,
         auto_renew_enabled: false,
+        username_1: '',
+        password_1: '',
         notes: `24hr trial - Device: ${device || 'Not specified'} - Message: ${message}`,
       })
       .select('id')
