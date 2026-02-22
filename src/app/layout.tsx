@@ -17,8 +17,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ooustream Customer Portal",
-  description: "Manage your IPTV subscription, view credentials, and get support",
+  title: "Ooustream IPTV — Seamless Streaming Technology",
+  description: "Premium IPTV with 10,000+ live channels, movies and shows on demand, live sports and PPV events — all in HD and 4K on any device.",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -30,15 +30,15 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: "Ooustream Customer Portal",
-    description: "Manage your IPTV subscription, view credentials, and get support",
+    title: "Ooustream IPTV — Seamless Streaming Technology",
+    description: "Premium IPTV with 10,000+ live channels, movies and shows on demand, live sports and PPV events — all in HD and 4K on any device.",
     images: [{ url: "/og-image.png", width: 1200, height: 630 }],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Ooustream Customer Portal",
-    description: "Manage your IPTV subscription, view credentials, and get support",
+    title: "Ooustream IPTV — Seamless Streaming Technology",
+    description: "Premium IPTV with 10,000+ live channels, movies and shows on demand, live sports and PPV events — all in HD and 4K on any device.",
     images: ["/og-image.png"],
   },
 };

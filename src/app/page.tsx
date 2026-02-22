@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { motion, AnimatePresence, MotionReveal, MotionStagger, MotionStaggerChild, AnimatedCounter } from "@/components/motion";
 
 declare global {
   interface Window {
@@ -225,32 +226,7 @@ const STEPS = [
   },
 ];
 
-// ─── Hook: Intersection Observer for scroll animations ───────────────────────
-
-function useScrollReveal() {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setVisible(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.12 }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
-  return { ref, visible };
-}
+// ─── Framer Motion powered (see @/components/motion.tsx) ─────────────────────
 
 // ─── Email Modal ──────────────────────────────────────────────────────────────
 
@@ -326,21 +302,29 @@ function EmailModal({ planType, billingOption, planName, onClose }: EmailModalPr
   }, [onClose]);
 
   return (
-    <div
+    <motion.div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ background: "rgba(10,10,15,0.85)", backdropFilter: "blur(8px)" }}
       onClick={handleBackdrop}
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-title"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
     >
-      <div
-        className="w-full max-w-md rounded-2xl p-8 relative animate-fadeIn"
+      <motion.div
+        className="w-full max-w-md rounded-2xl p-8 relative"
         style={{
           background: "#12121a",
           border: "1px solid #2a2a3a",
           boxShadow: "0 0 60px rgba(0,212,255,0.15), 0 40px 80px rgba(0,0,0,0.6)",
         }}
+        initial={{ opacity: 0, scale: 0.92, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.92, y: 20 }}
+        transition={{ type: "spring", stiffness: 300, damping: 25 }}
       >
         {/* Close */}
         <button
@@ -434,15 +418,14 @@ function EmailModal({ planType, billingOption, planName, onClose }: EmailModalPr
           Secured by{" "}
           <span className="text-[#94a3b8]">Stripe</span>. We never store your card details.
         </p>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
 // ─── Contact Form ─────────────────────────────────────────────────────────────
 
 function ContactForm() {
-  const { ref, visible } = useScrollReveal();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -490,11 +473,7 @@ function ContactForm() {
   return (
     <section id="contact" className="py-24 px-4">
       <div className="max-w-2xl mx-auto">
-        <div
-          ref={ref}
-          className="transition-all duration-700"
-          style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(32px)" }}
-        >
+        <MotionReveal>
           {/* Section header */}
           <div className="text-center mb-12">
             <span
@@ -516,148 +495,159 @@ function ContactForm() {
             </p>
           </div>
 
-          {submitted ? (
-            <div
-              className="card text-center py-12"
-              style={{ borderColor: "rgba(34,197,94,0.3)", boxShadow: "0 0 40px rgba(34,197,94,0.08)" }}
-            >
-              <div
-                className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-6 mx-auto"
-                style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)" }}
+          <AnimatePresence mode="wait">
+            {submitted ? (
+              <motion.div
+                key="success"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                className="card text-center py-12"
+                style={{ borderColor: "rgba(34,197,94,0.3)", boxShadow: "0 0 40px rgba(34,197,94,0.08)" }}
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth={2} className="w-8 h-8">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-[#f1f5f9] mb-2">Message Sent!</h3>
-              <p className="text-[#94a3b8]">Thanks! We will be in touch shortly to set up your free trial.</p>
-            </div>
-          ) : (
-            <form
-              onSubmit={handleSubmit}
-              noValidate
-              className="card"
-              style={{ borderColor: "#2a2a3a" }}
-            >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
-                <div>
-                  <label htmlFor="contact-name" className="label">
-                    Full Name <span className="text-[#ef4444]">*</span>
-                  </label>
-                  <input
-                    id="contact-name"
-                    name="name"
-                    type="text"
-                    className="input"
-                    placeholder="John Smith"
-                    value={form.name}
-                    onChange={handleChange}
-                    required
-                    aria-required="true"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="contact-email" className="label">
-                    Email Address <span className="text-[#ef4444]">*</span>
-                  </label>
-                  <input
-                    id="contact-email"
-                    name="email"
-                    type="email"
-                    className="input"
-                    placeholder="you@example.com"
-                    value={form.email}
-                    onChange={handleChange}
-                    required
-                    aria-required="true"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="contact-phone" className="label">
-                    Phone Number
-                  </label>
-                  <input
-                    id="contact-phone"
-                    name="phone"
-                    type="tel"
-                    className="input"
-                    placeholder="(323) 000-0000"
-                    value={form.phone}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="contact-device" className="label">
-                    Your Device
-                  </label>
-                  <select
-                    id="contact-device"
-                    name="device"
-                    className="input"
-                    value={form.device}
-                    onChange={handleChange}
-                    style={{ cursor: "pointer" }}
-                  >
-                    <option value="">Select a device...</option>
-                    <option value="Firestick">Amazon Firestick</option>
-                    <option value="Android TV">Android TV / Box</option>
-                    <option value="iPhone/iPad">iPhone / iPad</option>
-                    <option value="Android Phone">Android Phone/Tablet</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <label htmlFor="contact-message" className="label">
-                  Message <span className="text-[#ef4444]">*</span>
-                </label>
-                <textarea
-                  id="contact-message"
-                  name="message"
-                  className="input resize-none"
-                  rows={4}
-                  placeholder="Tell us a bit about yourself or ask a question..."
-                  value={form.message}
-                  onChange={handleChange}
-                  required
-                  aria-required="true"
-                />
-              </div>
-
-              {error && (
-                <p
-                  role="alert"
-                  className="text-[#ef4444] text-sm mb-5 p-3 rounded-lg"
-                  style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)" }}
+                <div
+                  className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-6 mx-auto"
+                  style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.2)" }}
                 >
-                  {error}
-                </p>
-              )}
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="btn btn-primary w-full"
-                style={{ fontSize: "1rem" }}
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth={2} className="w-8 h-8">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-[#f1f5f9] mb-2">Message Sent!</h3>
+                <p className="text-[#94a3b8]">Thanks! We will be in touch shortly to set up your free trial.</p>
+              </motion.div>
+            ) : (
+              <motion.form
+                key="form"
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                onSubmit={handleSubmit}
+                noValidate
+                className="card"
+                style={{ borderColor: "#2a2a3a" }}
               >
-                {loading ? (
-                  <>
-                    <span className="spinner" style={{ width: 18, height: 18, borderWidth: 2 }} />
-                    Sending...
-                  </>
-                ) : (
-                  <>
-                    Send Request
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
-                    </svg>
-                  </>
+                <MotionStagger className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5" staggerDelay={0.06}>
+                  <MotionStaggerChild>
+                    <label htmlFor="contact-name" className="label">
+                      Full Name <span className="text-[#ef4444]">*</span>
+                    </label>
+                    <input
+                      id="contact-name"
+                      name="name"
+                      type="text"
+                      className="input"
+                      placeholder="John Smith"
+                      value={form.name}
+                      onChange={handleChange}
+                      required
+                      aria-required="true"
+                    />
+                  </MotionStaggerChild>
+                  <MotionStaggerChild>
+                    <label htmlFor="contact-email" className="label">
+                      Email Address <span className="text-[#ef4444]">*</span>
+                    </label>
+                    <input
+                      id="contact-email"
+                      name="email"
+                      type="email"
+                      className="input"
+                      placeholder="you@example.com"
+                      value={form.email}
+                      onChange={handleChange}
+                      required
+                      aria-required="true"
+                    />
+                  </MotionStaggerChild>
+                  <MotionStaggerChild>
+                    <label htmlFor="contact-phone" className="label">
+                      Phone Number
+                    </label>
+                    <input
+                      id="contact-phone"
+                      name="phone"
+                      type="tel"
+                      className="input"
+                      placeholder="(323) 000-0000"
+                      value={form.phone}
+                      onChange={handleChange}
+                    />
+                  </MotionStaggerChild>
+                  <MotionStaggerChild>
+                    <label htmlFor="contact-device" className="label">
+                      Your Device
+                    </label>
+                    <select
+                      id="contact-device"
+                      name="device"
+                      className="input"
+                      value={form.device}
+                      onChange={handleChange}
+                      style={{ cursor: "pointer" }}
+                    >
+                      <option value="">Select a device...</option>
+                      <option value="Firestick">Amazon Firestick</option>
+                      <option value="Android TV">Android TV / Box</option>
+                      <option value="iPhone/iPad">iPhone / iPad</option>
+                      <option value="Android Phone">Android Phone/Tablet</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </MotionStaggerChild>
+                </MotionStagger>
+
+                <div className="mb-6">
+                  <label htmlFor="contact-message" className="label">
+                    Message <span className="text-[#ef4444]">*</span>
+                  </label>
+                  <textarea
+                    id="contact-message"
+                    name="message"
+                    className="input resize-none"
+                    rows={4}
+                    placeholder="Tell us a bit about yourself or ask a question..."
+                    value={form.message}
+                    onChange={handleChange}
+                    required
+                    aria-required="true"
+                  />
+                </div>
+
+                {error && (
+                  <p
+                    role="alert"
+                    className="text-[#ef4444] text-sm mb-5 p-3 rounded-lg"
+                    style={{ background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)" }}
+                  >
+                    {error}
+                  </p>
                 )}
-              </button>
-            </form>
-          )}
-        </div>
+
+                <motion.button
+                  type="submit"
+                  disabled={loading}
+                  className="btn btn-primary w-full"
+                  style={{ fontSize: "1rem" }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  {loading ? (
+                    <>
+                      <span className="spinner" style={{ width: 18, height: 18, borderWidth: 2 }} />
+                      Sending...
+                    </>
+                  ) : (
+                    <>
+                      Send Request
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                      </svg>
+                    </>
+                  )}
+                </motion.button>
+              </motion.form>
+            )}
+          </AnimatePresence>
+        </MotionReveal>
       </div>
     </section>
   );
@@ -666,17 +656,12 @@ function ContactForm() {
 // ─── App Showcase ─────────────────────────────────────────────────────────────
 
 function AppShowcase() {
-  const { ref, visible } = useScrollReveal();
   const [active, setActive] = useState(0);
 
   return (
     <section id="showcase" className="py-24 px-4" style={{ borderTop: "1px solid #1a1a24" }}>
       <div className="max-w-6xl mx-auto">
-        <div
-          ref={ref}
-          className="transition-all duration-700"
-          style={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(32px)" }}
-        >
+        <MotionReveal>
           {/* Header */}
           <div className="text-center mb-14">
             <span
@@ -698,61 +683,78 @@ function AppShowcase() {
             </p>
           </div>
 
-          {/* Tabs */}
+          {/* Tabs with sliding indicator */}
           <div className="flex flex-wrap justify-center gap-2 mb-8">
             {SCREENSHOTS.map((s, i) => (
               <button
                 key={s.label}
                 onClick={() => setActive(i)}
-                className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200"
-                style={
-                  active === i
-                    ? {
-                        background: "linear-gradient(135deg, rgba(0,212,255,0.15), rgba(124,58,237,0.15))",
-                        border: "1px solid rgba(0,212,255,0.4)",
-                        color: "#00d4ff",
-                        boxShadow: "0 0 20px rgba(0,212,255,0.1)",
-                      }
-                    : {
-                        background: "rgba(30,41,59,0.5)",
-                        border: "1px solid #334155",
-                        color: "#94a3b8",
-                      }
-                }
+                className="relative px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200"
+                style={{
+                  background: "rgba(30,41,59,0.5)",
+                  border: "1px solid #334155",
+                  color: active === i ? "#00d4ff" : "#94a3b8",
+                }}
               >
-                {s.label}
+                {active === i && (
+                  <motion.div
+                    layoutId="showcase-tab"
+                    className="absolute inset-0 rounded-lg"
+                    style={{
+                      background: "linear-gradient(135deg, rgba(0,212,255,0.15), rgba(124,58,237,0.15))",
+                      border: "1px solid rgba(0,212,255,0.4)",
+                      boxShadow: "0 0 20px rgba(0,212,255,0.1)",
+                    }}
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                )}
+                <span className="relative z-10">{s.label}</span>
               </button>
             ))}
           </div>
 
           {/* Screenshot Display */}
           <div className="relative">
-            {/* TV frame */}
-            <div
+            {/* TV frame with glow pulse */}
+            <motion.div
               className="relative mx-auto rounded-2xl overflow-hidden"
               style={{
                 maxWidth: 900,
                 border: "3px solid #2a2a3a",
-                boxShadow: "0 0 80px rgba(0,212,255,0.08), 0 40px 80px rgba(0,0,0,0.5)",
                 background: "#0a0a0f",
               }}
+              animate={{
+                boxShadow: [
+                  "0 0 60px rgba(0,212,255,0.08), 0 40px 80px rgba(0,0,0,0.5)",
+                  "0 0 80px rgba(0,212,255,0.14), 0 40px 80px rgba(0,0,0,0.5)",
+                  "0 0 60px rgba(0,212,255,0.08), 0 40px 80px rgba(0,0,0,0.5)",
+                ],
+              }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             >
-              {/* Screenshot images - crossfade */}
+              {/* Screenshot with AnimatePresence */}
               <div className="relative" style={{ aspectRatio: "16/10" }}>
-                {SCREENSHOTS.map((s, i) => (
-                  <Image
-                    key={s.label}
-                    src={s.src}
-                    alt={`Ooustream IPTV - ${s.label}`}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 900px"
-                    className="object-cover transition-opacity duration-500"
-                    style={{ opacity: active === i ? 1 : 0 }}
-                    priority={i === 0}
-                  />
-                ))}
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={active}
+                    initial={{ opacity: 0, scale: 1.02 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.98 }}
+                    transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+                    className="absolute inset-0"
+                  >
+                    <Image
+                      src={SCREENSHOTS[active].src}
+                      alt={`Ooustream IPTV - ${SCREENSHOTS[active].label}`}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 900px"
+                      className="object-cover"
+                      priority={active === 0}
+                    />
+                  </motion.div>
+                </AnimatePresence>
               </div>
-            </div>
+            </motion.div>
 
             {/* Stand / base decoration */}
             <div className="flex justify-center mt-[-1px]">
@@ -767,65 +769,51 @@ function AppShowcase() {
             </div>
           </div>
 
-          {/* Caption */}
+          {/* Caption with AnimatePresence */}
           <div className="text-center mt-6">
-            <p className="text-[#f1f5f9] font-semibold text-lg">{SCREENSHOTS[active].label}</p>
-            <p className="text-[#64748b] text-sm">{SCREENSHOTS[active].description}</p>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={active}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.25 }}
+              >
+                <p className="text-[#f1f5f9] font-semibold text-lg">{SCREENSHOTS[active].label}</p>
+                <p className="text-[#64748b] text-sm">{SCREENSHOTS[active].description}</p>
+              </motion.div>
+            </AnimatePresence>
           </div>
 
-          {/* Feature highlights from the app */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
+          {/* Feature highlights */}
+          <MotionStagger className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12" staggerDelay={0.08}>
             {[
               { label: "AI Recommendations", desc: "Personalized content just for you" },
               { label: "Binge Mode", desc: "Auto-play next episode" },
               { label: "Continue Watching", desc: "Pick up where you left off" },
               { label: "Voice Search", desc: "Find anything instantly" },
-            ].map((feat, i) => (
-              <div
-                key={feat.label}
-                className="text-center p-4 rounded-xl transition-all duration-300"
-                style={{
-                  background: "rgba(30,41,59,0.3)",
-                  border: "1px solid #1e293b",
-                  animationDelay: `${i * 80}ms`,
-                }}
-              >
-                <p className="text-sm font-semibold text-[#f1f5f9] mb-1">{feat.label}</p>
-                <p className="text-xs text-[#64748b]">{feat.desc}</p>
-              </div>
+            ].map((feat) => (
+              <MotionStaggerChild key={feat.label}>
+                <div
+                  className="text-center p-4 rounded-xl transition-all duration-300"
+                  style={{
+                    background: "rgba(30,41,59,0.3)",
+                    border: "1px solid #1e293b",
+                  }}
+                >
+                  <p className="text-sm font-semibold text-[#f1f5f9] mb-1">{feat.label}</p>
+                  <p className="text-xs text-[#64748b]">{feat.desc}</p>
+                </div>
+              </MotionStaggerChild>
             ))}
-          </div>
-        </div>
+          </MotionStagger>
+        </MotionReveal>
       </div>
     </section>
   );
 }
 
-// ─── Section Reveal Wrapper ───────────────────────────────────────────────────
-
-interface RevealProps {
-  children: React.ReactNode;
-  delay?: number;
-  className?: string;
-}
-
-function Reveal({ children, delay = 0, className = "" }: RevealProps) {
-  const { ref, visible } = useScrollReveal();
-
-  return (
-    <div
-      ref={ref}
-      className={className}
-      style={{
-        opacity: visible ? 1 : 0,
-        transform: visible ? "translateY(0)" : "translateY(28px)",
-        transition: `opacity 0.65s ease ${delay}ms, transform 0.65s ease ${delay}ms`,
-      }}
-    >
-      {children}
-    </div>
-  );
-}
+// Reveal is now MotionReveal from @/components/motion.tsx
 
 // ─── Main Landing Page ────────────────────────────────────────────────────────
 
@@ -876,14 +864,16 @@ export default function LandingPage() {
     <div className="min-h-screen" style={{ background: "#0a0a0f" }}>
 
       {/* ── Checkout Email Modal ──────────────────────────────────────────────── */}
-      {selectedCheckout && (
-        <EmailModal
-          planType={selectedCheckout.planType}
-          billingOption={selectedCheckout.billingOption}
-          planName={selectedCheckout.planName}
-          onClose={() => setSelectedCheckout(null)}
-        />
-      )}
+      <AnimatePresence>
+        {selectedCheckout && (
+          <EmailModal
+            planType={selectedCheckout.planType}
+            billingOption={selectedCheckout.billingOption}
+            planName={selectedCheckout.planName}
+            onClose={() => setSelectedCheckout(null)}
+          />
+        )}
+      </AnimatePresence>
 
       {/* ── Sticky Header ────────────────────────────────────────────────────── */}
       <header
@@ -954,66 +944,88 @@ export default function LandingPage() {
         </div>
 
         {/* Mobile menu */}
-        <div
-          id="mobile-menu"
-          role="region"
-          aria-label="Mobile navigation"
-          className="md:hidden overflow-hidden transition-all duration-300"
-          style={{
-            maxHeight: menuOpen ? "320px" : "0",
-            background: "rgba(10,10,15,0.98)",
-            borderTop: menuOpen ? "1px solid #2a2a3a" : "none",
-          }}
-        >
-          <div className="px-4 py-4 flex flex-col gap-1">
-            {navLinks.map((link) => (
-              <button
-                key={link.id}
-                onClick={() => scrollTo(link.id)}
-                className="w-full text-left px-4 py-3 rounded-xl text-[#94a3b8] hover:text-[#f1f5f9] hover:bg-[#1a1a24] transition-all text-sm font-medium"
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              id="mobile-menu"
+              role="region"
+              aria-label="Mobile navigation"
+              className="md:hidden overflow-hidden"
+              style={{
+                background: "rgba(10,10,15,0.98)",
+                borderTop: "1px solid #2a2a3a",
+              }}
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
+            >
+              <motion.div
+                className="px-4 py-4 flex flex-col gap-1"
+                initial="hidden"
+                animate="visible"
+                variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.05 } } }}
               >
-                {link.label}
-              </button>
-            ))}
-            <div className="pt-2 pb-1">
-              <Link
-                href="/login"
-                className="btn btn-primary w-full text-sm"
-                onClick={() => setMenuOpen(false)}
-              >
-                Customer Login
-              </Link>
-            </div>
-          </div>
-        </div>
+                {navLinks.map((link) => (
+                  <motion.button
+                    key={link.id}
+                    onClick={() => scrollTo(link.id)}
+                    className="w-full text-left px-4 py-3 rounded-xl text-[#94a3b8] hover:text-[#f1f5f9] hover:bg-[#1a1a24] transition-all text-sm font-medium"
+                    variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
+                  >
+                    {link.label}
+                  </motion.button>
+                ))}
+                <motion.div
+                  className="pt-2 pb-1"
+                  variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
+                >
+                  <Link
+                    href="/login"
+                    className="btn btn-primary w-full text-sm"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Customer Login
+                  </Link>
+                </motion.div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       {/* ── Hero ─────────────────────────────────────────────────────────────── */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-4">
-        {/* Ambient glow orbs */}
-        <div
+        {/* Ambient glow orbs — floating */}
+        <motion.div
           aria-hidden="true"
           className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none"
           style={{
             background: "radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%)",
             filter: "blur(40px)",
           }}
+          animate={{ y: [0, -15, 0], x: [0, 8, 0] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         />
-        <div
+        <motion.div
           aria-hidden="true"
           className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full pointer-events-none"
           style={{
             background: "radial-gradient(circle, rgba(124,58,237,0.06) 0%, transparent 70%)",
             filter: "blur(60px)",
           }}
+          animate={{ y: [0, 10, 0], x: [0, -6, 0] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
         />
-        <div
+        <motion.div
           aria-hidden="true"
           className="absolute top-20 left-10 w-[200px] h-[200px] rounded-full pointer-events-none"
           style={{
             background: "radial-gradient(circle, rgba(251,191,36,0.04) 0%, transparent 70%)",
             filter: "blur(40px)",
           }}
+          animate={{ y: [0, -8, 0] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
         />
 
         {/* Subtle grid overlay */}
@@ -1031,103 +1043,166 @@ export default function LandingPage() {
 
         <div className="relative z-10 max-w-5xl mx-auto text-center pt-24 pb-16">
           {/* Pill badge */}
-          <div
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-mono font-semibold tracking-widest uppercase mb-8 animate-fadeIn"
+          <motion.div
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-mono font-semibold tracking-widest uppercase mb-8"
             style={{
               background: "rgba(0,212,255,0.08)",
               border: "1px solid rgba(0,212,255,0.2)",
               color: "#00d4ff",
             }}
+            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
           >
             <span
               className="w-2 h-2 rounded-full animate-glow"
               style={{ background: "#00d4ff", flexShrink: 0 }}
             />
             Premium IPTV Service
-          </div>
+          </motion.div>
 
-          {/* Headline */}
-          <h1
-            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-tight mb-6 animate-fadeIn stagger-1"
+          {/* Headline — word-by-word reveal */}
+          <motion.h1
+            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-tight mb-6"
             style={{ letterSpacing: "-0.03em" }}
+            initial="hidden"
+            animate="visible"
+            variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08, delayChildren: 0.4 } } }}
           >
-            Stream{" "}
-            <span className="gradient-text">Everything.</span>
+            {["Stream", " "].map((word, i) => (
+              <motion.span
+                key={i}
+                variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] } } }}
+              >
+                {word}
+              </motion.span>
+            ))}
+            <motion.span
+              className="gradient-text"
+              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] } } }}
+            >
+              Everything.
+            </motion.span>
             <br />
-            <span style={{ color: "#f1f5f9" }}>Anywhere.</span>
-          </h1>
+            <motion.span
+              style={{ color: "#f1f5f9" }}
+              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] } } }}
+            >
+              Anywhere.
+            </motion.span>
+          </motion.h1>
 
           {/* Subtitle */}
-          <p
-            className="text-lg md:text-xl text-[#94a3b8] max-w-2xl mx-auto mb-10 leading-relaxed animate-fadeIn stagger-2"
+          <motion.p
+            className="text-lg md:text-xl text-[#94a3b8] max-w-2xl mx-auto mb-10 leading-relaxed"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
           >
             Premium IPTV with 10,000+ live channels, an on-demand library of movies and shows,
             live sports and PPV events — all in HD and 4K on any device.
-          </p>
+          </motion.p>
 
           {/* CTA buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fadeIn stagger-3">
-            <button
+          <motion.div
+            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.0, ease: [0.25, 0.1, 0.25, 1] }}
+          >
+            <motion.button
               onClick={() => scrollTo("pricing")}
               className="btn btn-primary text-base px-8 py-4"
               style={{ fontSize: "1rem" }}
+              whileHover={{ scale: 1.03, boxShadow: "0 0 35px rgba(0,212,255,0.5)" }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 400, damping: 25 }}
             >
               Get Started
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
               </svg>
-            </button>
-            <Link
-              href="/login"
-              className="btn btn-secondary text-base px-8 py-4"
-              style={{ fontSize: "1rem" }}
+            </motion.button>
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
-              Customer Login
-            </Link>
-          </div>
+              <Link
+                href="/login"
+                className="btn btn-secondary text-base px-8 py-4"
+                style={{ fontSize: "1rem" }}
+              >
+                Customer Login
+              </Link>
+            </motion.div>
+          </motion.div>
 
-          {/* Social proof */}
-          <div className="mt-14 flex flex-wrap items-center justify-center gap-8 animate-fadeIn stagger-4">
+          {/* Social proof with animated counter */}
+          <motion.div
+            className="mt-14 flex flex-wrap items-center justify-center gap-8"
+            initial="hidden"
+            animate="visible"
+            variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1, delayChildren: 1.2 } } }}
+          >
+            <motion.div
+              className="text-center"
+              variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
+            >
+              <p className="text-2xl font-bold" style={{ color: "#00d4ff" }}>
+                <AnimatedCounter value={10000} suffix="+" />
+              </p>
+              <p className="text-xs text-[#64748b] font-medium uppercase tracking-wider mt-0.5">Live Channels</p>
+            </motion.div>
             {[
-              { value: "10,000+", label: "Live Channels" },
               { value: "HD & 4K", label: "Quality" },
               { value: "All Devices", label: "Compatible" },
               { value: "24/7", label: "Support" },
             ].map((stat) => (
-              <div key={stat.label} className="text-center">
+              <motion.div
+                key={stat.label}
+                className="text-center"
+                variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
+              >
                 <p className="text-2xl font-bold" style={{ color: "#00d4ff" }}>{stat.value}</p>
                 <p className="text-xs text-[#64748b] font-medium uppercase tracking-wider mt-0.5">{stat.label}</p>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
 
         {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-fadeIn stagger-5">
+        <motion.div
+          className="absolute bottom-8 left-1/2 -translate-x-1/2"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 0.6 }}
+        >
           <button
             onClick={() => scrollTo("features")}
             aria-label="Scroll to features"
             className="flex flex-col items-center gap-2 text-[#64748b] hover:text-[#94a3b8] transition-colors"
           >
             <span className="text-xs font-mono uppercase tracking-widest">Scroll</span>
-            <svg
+            <motion.svg
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth={1.5}
-              className="w-5 h-5 animate-bounce"
+              className="w-5 h-5"
+              animate={{ y: [0, 6, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
             >
               <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-            </svg>
+            </motion.svg>
           </button>
-        </div>
+        </motion.div>
       </section>
 
       {/* ── Features ─────────────────────────────────────────────────────────── */}
       <section id="features" className="py-24 px-4">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <Reveal className="text-center mb-16">
+          <MotionReveal className="text-center mb-16">
             <span
               className="inline-block text-xs font-mono font-semibold tracking-widest uppercase mb-4 px-3 py-1 rounded-full"
               style={{
@@ -1145,15 +1220,16 @@ export default function LandingPage() {
             <p className="text-[#94a3b8] text-lg max-w-xl mx-auto">
               Everything you need for the ultimate streaming experience, all in one service.
             </p>
-          </Reveal>
+          </MotionReveal>
 
-          {/* Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {FEATURES.map((feature, i) => (
-              <Reveal key={feature.title} delay={i * 80}>
-                <div
+          {/* Grid — staggered cascade */}
+          <MotionStagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" staggerDelay={0.1}>
+            {FEATURES.map((feature) => (
+              <MotionStaggerChild key={feature.title}>
+                <motion.div
                   className="card card-hover group h-full"
                   style={{ "--glow-color": feature.glow } as React.CSSProperties}
+                  whileHover={{ y: -6, transition: { type: "spring", stiffness: 300, damping: 20 } }}
                 >
                   <div
                     className={`inline-flex items-center justify-center w-12 h-12 rounded-xl mb-5 ${feature.color} transition-transform duration-300 group-hover:scale-110`}
@@ -1163,10 +1239,10 @@ export default function LandingPage() {
                   </div>
                   <h3 className="text-lg font-bold text-[#f1f5f9] mb-2">{feature.title}</h3>
                   <p className="text-[#94a3b8] text-sm leading-relaxed">{feature.description}</p>
-                </div>
-              </Reveal>
+                </motion.div>
+              </MotionStaggerChild>
             ))}
-          </div>
+          </MotionStagger>
         </div>
       </section>
 
@@ -1177,7 +1253,7 @@ export default function LandingPage() {
       <section id="devices" className="py-24 px-4">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <Reveal className="text-center mb-16">
+          <MotionReveal className="text-center mb-16">
             <span
               className="inline-block text-xs font-mono font-semibold tracking-widest uppercase mb-4 px-3 py-1 rounded-full"
               style={{
@@ -1195,33 +1271,31 @@ export default function LandingPage() {
             <p className="text-[#94a3b8] text-lg max-w-xl mx-auto">
               One subscription. Stream on Firestick, Android TV, iPhone, and Android devices.
             </p>
-          </Reveal>
+          </MotionReveal>
 
           {/* Devices — horizontal scroll on mobile, grid on desktop */}
-          <Reveal>
-            <div className="flex md:grid md:grid-cols-4 gap-4 overflow-x-auto pb-4 md:pb-0 scrollbar-thin">
-              {DEVICES.map((device, i) => (
-                <div
-                  key={device.name}
-                  className="flex-shrink-0 w-36 md:w-auto group"
-                  style={{ animationDelay: `${i * 60}ms` }}
+          <MotionStagger className="flex md:grid md:grid-cols-4 gap-4 overflow-x-auto pb-4 md:pb-0 scrollbar-thin" staggerDelay={0.1}>
+            {DEVICES.map((device) => (
+              <MotionStaggerChild
+                key={device.name}
+                className="flex-shrink-0 w-36 md:w-auto group"
+              >
+                <motion.div
+                  className="card card-hover text-center py-8 px-4 h-full cursor-default"
+                  aria-label={device.name}
+                  whileHover={{ y: -4, transition: { type: "spring", stiffness: 300, damping: 20 } }}
                 >
                   <div
-                    className="card card-hover text-center py-8 px-4 h-full cursor-default"
-                    aria-label={device.name}
+                    className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 text-[#00d4ff] mx-auto transition-all duration-300 group-hover:scale-110 group-hover:text-[#7c3aed]"
+                    style={{ background: "rgba(0,212,255,0.08)", border: "1px solid rgba(0,212,255,0.15)" }}
                   >
-                    <div
-                      className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 text-[#00d4ff] mx-auto transition-all duration-300 group-hover:scale-110 group-hover:text-[#7c3aed]"
-                      style={{ background: "rgba(0,212,255,0.08)", border: "1px solid rgba(0,212,255,0.15)" }}
-                    >
-                      {device.icon}
-                    </div>
-                    <p className="text-sm font-semibold text-[#f1f5f9]">{device.name}</p>
+                    {device.icon}
                   </div>
-                </div>
-              ))}
-            </div>
-          </Reveal>
+                  <p className="text-sm font-semibold text-[#f1f5f9]">{device.name}</p>
+                </motion.div>
+              </MotionStaggerChild>
+            ))}
+          </MotionStagger>
         </div>
       </section>
 
@@ -1229,7 +1303,7 @@ export default function LandingPage() {
       <section id="pricing" className="py-24 px-4">
         <div className="max-w-5xl mx-auto">
           {/* Header */}
-          <Reveal className="text-center mb-16">
+          <MotionReveal className="text-center mb-16">
             <span
               className="inline-block text-xs font-mono font-semibold tracking-widest uppercase mb-4 px-3 py-1 rounded-full"
               style={{
@@ -1247,7 +1321,7 @@ export default function LandingPage() {
             <p className="text-[#94a3b8] text-lg max-w-xl mx-auto">
               No hidden fees. No contracts. Cancel anytime. Pick the plan that fits your needs.
             </p>
-          </Reveal>
+          </MotionReveal>
 
           {/* Plan cards - side by side */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start max-w-4xl mx-auto">
@@ -1255,19 +1329,24 @@ export default function LandingPage() {
               const periodIdx = selectedPeriods[plan.planType];
               const currentOption = plan.billingOptions[periodIdx];
               return (
-                <Reveal key={plan.planType} delay={planIdx * 150}>
-                  <div
-                    className="relative rounded-2xl p-px transition-all duration-300"
+                <MotionReveal key={plan.planType} delay={planIdx * 150}>
+                  <motion.div
+                    className="relative rounded-2xl p-px"
                     style={
                       plan.featured
                         ? {
                             background: "linear-gradient(135deg, #00d4ff, #7c3aed)",
-                            boxShadow: "0 0 60px rgba(0,212,255,0.25), 0 0 100px rgba(124,58,237,0.15)",
                           }
                         : {
                             background: "#2a2a3a",
                           }
                     }
+                    whileHover={plan.featured
+                      ? { y: -6, boxShadow: "0 0 80px rgba(0,212,255,0.35), 0 0 120px rgba(124,58,237,0.2)" }
+                      : { y: -4, boxShadow: "0 0 40px rgba(0,212,255,0.1)" }
+                    }
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                    initial={plan.featured ? { boxShadow: "0 0 60px rgba(0,212,255,0.25), 0 0 100px rgba(124,58,237,0.15)" } : {}}
                   >
                     <div
                       className="rounded-[calc(1rem-1px)] p-8 h-full flex flex-col"
@@ -1339,19 +1418,35 @@ export default function LandingPage() {
                         ))}
                       </div>
 
-                      {/* Price display */}
-                      <div className="mb-2">
-                        <span
-                          className="text-5xl font-bold"
-                          style={{ color: plan.featured ? "#00d4ff" : "#f1f5f9", letterSpacing: "-0.03em" }}
-                        >
-                          ${currentOption.price}
-                        </span>
+                      {/* Price display — morphing animation */}
+                      <div className="mb-2 overflow-hidden">
+                        <AnimatePresence mode="wait">
+                          <motion.span
+                            key={currentOption.price}
+                            className="text-5xl font-bold inline-block"
+                            style={{ color: plan.featured ? "#00d4ff" : "#f1f5f9", letterSpacing: "-0.03em" }}
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: 10 }}
+                            transition={{ duration: 0.25, ease: "easeOut" }}
+                          >
+                            ${currentOption.price}
+                          </motion.span>
+                        </AnimatePresence>
                       </div>
-                      <p className="text-sm text-[#64748b] mb-8">
-                        {currentOption.perMonth} billed{" "}
-                        {currentOption.period === "monthly" ? "monthly" : currentOption.period === "6month" ? "every 6 months" : "annually"}
-                      </p>
+                      <AnimatePresence mode="wait">
+                        <motion.p
+                          key={currentOption.perMonth}
+                          className="text-sm text-[#64748b] mb-8"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          {currentOption.perMonth} billed{" "}
+                          {currentOption.period === "monthly" ? "monthly" : currentOption.period === "6month" ? "every 6 months" : "annually"}
+                        </motion.p>
+                      </AnimatePresence>
 
                       {/* Feature list */}
                       <ul className="space-y-3 mb-8 flex-1" role="list">
@@ -1373,25 +1468,27 @@ export default function LandingPage() {
                       </ul>
 
                       {/* CTA */}
-                      <button
+                      <motion.button
                         onClick={() => setSelectedCheckout({ planType: plan.planType, billingOption: currentOption, planName: plan.name })}
                         className={`btn w-full text-sm ${plan.featured ? "btn-primary" : "btn-secondary"}`}
                         aria-label={`Subscribe to ${plan.name} plan for $${currentOption.price}`}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
                       >
                         Subscribe Now
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4">
                           <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                         </svg>
-                      </button>
+                      </motion.button>
                     </div>
-                  </div>
-                </Reveal>
+                  </motion.div>
+                </MotionReveal>
               );
             })}
           </div>
 
           {/* Existing customer callout */}
-          <Reveal delay={300}>
+          <MotionReveal delay={300}>
             <p className="text-center text-[#64748b] text-sm mt-10">
               Already a customer?{" "}
               <Link href="/login" className="text-[#00d4ff] hover:underline font-medium">
@@ -1399,7 +1496,7 @@ export default function LandingPage() {
               </Link>{" "}
               to manage your subscription.
             </p>
-          </Reveal>
+          </MotionReveal>
         </div>
       </section>
 
@@ -1407,7 +1504,7 @@ export default function LandingPage() {
       <section className="py-24 px-4" style={{ borderTop: "1px solid #1a1a24" }}>
         <div className="max-w-5xl mx-auto">
           {/* Header */}
-          <Reveal className="text-center mb-16">
+          <MotionReveal className="text-center mb-16">
             <span
               className="inline-block text-xs font-mono font-semibold tracking-widest uppercase mb-4 px-3 py-1 rounded-full"
               style={{
@@ -1425,33 +1522,39 @@ export default function LandingPage() {
             <p className="text-[#94a3b8] text-lg max-w-xl mx-auto">
               Getting started with Ooustream is simple. Follow these three easy steps.
             </p>
-          </Reveal>
+          </MotionReveal>
 
           {/* Steps */}
           <div className="relative">
-            {/* Connecting line (desktop) */}
-            <div
+            {/* Connecting line — draws itself */}
+            <motion.div
               className="hidden md:block absolute top-12 left-0 right-0 h-px"
               aria-hidden="true"
               style={{
                 background: "linear-gradient(90deg, transparent, rgba(0,212,255,0.3) 20%, rgba(124,58,237,0.3) 80%, transparent)",
                 margin: "0 16.67%",
+                transformOrigin: "left",
               }}
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 1.2, delay: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {STEPS.map((step, i) => (
-                <Reveal key={step.number} delay={i * 120}>
+            <MotionStagger className="grid grid-cols-1 md:grid-cols-3 gap-8" staggerDelay={0.15}>
+              {STEPS.map((step) => (
+                <MotionStaggerChild key={step.number}>
                   <div className="relative text-center group">
                     {/* Step number bubble */}
                     <div className="relative inline-flex mb-6">
-                      <div
-                        className="w-24 h-24 rounded-2xl flex items-center justify-center mx-auto relative z-10 transition-transform duration-300 group-hover:scale-110"
+                      <motion.div
+                        className="w-24 h-24 rounded-2xl flex items-center justify-center mx-auto relative z-10"
                         style={{
                           background: "linear-gradient(135deg, rgba(0,212,255,0.1), rgba(124,58,237,0.1))",
                           border: "1px solid rgba(0,212,255,0.2)",
                           boxShadow: "0 0 30px rgba(0,212,255,0.06)",
                         }}
+                        whileHover={{ scale: 1.1, transition: { type: "spring", stiffness: 300, damping: 20 } }}
                       >
                         <span
                           className="absolute top-2 right-2 text-xs font-mono font-bold"
@@ -1460,31 +1563,34 @@ export default function LandingPage() {
                           {step.number}
                         </span>
                         <span className="text-[#00d4ff]">{step.icon}</span>
-                      </div>
+                      </motion.div>
                     </div>
 
                     <h3 className="text-lg font-bold text-[#f1f5f9] mb-3">{step.title}</h3>
                     <p className="text-[#94a3b8] text-sm leading-relaxed max-w-xs mx-auto">{step.description}</p>
                   </div>
-                </Reveal>
+                </MotionStaggerChild>
               ))}
-            </div>
+            </MotionStagger>
           </div>
 
           {/* Bottom CTA */}
-          <Reveal delay={360}>
+          <MotionReveal delay={360}>
             <div className="text-center mt-14">
-              <button
+              <motion.button
                 onClick={() => scrollTo("pricing")}
                 className="btn btn-primary text-base px-8"
+                whileHover={{ scale: 1.03, boxShadow: "0 0 35px rgba(0,212,255,0.5)" }}
+                whileTap={{ scale: 0.97 }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
               >
                 Get Started Today
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-5 h-5">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                 </svg>
-              </button>
+              </motion.button>
             </div>
-          </Reveal>
+          </MotionReveal>
         </div>
       </section>
 
@@ -1496,7 +1602,7 @@ export default function LandingPage() {
         className="py-14 px-4"
         style={{ borderTop: "1px solid #1a1a24", background: "rgba(18,18,26,0.6)" }}
       >
-        <div className="max-w-7xl mx-auto">
+        <MotionReveal className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
             {/* Brand */}
             <div className="md:col-span-1">
@@ -1606,7 +1712,7 @@ export default function LandingPage() {
               Made with care for premium streaming.
             </p>
           </div>
-        </div>
+        </MotionReveal>
       </footer>
     </div>
   );
