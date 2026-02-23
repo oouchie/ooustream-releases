@@ -167,3 +167,24 @@ export const TICKET_STATUSES: Record<TicketStatus, string> = {
   resolved: 'Resolved',
   closed: 'Closed',
 };
+
+// Customer Review
+export interface Review {
+  id: string;
+  customer_id: string;
+  rating: number;
+  review_text: string;
+  display_name: string;
+  is_approved: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ReviewWithCustomer extends Review {
+  customer?: {
+    id: string;
+    name: string;
+    email: string;
+    status: string;
+  } | null;
+}

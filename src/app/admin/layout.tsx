@@ -107,6 +107,12 @@ export default function AdminLayout({
                 >
                   Announcements
                 </Link>
+                <Link
+                  href="/admin/reviews"
+                  className={`transition-colors ${pathname?.startsWith("/admin/reviews") ? "text-[#f1f5f9]" : "text-[#94a3b8] hover:text-[#f1f5f9]"}`}
+                >
+                  Reviews
+                </Link>
               </nav>
             </div>
             <div className="flex items-center gap-2 md:gap-4">
@@ -168,6 +174,16 @@ export default function AdminLayout({
                 }`}
               >
                 Announcements
+              </Link>
+              <Link
+                href="/admin/reviews"
+                className={`block px-4 py-3 rounded-lg text-base font-medium transition-colors ${
+                  pathname?.startsWith("/admin/reviews")
+                    ? "bg-[#6366f1] text-white"
+                    : "text-[#94a3b8] hover:bg-[#334155] hover:text-[#f1f5f9]"
+                }`}
+              >
+                Reviews
               </Link>
               <a
                 href={process.env.NEXT_PUBLIC_CRM_URL || "https://ooustream-crm.vercel.app"}

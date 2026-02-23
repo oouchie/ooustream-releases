@@ -423,6 +423,120 @@ function EmailModal({ planType, billingOption, planName, onClose }: EmailModalPr
   );
 }
 
+// ─── Testimonials Section ─────────────────────────────────────────────────────
+
+function TestimonialsSection() {
+  const [reviews, setReviews] = useState<
+    Array<{
+      id: string;
+      rating: number;
+      review_text: string;
+      display_name: string;
+      created_at: string;
+    }>
+  >([]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/reviews")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.reviews) setReviews(data.reviews);
+      })
+      .catch(() => {})
+      .finally(() => setLoaded(true));
+  }, []);
+
+  if (!loaded || reviews.length === 0) return null;
+
+  return (
+    <section className="py-24 px-4" style={{ borderTop: "1px solid #1a1a24" }}>
+      <div className="max-w-5xl mx-auto">
+        <MotionReveal className="text-center mb-16">
+          <span
+            className="inline-block text-xs font-mono font-semibold tracking-widest uppercase mb-4 px-3 py-1 rounded-full"
+            style={{
+              color: "#fbbf24",
+              background: "rgba(251,191,36,0.08)",
+              border: "1px solid rgba(251,191,36,0.2)",
+            }}
+          >
+            Testimonials
+          </span>
+          <h2 className="text-3xl md:text-4xl font-bold text-[#f1f5f9] mb-4">
+            What Our{" "}
+            <span className="gradient-text">Customers Say</span>
+          </h2>
+          <p className="text-[#94a3b8] text-lg max-w-xl mx-auto">
+            Real reviews from verified Ooustream subscribers.
+          </p>
+        </MotionReveal>
+
+        <MotionStagger
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+          staggerDelay={0.1}
+        >
+          {reviews.slice(0, 6).map((review) => (
+            <MotionStaggerChild key={review.id}>
+              <motion.div
+                className="card card-hover h-full flex flex-col"
+                whileHover={{
+                  y: -6,
+                  transition: { type: "spring", stiffness: 300, damping: 20 },
+                }}
+              >
+                {/* Star rating */}
+                <div className="flex gap-1 mb-3">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <svg
+                      key={star}
+                      className={`w-5 h-5 ${
+                        star <= review.rating
+                          ? "text-[#fbbf24]"
+                          : "text-[#334155]"
+                      }`}
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    </svg>
+                  ))}
+                </div>
+
+                {/* Review text */}
+                <p className="text-[#cbd5e1] text-sm leading-relaxed flex-1 mb-4">
+                  &ldquo;{review.review_text}&rdquo;
+                </p>
+
+                {/* Author */}
+                <div className="flex items-center gap-3 pt-3 border-t border-[#1e293b]">
+                  <div
+                    className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold"
+                    style={{
+                      background:
+                        "linear-gradient(135deg, rgba(0,212,255,0.2), rgba(124,58,237,0.2))",
+                      border: "1px solid rgba(0,212,255,0.3)",
+                      color: "#00d4ff",
+                    }}
+                  >
+                    {review.display_name.charAt(0).toUpperCase()}
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-[#f1f5f9]">
+                      {review.display_name}
+                    </p>
+                    <p className="text-xs text-[#64748b]">Verified Customer</p>
+                  </div>
+                </div>
+              </motion.div>
+            </MotionStaggerChild>
+          ))}
+        </MotionStagger>
+      </div>
+    </section>
+  );
+}
+
 // ─── Contact Form ─────────────────────────────────────────────────────────────
 
 function ContactForm() {
@@ -1593,6 +1707,9 @@ export default function LandingPage() {
           </MotionReveal>
         </div>
       </section>
+
+      {/* ── Testimonials ──────────────────────────────────────────────────── */}
+      <TestimonialsSection />
 
       {/* ── Contact / Trial Form ──────────────────────────────────────────────── */}
       <ContactForm />

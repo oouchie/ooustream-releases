@@ -44,6 +44,12 @@ export async function GET() {
       .select('*', { count: 'exact', head: true })
       .eq('is_active', true);
 
+    // Get pending reviews count
+    const { count: pendingReviews } = await supabase
+      .from('reviews')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_approved', false);
+
     return NextResponse.json({
       stats: {
         totalCustomers: totalCustomers || 0,
@@ -51,6 +57,7 @@ export async function GET() {
         openTickets: openTickets || 0,
         pendingTickets: pendingTickets || 0,
         activeAnnouncements: activeAnnouncements || 0,
+        pendingReviews: pendingReviews || 0,
       },
     });
   } catch (error) {

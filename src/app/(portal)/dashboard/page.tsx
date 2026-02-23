@@ -1,6 +1,7 @@
 import { getCustomerSession } from "@/lib/auth";
 import { createServerClient } from "@/lib/supabase";
 import Link from "next/link";
+import ReviewCard from "@/components/portal/ReviewCard";
 
 async function getCustomerData(customerId: string) {
   const supabase = createServerClient();
@@ -266,6 +267,14 @@ export default async function DashboardPage() {
             <p className="text-sm text-[#94a3b8] mt-1">FAQs & setup guides</p>
           </Link>
         </div>
+      </div>
+
+      {/* Share Your Experience */}
+      <div>
+        <h2 className="text-lg font-semibold text-[#f1f5f9] mb-4">
+          Share Your Experience
+        </h2>
+        <ReviewCard customerName={customer.name} />
       </div>
 
       {/* Tutorial Videos */}
