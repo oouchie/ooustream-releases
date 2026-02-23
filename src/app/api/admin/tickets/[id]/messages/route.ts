@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAdminAuth } from "@/lib/auth";
 import { createServerClient } from "@/lib/supabase";
+import { sendTicketReplyNotification } from "@/lib/email";
 
 // POST - Add admin reply to ticket
 export async function POST(
@@ -26,10 +27,10 @@ export async function POST(
 
     const supabase = createServerClient();
 
-    // Verify ticket exists
+    // Verify ticket exists and get details for email notification
     const { data: ticket } = await supabase
       .from("support_tickets")
-      .select("id, status")
+      .select("id, status, subject, ticket_number, customer_id")
       .eq("id", id)
       .single();
 
@@ -68,6 +69,26 @@ export async function POST(
         .from("support_tickets")
         .update({ updated_at: new Date().toISOString() })
         .eq("id", id);
+    }
+
+    // Send email notification to customer (non-internal replies only)
+    if (!is_internal && ticket.customer_id) {
+      const { data: customer } = await supabase
+        .from("customers")
+        .select("name, email")
+        .eq("id", ticket.customer_id)
+        .single();
+
+      if (customer?.email) {
+        sendTicketReplyNotification({
+          customerEmail: customer.email,
+          customerName: customer.name || "Customer",
+          ticketId: ticket.id,
+          ticketNumber: ticket.ticket_number,
+          subject: ticket.subject,
+          replyMessage: message.trim(),
+        }).catch((err) => console.error("Ticket reply email error:", err));
+      }
     }
 
     return NextResponse.json({ success: true, message: newMessage });

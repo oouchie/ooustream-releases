@@ -165,6 +165,55 @@ export async function sendNewCustomerNotification({
   });
 }
 
+// Notify customer about admin reply on their ticket
+export async function sendTicketReplyNotification({
+  customerEmail,
+  customerName,
+  ticketId,
+  ticketNumber,
+  subject,
+  replyMessage,
+}: {
+  customerEmail: string;
+  customerName: string;
+  ticketId: string;
+  ticketNumber: string;
+  subject: string;
+  replyMessage: string;
+}): Promise<void> {
+  initSendGrid();
+
+  const content = `
+    <h2 style="color: #111827; margin-top: 0;">New Reply on Your Ticket</h2>
+    <p style="color: #4b5563;">Hi ${customerName}, our support team has replied to your ticket.</p>
+
+    <div style="background-color: #f3f4f6; padding: 16px; border-radius: 8px; margin: 20px 0;">
+      <p style="margin: 0 0 8px 0; color: #4b5563;">Ticket: <strong style="color: #111827;">#${ticketNumber}</strong></p>
+      <p style="margin: 0; color: #4b5563;">Subject: <strong style="color: #111827;">${subject}</strong></p>
+    </div>
+
+    <div style="background-color: #f9fafb; padding: 16px; border-radius: 8px; border-left: 4px solid #00d4ff;">
+      <p style="margin: 0; color: #4b5563; white-space: pre-wrap;">${replyMessage}</p>
+    </div>
+
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="${PORTAL_URL}/support/${ticketId}" style="background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%); color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">
+        View Ticket
+      </a>
+    </div>
+
+    <p style="color: #9ca3af; font-size: 14px; margin-top: 24px; margin-bottom: 0;">
+      You can reply directly in your portal or respond to this email.
+    </p>`;
+
+  await sgMail.send({
+    from: EMAIL_FROM,
+    to: customerEmail,
+    subject: `Re: Ticket #${ticketNumber} - ${subject}`,
+    html: emailWrapper(content),
+  });
+}
+
 // Notify admin about new support ticket
 export async function sendSupportTicketNotification({
   customerName,
