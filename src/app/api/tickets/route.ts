@@ -53,6 +53,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Input length validation
+    if (subject.length > 200) {
+      return NextResponse.json(
+        { error: "Subject must be under 200 characters" },
+        { status: 400 }
+      );
+    }
+    if (description.length > 5000) {
+      return NextResponse.json(
+        { error: "Description must be under 5000 characters" },
+        { status: 400 }
+      );
+    }
+
     const supabase = createServerClient();
 
     // Create ticket

@@ -5,11 +5,6 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
 });
 
-export interface CustomerCredential {
-  username: string;
-  password: string;
-}
-
 export interface CustomerContext {
   name: string;
   email: string;
@@ -19,7 +14,6 @@ export interface CustomerContext {
   days_until_expiry: number | null;
   has_credentials: boolean;
   credential_count: number;
-  credentials: CustomerCredential[];
   billing_type: string;
   billing_period: string;
 }
@@ -31,21 +25,20 @@ export async function buildCustomerContext(
   const { data: customer } = await supabase
     .from("customers")
     .select(
-      "name, email, status, service_type, expiry_date, billing_type, billing_period, username_1, password_1, username_2, password_2, username_3, password_3, username_4, password_4"
+      "name, email, status, service_type, expiry_date, billing_type, billing_period, username_1, username_2, username_3, username_4"
     )
     .eq("id", customerId)
     .single();
 
   if (!customer) throw new Error("Customer not found");
 
-  const credentials: CustomerCredential[] = [
-    { username: customer.username_1, password: customer.password_1 },
-    { username: customer.username_2, password: customer.password_2 },
-    { username: customer.username_3, password: customer.password_3 },
-    { username: customer.username_4, password: customer.password_4 },
-  ].filter((c): c is CustomerCredential => Boolean(c.username && c.password));
-
-  const credentialCount = credentials.length;
+  // Count credentials without loading passwords — never send passwords to AI
+  const credentialCount = [
+    customer.username_1,
+    customer.username_2,
+    customer.username_3,
+    customer.username_4,
+  ].filter(Boolean).length;
 
   const expiryDate = customer.expiry_date
     ? new Date(customer.expiry_date)
@@ -63,7 +56,6 @@ export async function buildCustomerContext(
     days_until_expiry: daysUntilExpiry,
     has_credentials: credentialCount > 0,
     credential_count: credentialCount,
-    credentials,
     billing_type: customer.billing_type || "manual",
     billing_period: customer.billing_period || "monthly",
   };
@@ -111,8 +103,7 @@ CUSTOMER CONTEXT:
 - Service Type: ${ctx.service_type}
 - Expiry Date: ${expiryFormatted}
 - Days Until Expiry: ${expiryStatus}
-- Has Credentials: ${ctx.has_credentials ? `Yes (${ctx.credential_count} set${ctx.credential_count > 1 ? "s" : ""})` : "No"}
-${ctx.credentials.length > 0 ? ctx.credentials.map((c, i) => `- Credential Set ${i + 1}: Username: ${c.username} | Password: ${c.password}`).join("\n") : ""}
+- Has Credentials: ${ctx.has_credentials ? `Yes (${ctx.credential_count} set${ctx.credential_count > 1 ? "s" : ""})` : "No — credentials not yet assigned"}
 - Billing Type: ${ctx.billing_type}
 
 KNOWLEDGE BASE:

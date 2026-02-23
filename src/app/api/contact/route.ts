@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase';
 import { sendNewCustomerNotification } from '@/lib/email';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit: 3 trial signups per 15 minutes per IP
+    const ip = getClientIp(request);
+    const { allowed, retryAfterSeconds } = checkRateLimit(`contact:${ip}`, { max: 3, windowSeconds: 900 });
+    if (!allowed) {
+      return NextResponse.json(
+        { error: `Too many requests. Try again in ${retryAfterSeconds} seconds.` },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { name, email, phone, device, message } = body;
 

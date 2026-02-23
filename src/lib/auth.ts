@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { SignJWT, jwtVerify } from 'jose';
+import { createHmac, timingSafeEqual } from 'crypto';
 
 const CUSTOMER_COOKIE = 'oostream_customer_session';
 const ADMIN_COOKIE = 'oostream_admin_auth';
@@ -30,7 +31,10 @@ export interface CustomerSession {
 
 // Get JWT secret as Uint8Array
 function getJwtSecret(): Uint8Array {
-  const secret = process.env.JWT_SECRET || 'default_secret';
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET environment variable is required');
+  }
   return new TextEncoder().encode(secret);
 }
 
@@ -85,7 +89,22 @@ export async function clearCustomerSession(): Promise<void> {
   cookieStore.delete(CUSTOMER_COOKIE);
 }
 
-// Admin auth (same pattern as CRM)
+// Hash a value with HMAC-SHA256 using JWT_SECRET
+function hmacHash(value: string): string {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) throw new Error('JWT_SECRET environment variable is required');
+  return createHmac('sha256', secret).update(value).digest('hex');
+}
+
+// Timing-safe string comparison
+function safeCompare(a: string, b: string): boolean {
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) return false;
+  return timingSafeEqual(bufA, bufB);
+}
+
+// Admin auth — stores HMAC hash in cookie instead of plaintext password
 export async function verifyAdminAuth(): Promise<boolean> {
   const cookieStore = await cookies();
   const authCookie = cookieStore.get(ADMIN_COOKIE);
@@ -95,7 +114,8 @@ export async function verifyAdminAuth(): Promise<boolean> {
   try {
     const { token, expires } = JSON.parse(authCookie.value);
     if (Date.now() > expires) return false;
-    return token === process.env.ADMIN_PASSWORD;
+    const expectedHash = hmacHash(process.env.ADMIN_PASSWORD || '');
+    return safeCompare(token, expectedHash);
   } catch {
     return false;
   }
@@ -108,7 +128,7 @@ export async function setAdminCookie(password: string): Promise<boolean> {
 
   const cookieStore = await cookies();
   cookieStore.set(ADMIN_COOKIE, JSON.stringify({
-    token: password,
+    token: hmacHash(password),
     expires: Date.now() + ADMIN_SESSION_DURATION,
   }), {
     httpOnly: true,

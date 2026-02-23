@@ -71,6 +71,18 @@ async function handleCheckoutCompleted(
     return;
   }
 
+  // Idempotency: skip if we already processed this checkout session
+  const { data: existingPayment } = await supabase
+    .from('payments')
+    .select('id')
+    .eq('stripe_checkout_session_id', session.id)
+    .maybeSingle();
+
+  if (existingPayment) {
+    console.log(`Checkout session ${session.id} already processed, skipping`);
+    return;
+  }
+
   // Landing page signup — no existing customer
   if (source === 'landing_page') {
     await handleLandingPageSignup(supabase, session, billingPeriod, planType);
@@ -195,6 +207,8 @@ async function handleLandingPageSignup(
         reseller: null,
         stripe_customer_id: stripeCustomerId,
         auto_renew_enabled: false,
+        username_1: '',
+        password_1: '',
       })
       .select('id')
       .single();

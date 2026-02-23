@@ -1,9 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase';
 import { createMagicLink, sendMagicLinkEmail, sendMagicLinkSMS } from '@/lib/magic-link';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit: 3 requests per 15 minutes per IP
+    const ip = getClientIp(request);
+    const { allowed, retryAfterSeconds } = checkRateLimit(`magic-link:${ip}`, { max: 3, windowSeconds: 900 });
+    if (!allowed) {
+      return NextResponse.json(
+        { error: `Too many requests. Try again in ${retryAfterSeconds} seconds.` },
+        { status: 429 }
+      );
+    }
+
     const { identifier, method } = await request.json();
 
     if (!identifier) {
@@ -32,19 +43,23 @@ export async function POST(request: NextRequest) {
       .select('id, name, email, phone');
 
     if (isEmail) {
-      query = query.ilike('email', identifier);
+      query = query.ilike('email', identifier.trim());
     } else {
-      // Search by phone - try to match with or without country code
-      query = query.or(`phone.ilike.%${searchValue},phone.ilike.%${searchValue.slice(-10)}`);
+      // Search by phone - sanitize digits only to prevent filter injection
+      const digits = searchValue.replace(/\D/g, '');
+      const last10 = digits.slice(-10);
+      query = query.or(`phone.ilike.%${last10}`);
     }
 
     const { data: customer, error } = await query.single();
 
     if (error || !customer) {
-      return NextResponse.json(
-        { error: 'No account found with this email or phone number' },
-        { status: 404 }
-      );
+      // Return success even if not found to prevent user enumeration
+      return NextResponse.json({
+        success: true,
+        message: `If an account exists, a login link has been sent to your ${isEmail ? 'email' : 'phone'}`,
+        deliveryMethod: isEmail ? 'email' : 'sms',
+      });
     }
 
     // Determine delivery method
