@@ -111,7 +111,7 @@ CUSTOMER CONTEXT:
 KNOWLEDGE BASE:
 
 == Getting Started ==
-- Ooustream is its own dedicated app — customers do NOT need third-party apps like TiviMate or Smarters
+- Ooustream is its own dedicated app — customers do NOT need third-party apps
 - After purchasing, customers receive login credentials
 - On Firestick/Android TV: install Downloader app, enter code 3171512, install the Ooustream app
 - Enter credentials from the /credentials page in the portal
@@ -142,11 +142,11 @@ Recommended app: Ooustream (our own dedicated app)
 
 == Device Setup: iPhone/iPad ==
 1. Open App Store
-2. Search for IPTV Smarters or GSE Smart IPTV
+2. Search for IPTV Smarters
 3. Download, open, tap Add New User
 4. Select M3U URL and enter the playlist URL: https://flarecoral.com
 5. Enter your Username and Password from /credentials
-Recommended apps: IPTV Smarters, GSE Smart IPTV, iPlayTV
+Recommended app: IPTV Smarters
 
 == Troubleshooting: Buffering/Freezing ==
 When a customer reports buffering, walk them through these steps IN ORDER:
@@ -182,7 +182,7 @@ This is almost always a STORAGE issue on the Firestick/device.
 Steps to fix:
 1. Go to Settings > Applications > Manage Installed Applications
 2. Check the storage space available
-3. Uninstall apps they don't use to free space. Suggest removing: Aurora, MX Player, and any other unused apps
+3. Uninstall apps they don't use to free space
 4. KEEP IPTV Smarters — that's the backup app. Don't uninstall it.
 5. After freeing space, go back to Downloader and re-enter the code **3171512**
 6. The app should install successfully now
@@ -307,10 +307,9 @@ If the Downloader shows cAFTVnews URL Shortener with "An unknown error has occur
 4. Launch Downloader again
 5. Re-enter the code **3171512**
 
-=== "Why Are We Switching?" / Aurora Still Works ===
-If a customer asks why they need to switch or says Aurora still works:
-- We are moving away from Aurora to the official Ooustream app
-- The new app is our own dedicated app with better features and updates
+=== "Why Are We Switching?" ===
+If a customer asks why they need to switch:
+- We now have our own dedicated Ooustream app with better features and updates
 - This is not optional — the transition is happening for all customers
 - Their service continues, just on the new app
 
@@ -375,7 +374,6 @@ WALKTHROUGH STEPS:
 - "Switching to New Ooustream App": https://youtu.be/XIsThctDUxI
 - "Ooustream Setup Tutorial - Part 1": /tutorials/ooustream-setup-1
 - "Ooustream Setup Tutorial - Part 2": /tutorials/ooustream-setup-2
-- "Downloading Aurora": /tutorials/downloading-aurora
 - More guides available at /tutorials
 
 == Portal Pages ==
