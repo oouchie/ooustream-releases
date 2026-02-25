@@ -313,6 +313,77 @@ If a customer asks why they need to switch:
 - This is not optional — the transition is happening for all customers
 - Their service continues, just on the new app
 
+=== Simultaneous Connection Limits / Too Many Devices Streaming ===
+This is a VERY common issue. If a customer reports freezing on live TV but movies/VOD work fine, ask how many devices are streaming at the same time.
+- **Standard plan**: 2 simultaneous connections max
+- **Pro plan**: 4 simultaneous connections max
+- If they exceed their limit, live TV channels will FREEZE (not buffer — freeze). This is different from buffering caused by internet issues.
+- Having multiple Firesticks does NOT mean they can all stream at once. The PLAN determines how many can stream simultaneously, not how many devices are set up.
+- Example: A customer with 3 Firesticks on a Standard plan can only use 2 at the same time. The 3rd will freeze.
+- If they previously had a different service that allowed more, explain: the old service would buffer when overloaded, but this service freezes instead.
+- Solution: Either reduce active streams to stay within their plan limit, or upgrade to Pro ($35/month) for 4 simultaneous connections.
+- To upgrade, direct them to the billing page at /billing or tell them to create a support ticket.
+- Be empathetic but clear — "Your plan supports 2 streams at a time. If 3 are going, one will freeze. We can upgrade you to 4 connections if you need it."
+
+=== Live TV Freezing but Movies/VOD Work Fine ===
+When a customer says live TV channels freeze but movies and VOD work:
+1. FIRST ask: "How many devices are streaming at the same time?" — this is the most common cause
+2. If they're exceeding their connection limit, explain the simultaneous connection limits (see above)
+3. If only 1-2 devices are active, then proceed with standard troubleshooting:
+   a. Update the app (Settings > Check for Update inside the app)
+   b. Clear cache inside Firestick Settings > Applications > Ooustream > Clear Cache
+   c. Unplug Firestick from power, wait 10 seconds, plug back in
+   d. Restart router
+4. If still freezing after all steps, create a support ticket
+
+=== Audio Suddenly Stops Working / No Sound Across Multiple Channels ===
+If audio was working and then suddenly cuts out across multiple channels (not just one):
+1. This is usually NOT the app — it's the Firestick itself
+2. First try: Unplug the Firestick from POWER completely (not just the HDMI), wait 10 seconds, plug back in
+3. This power cycle resets the audio decoder and fixes most sudden audio loss
+4. If audio was cutting in and out before going silent, also check for an app update: Open Ooustream > Settings > Check for Update
+5. If a specific update mentions an audio fix (e.g., "Live TV Audio Fix"), install it
+6. If power cycle + update don't fix it, try IPTV Smarters as backup to confirm it's an app issue vs device issue
+7. If IPTV Smarters also has no audio, it's definitely the Firestick — restart it or check HDMI connection
+8. Ask the customer WHICH channels are affected and whether it's ALL channels or specific ones — this helps narrow the cause
+
+=== Customer Scared to Clear Cache ("It Says Delete Everything") ===
+Customers often see the Firestick warning about clearing cache/data and get scared it will delete the app or their account.
+- Reassure them: Clearing cache only removes temporary files. It will NOT delete the app itself.
+- Clearing DATA will log them out — they'll need to re-enter their credentials from their [Credentials page](/credentials). But the app stays installed.
+- "Don't worry — clearing cache just removes temporary files. Your app and account are safe. If it asks you to log in again, just grab your credentials from your **[Credentials page](/credentials)**."
+
+=== Detailed App Settings Menu Guide ===
+The Ooustream app settings screen has these options (customers often don't know which to pick):
+- **Backup & Restore** — Export or import your data (rarely needed)
+- **Speed Test** — Test your connection speed
+- **Check for Updates** — CHECK THIS FIRST for any issue. Downloads the latest version of the app.
+- **Update Playlist** — Refresh channels and content from server
+- **Clear Cache** — Clear all cached data (safe to do, won't delete the app)
+- **Crash Logs** — View recent crash data (useful for support tickets)
+When walking a customer through settings, be SPECIFIC about which option to tap. Don't just say "go to settings" — say "Open the Ooustream app > Settings > Check for Update."
+
+=== Full Update Walkthrough (Step-by-Step for Non-Technical Customers) ===
+When a customer needs to update and isn't tech-savvy, walk them through EVERY step:
+1. Open the Ooustream app on your Firestick/device
+2. Look for **Settings** on the same row as Live TV, Movies — click it
+3. Click **Check for Update**
+4. If an update is available, you'll see the version number and what it fixes — click **Download Update**
+5. A security warning may pop up: "For your security, your TV is not allowed to install unknown apps from this source" — this is NORMAL
+6. Click **Settings** on that popup (not Cancel)
+7. Find **Ooustream IPTV** in the list and turn it **ON**
+8. Press the **back button** on your remote to go back to the update
+9. The update will install — you'll see a checkmark when it's done
+10. Click **Open** to launch the updated app
+If they ask "which one?" or seem confused at any step, just tell them exactly what to tap.
+
+=== "Where Do I Find Ooustick?" / Portal Access Confusion ===
+Customers may not know how to access the portal or what "ooustick" means:
+- Ooustick.com is the customer portal — direct them there for everything
+- The portal has their credentials, billing, support, and tutorials
+- If they're a new customer or transitioning, they can log in with their old IPTV username (Username tab) or email (Magic Link tab)
+- "Just go to **ooustick.com** — that's your portal. You'll find your credentials, billing, and support all there."
+
 === Email Delays (Yahoo, Hotmail, etc.) ===
 Some email providers are slow with automated emails:
 - Yahoo and Hotmail can delay emails significantly
@@ -390,20 +461,52 @@ export async function generateAIResponse(
   messages: Array<{ role: "user" | "assistant"; content: string }>,
   customerContext: CustomerContext
 ): Promise<string> {
-  const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
-    max_tokens: 1024,
-    system: buildSystemPrompt(customerContext),
-    messages,
-  });
+  const maxRetries = 3;
 
-  const textBlock = response.content.find(
-    (b: { type: string }) => b.type === "text"
-  );
-  return (
-    (textBlock as { type: "text"; text: string })?.text ||
-    "I apologize, but I was unable to generate a response. Please try again or create a support ticket."
-  );
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await anthropic.messages.create({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1024,
+        system: buildSystemPrompt(customerContext),
+        messages,
+      });
+
+      const textBlock = response.content.find(
+        (b: { type: string }) => b.type === "text"
+      );
+      return (
+        (textBlock as { type: "text"; text: string })?.text ||
+        "I apologize, but I was unable to generate a response. Please try again or create a support ticket."
+      );
+    } catch (error: unknown) {
+      const isOverloaded =
+        error instanceof Error &&
+        (error.message?.includes("overloaded") ||
+          error.message?.includes("529") ||
+          (error as { status?: number }).status === 529);
+      const isRateLimit =
+        error instanceof Error &&
+        (error.message?.includes("rate_limit") ||
+          (error as { status?: number }).status === 429);
+
+      if ((isOverloaded || isRateLimit) && attempt < maxRetries) {
+        // Wait before retrying: 1s, 2s, 4s
+        await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, attempt - 1)));
+        continue;
+      }
+
+      if (isOverloaded) {
+        throw new Error("AI_OVERLOADED");
+      }
+      if (isRateLimit) {
+        throw new Error("AI_RATE_LIMITED");
+      }
+      throw error;
+    }
+  }
+
+  throw new Error("AI_OVERLOADED");
 }
 
 export async function generateTicketAutoReply(

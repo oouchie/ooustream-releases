@@ -14,6 +14,7 @@ export default function AIChatWidget() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [lastFailedMessage, setLastFailedMessage] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -47,6 +48,7 @@ export default function AIChatWidget() {
           ...newMessages,
           { role: "assistant", content: data.response },
         ]);
+        setLastFailedMessage(null);
       } else {
         setMessages([
           ...newMessages,
@@ -54,9 +56,10 @@ export default function AIChatWidget() {
             role: "assistant",
             content:
               data.error ||
-              "Sorry, I encountered an error. Please try again or create a support ticket.",
+              "Something went wrong on our end. Please try again, or create a support ticket for help.",
           },
         ]);
+        setLastFailedMessage(userMessage.content);
       }
     } catch {
       setMessages([
@@ -64,9 +67,10 @@ export default function AIChatWidget() {
         {
           role: "assistant",
           content:
-            "Sorry, I encountered an error. Please try again or create a support ticket.",
+            "Our AI assistant is temporarily unavailable. Please try again in a moment, or create a support ticket and we'll get back to you quickly.",
         },
       ]);
+      setLastFailedMessage(userMessage.content);
     } finally {
       setLoading(false);
     }
@@ -230,6 +234,9 @@ export default function AIChatWidget() {
                     "I'm switching to the new app",
                     "How do I set up my Firestick?",
                     "Why is my stream buffering?",
+                    "No audio on my channels",
+                    "How do I update the app?",
+                    "My channels keep freezing",
                   ].map((q) => (
                     <button
                       key={q}
@@ -297,6 +304,69 @@ export default function AIChatWidget() {
                 className="w-full text-sm text-[#94a3b8] hover:text-[#00d4ff] transition-colors py-2 border border-dashed border-[#334155] hover:border-[#00d4ff]/50 rounded-lg"
               >
                 Still need help? Create a support ticket
+              </button>
+            </div>
+          )}
+
+          {/* Retry button */}
+          {lastFailedMessage && !loading && (
+            <div className="px-4 pt-2">
+              <button
+                onClick={() => {
+                  // Remove the last error message and retry
+                  const filtered = messages.filter(
+                    (_, i) => i !== messages.length - 1
+                  );
+                  setMessages(filtered);
+                  setLastFailedMessage(null);
+                  setInput(lastFailedMessage);
+                  setTimeout(() => {
+                    setInput("");
+                    const userMsg: ChatMessage = { role: "user", content: lastFailedMessage! };
+                    const retryMessages = [...filtered, userMsg];
+                    setMessages(retryMessages);
+                    setLoading(true);
+                    fetch("/api/ai/chat", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ messages: retryMessages }),
+                    })
+                      .then((res) => res.json())
+                      .then((data) => {
+                        if (data.response) {
+                          setMessages([
+                            ...retryMessages,
+                            { role: "assistant", content: data.response },
+                          ]);
+                          setLastFailedMessage(null);
+                        } else {
+                          setMessages([
+                            ...retryMessages,
+                            {
+                              role: "assistant",
+                              content:
+                                data.error ||
+                                "Still having trouble. Please create a support ticket and we'll help you directly.",
+                            },
+                          ]);
+                        }
+                      })
+                      .catch(() => {
+                        setMessages([
+                          ...retryMessages,
+                          {
+                            role: "assistant",
+                            content:
+                              "Still having trouble. Please create a support ticket and we'll help you directly.",
+                          },
+                        ]);
+                      })
+                      .finally(() => setLoading(false));
+                  }, 0);
+                }}
+                className="w-full py-2 text-xs text-[#00d4ff] border border-[#00d4ff]/30 rounded-lg hover:bg-[#00d4ff]/10 transition-colors"
+              >
+                Tap to try again
               </button>
             </div>
           )}

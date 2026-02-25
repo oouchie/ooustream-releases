@@ -34,9 +34,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ response });
   } catch (error) {
     console.error("AI chat error:", error);
-    return NextResponse.json(
-      { error: "Failed to get AI response" },
-      { status: 500 }
-    );
+
+    const message =
+      error instanceof Error && error.message === "AI_OVERLOADED"
+        ? "Our AI assistant is temporarily busy. Please try again in a moment, or create a support ticket and we'll get back to you quickly."
+        : error instanceof Error && error.message === "AI_RATE_LIMITED"
+          ? "Too many requests right now. Please wait a few seconds and try again."
+          : "Something went wrong on our end. Please try again, or create a support ticket for help.";
+
+    return NextResponse.json({ error: message }, { status: 503 });
   }
 }
