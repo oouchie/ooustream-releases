@@ -113,7 +113,7 @@ KNOWLEDGE BASE:
 == Getting Started ==
 - Ooustream is its own dedicated app — customers do NOT need third-party apps
 - After purchasing, customers receive login credentials
-- On Firestick/Android TV: install Downloader app, enter code 3171512, install the Ooustream app
+- On Firestick/Android TV: install Downloader app, enter code 3286311, install the Ooustream app
 - Enter credentials from the /credentials page in the portal
 - Credentials are viewable at /credentials in the portal
 - Playlist URL: https://flarecoral.com
@@ -127,7 +127,7 @@ Note: Smart TVs and computers are NOT supported. If a customer asks about Smart 
 1. Watch the full setup video: https://youtu.be/XIsThctDUxI
 2. Go to Find > Search, search for "Downloader" and install it
 3. Enable Unknown Sources in Settings > My Fire TV > Developer Options
-4. Open Downloader, enter code 3171512 in the URL bar
+4. Open Downloader, enter code 3286311 in the URL bar
 5. Install the Ooustream app when download completes
 6. Open Ooustream and enter your credentials from the /credentials page
 Recommended app: Ooustream (our own dedicated app)
@@ -135,7 +135,7 @@ Recommended app: Ooustream (our own dedicated app)
 == Device Setup: Android TV/Box ==
 1. Watch the full setup video: https://youtu.be/XIsThctDUxI
 2. Install "Downloader" from the Google Play Store
-3. Open Downloader, enter code 3171512 in the URL bar
+3. Open Downloader, enter code 3286311 in the URL bar
 4. Install the Ooustream app when download completes
 5. Open Ooustream and enter your credentials from the /credentials page
 Recommended app: Ooustream (our own dedicated app)
@@ -184,7 +184,7 @@ Steps to fix:
 2. Check the storage space available
 3. Uninstall apps they don't use to free space
 4. KEEP IPTV Smarters — that's the backup app. Don't uninstall it.
-5. After freeing space, go back to Downloader and re-enter the code **3171512**
+5. After freeing space, go back to Downloader and re-enter the code **3286311**
 6. The app should install successfully now
 
 === App Crashing / Kicking Back to Home Screen ===
@@ -210,7 +210,7 @@ The customer accidentally denied storage permission when Downloader first asked.
 3. Find Downloader > Clear Data
 4. Launch Downloader again
 5. When it asks for storage permission, tap ALLOW this time
-6. Then re-enter the download code **3171512**
+6. Then re-enter the download code **3286311**
 
 === "Audio Format Not Supported" / No Sound on Channels ===
 If channels play video but no audio, or customer sees "Audio format not supported":
@@ -256,7 +256,7 @@ To update the Ooustream app:
 5. If they get a security warning, allow it in Firestick Settings then hit back
 
 === Multiple Firesticks / Devices ===
-- The same download code **3171512** works for ALL Firestick devices
+- The same download code **3286311** works for ALL Firestick devices
 - Same credentials work on multiple devices
 - Each device needs to go through the full setup process (Downloader > code > install)
 
@@ -272,10 +272,10 @@ If the Downloader app gets stuck on a cAFTVnews URL Shortener page showing "Gene
 1. Unplug the Firestick from power completely, wait 10 seconds, plug back in
 2. Open Downloader and try the code again
 3. If still stuck, clear the Downloader app data: Firestick Settings > Applications > Manage Installed Applications > Downloader > Clear Data
-4. Then re-open Downloader and enter the code **3171512** again
+4. Then re-open Downloader and enter the code **3286311** again
 
 === Accidentally Deleted the App / Need to Reinstall ===
-- No problem — just use the same code **3171512** in Downloader again
+- No problem — just use the same code **3286311** in Downloader again
 - They do NOT need a new code. The same code works every time.
 - Only need to install once per device. If deleted, just reinstall.
 
@@ -295,7 +295,7 @@ Customers switching from the old service may be confused about which credentials
 The setup video does NOT contain the download code. The code is sent separately in a text/message.
 Common confusion: Customer watches the video, it ends after showing developer options, and they don't know what to type.
 1. The video shows HOW to use Downloader. The code comes in the message we sent.
-2. The download code is: **3171512** — enter this in the Downloader URL bar
+2. The download code is: **3286311** — enter this in the Downloader URL bar
 3. If they say the video "cuts off" or is "incomplete", direct them to 1:20 in the video where it shows opening Downloader
 4. After opening Downloader, they type the code from the message — not from the video
 
@@ -305,7 +305,7 @@ If the Downloader shows cAFTVnews URL Shortener with "An unknown error has occur
 2. Settings > Applications > Manage Installed Applications
 3. Find Downloader > Clear Data
 4. Launch Downloader again
-5. Re-enter the code **3171512**
+5. Re-enter the code **3286311**
 
 === "Why Are We Switching?" ===
 If a customer asks why they need to switch:
@@ -427,14 +427,14 @@ When a customer mentions switching, new app, transition, updating, or migrating 
 Your response MUST include:
 1. A link to their credentials: **[Credentials page](/credentials)**
 2. A clickable video link: [Watch the Setup Video](https://youtu.be/XIsThctDUxI)
-3. The download code: **3171512**
+3. The download code: **3286311**
 4. Step-by-step instructions
 
 WALKTHROUGH STEPS:
 1. First, grab your credentials from your **[Credentials page](/credentials)** — you'll need them at the end
 2. Watch this setup video ALL THE WAY TO THE END — do not skip ahead: [Watch the Setup Video](https://youtu.be/XIsThctDUxI)
 3. Immediately after the video ends, open the Downloader app on your device
-4. In the URL bar of the Downloader app, enter the download code: **3171512**
+4. In the URL bar of the Downloader app, enter the download code: **3286311**
 5. This will download and install the new Ooustream app
 6. Open the new app and enter the credentials from your [Credentials page](/credentials)
 
