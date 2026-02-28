@@ -458,11 +458,34 @@ WALKTHROUGH STEPS:
 - /help - FAQ and device setup guides`;
 }
 
+export interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+  image?: string; // base64 data URI (e.g. "data:image/jpeg;base64,...")
+}
+
 export async function generateAIResponse(
-  messages: Array<{ role: "user" | "assistant"; content: string }>,
+  messages: ChatMessage[],
   customerContext: CustomerContext
 ): Promise<string> {
   const maxRetries = 3;
+
+  // Convert messages to Claude API format, handling image attachments
+  const apiMessages: Anthropic.MessageParam[] = messages.map((msg) => {
+    if (msg.role === "user" && msg.image) {
+      const match = msg.image.match(/^data:(image\/[a-z+]+);base64,(.+)$/i);
+      if (match) {
+        const mediaType = match[1] as "image/jpeg" | "image/png" | "image/gif" | "image/webp";
+        const data = match[2];
+        const content: Anthropic.ContentBlockParam[] = [
+          { type: "image", source: { type: "base64", media_type: mediaType, data } },
+          { type: "text", text: msg.content || "What do you see in this image? Help me troubleshoot." },
+        ];
+        return { role: "user" as const, content };
+      }
+    }
+    return { role: msg.role as "user" | "assistant", content: msg.content };
+  });
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
@@ -470,7 +493,7 @@ export async function generateAIResponse(
         model: "claude-sonnet-4-20250514",
         max_tokens: 1024,
         system: buildSystemPrompt(customerContext),
-        messages,
+        messages: apiMessages,
       });
 
       const textBlock = response.content.find(

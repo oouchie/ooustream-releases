@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCustomerSession } from "@/lib/auth";
-import { buildCustomerContext, generateAIResponse } from "@/lib/ai";
+import { buildCustomerContext, generateAIResponse, ChatMessage } from "@/lib/ai";
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,8 +28,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate and sanitize messages, allowing optional image field
+    const sanitized: ChatMessage[] = messages.map((m: { role: string; content: string; image?: string }) => {
+      const msg: ChatMessage = { role: m.role as "user" | "assistant", content: m.content };
+      if (m.image && typeof m.image === "string" && m.image.startsWith("data:image/")) {
+        // Cap image size at ~4MB base64
+        if (m.image.length <= 5_600_000) {
+          msg.image = m.image;
+        }
+      }
+      return msg;
+    });
+
     const customerContext = await buildCustomerContext(session.customerId);
-    const response = await generateAIResponse(messages, customerContext);
+    const response = await generateAIResponse(sanitized, customerContext);
 
     return NextResponse.json({ response });
   } catch (error) {

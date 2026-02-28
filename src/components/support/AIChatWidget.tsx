@@ -1,11 +1,16 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+
+const MAX_IMAGE_SIZE = 4 * 1024 * 1024; // 4MB
+const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
 interface ChatMessage {
   role: "user" | "assistant";
   content: string;
+  image?: string; // base64 data URI
 }
 
 export default function AIChatWidget() {
@@ -15,8 +20,11 @@ export default function AIChatWidget() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [lastFailedMessage, setLastFailedMessage] = useState<string | null>(null);
+  const [pendingImage, setPendingImage] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -26,13 +34,40 @@ export default function AIChatWidget() {
     if (isOpen) inputRef.current?.focus();
   }, [isOpen]);
 
+  const handleImageSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setImageError(null);
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setImageError("Please select a JPG, PNG, WebP, or GIF image.");
+      return;
+    }
+    if (file.size > MAX_IMAGE_SIZE) {
+      setImageError("Image must be under 4MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setPendingImage(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+
+    // Reset file input so the same file can be re-selected
+    e.target.value = "";
+  }, []);
+
   const sendMessage = async () => {
-    if (!input.trim() || loading) return;
+    if ((!input.trim() && !pendingImage) || loading) return;
 
     const userMessage: ChatMessage = { role: "user", content: input.trim() };
+    if (pendingImage) userMessage.image = pendingImage;
     const newMessages = [...messages, userMessage];
     setMessages(newMessages);
     setInput("");
+    setPendingImage(null);
+    setImageError(null);
     setLoading(true);
 
     try {
@@ -269,6 +304,18 @@ export default function AIChatWidget() {
                       </span>
                     </div>
                   )}
+                  {msg.image && (
+                    <div className="mb-2">
+                      <Image
+                        src={msg.image}
+                        alt="Attached screenshot"
+                        width={200}
+                        height={150}
+                        className="rounded-md border border-[#334155] object-cover max-h-[150px] w-auto"
+                        unoptimized
+                      />
+                    </div>
+                  )}
                   <div className="text-sm whitespace-pre-wrap leading-relaxed">
                     {msg.role === "assistant" ? renderMarkdown(msg.content) : msg.content}
                   </div>
@@ -372,36 +419,91 @@ export default function AIChatWidget() {
           )}
 
           {/* Input */}
-          <div className="p-4 border-t border-[#1e293b] flex gap-2">
-            <input
-              ref={inputRef}
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Type your question..."
-              disabled={loading}
-              className="flex-1 bg-[#0f172a] border border-[#334155] rounded-lg px-4 py-2.5 text-sm text-[#f1f5f9] placeholder-[#64748b] focus:outline-none focus:border-[#00d4ff] disabled:opacity-50"
-            />
-            <button
-              onClick={sendMessage}
-              disabled={!input.trim() || loading}
-              className="px-4 py-2.5 bg-[#7c3aed] hover:bg-[#6d28d9] disabled:opacity-50 disabled:hover:bg-[#7c3aed] rounded-lg transition-colors"
-            >
-              <svg
-                className="w-4 h-4 text-white"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+          <div className="border-t border-[#1e293b]">
+            {/* Image preview */}
+            {pendingImage && (
+              <div className="px-4 pt-3 flex items-start gap-2">
+                <div className="relative">
+                  <Image
+                    src={pendingImage}
+                    alt="Image to send"
+                    width={80}
+                    height={60}
+                    className="rounded-md border border-[#334155] object-cover max-h-[60px] w-auto"
+                    unoptimized
+                  />
+                  <button
+                    onClick={() => setPendingImage(null)}
+                    className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-[#ef4444] rounded-full flex items-center justify-center text-white hover:bg-[#dc2626] transition-colors"
+                  >
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <span className="text-xs text-[#64748b] mt-1">Screenshot attached</span>
+              </div>
+            )}
+
+            {/* Image error */}
+            {imageError && (
+              <div className="px-4 pt-2">
+                <p className="text-xs text-[#ef4444]">{imageError}</p>
+              </div>
+            )}
+
+            <div className="p-4 flex gap-2">
+              {/* Hidden file input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                onChange={handleImageSelect}
+                className="hidden"
+              />
+
+              {/* Image upload button */}
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={loading}
+                title="Attach a screenshot"
+                className="px-3 py-2.5 border border-[#334155] rounded-lg hover:border-[#00d4ff] hover:text-[#00d4ff] text-[#64748b] transition-colors disabled:opacity-50"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                />
-              </svg>
-            </button>
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21zM8.25 8.625a1.125 1.125 0 100-2.25 1.125 1.125 0 000 2.25z" />
+                </svg>
+              </button>
+
+              <input
+                ref={inputRef}
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder={pendingImage ? "Describe the issue (optional)..." : "Type your question..."}
+                disabled={loading}
+                className="flex-1 bg-[#0f172a] border border-[#334155] rounded-lg px-4 py-2.5 text-sm text-[#f1f5f9] placeholder-[#64748b] focus:outline-none focus:border-[#00d4ff] disabled:opacity-50"
+              />
+              <button
+                onClick={sendMessage}
+                disabled={(!input.trim() && !pendingImage) || loading}
+                className="px-4 py-2.5 bg-[#7c3aed] hover:bg-[#6d28d9] disabled:opacity-50 disabled:hover:bg-[#7c3aed] rounded-lg transition-colors"
+              >
+                <svg
+                  className="w-4 h-4 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       )}
