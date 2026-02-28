@@ -771,6 +771,24 @@ function ContactForm() {
 
 function AppShowcase() {
   const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Auto-rotate every 4 seconds, pause on manual interaction for 10s
+  useEffect(() => {
+    if (paused) return;
+    const interval = setInterval(() => {
+      setActive((prev) => (prev + 1) % SCREENSHOTS.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [paused]);
+
+  const handleManualSelect = useCallback((i: number) => {
+    setActive(i);
+    setPaused(true);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => setPaused(false), 10000);
+  }, []);
 
   return (
     <section id="showcase" className="py-24 px-4" style={{ borderTop: "1px solid #1a1a24" }}>
@@ -802,7 +820,7 @@ function AppShowcase() {
             {SCREENSHOTS.map((s, i) => (
               <button
                 key={s.label}
-                onClick={() => setActive(i)}
+                onClick={() => handleManualSelect(i)}
                 className="relative px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200"
                 style={{
                   background: "rgba(30,41,59,0.5)",
