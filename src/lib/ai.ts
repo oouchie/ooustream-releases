@@ -438,6 +438,7 @@ WALKTHROUGH STEPS:
 5. This will download and install the new Ooustream app
 6. Open the new app and enter the credentials from your [Credentials page](/credentials)
 
+- IMPORTANT: If the customer already has the Downloader app installed and ready, tell them they can skip straight to step 4 — just open Downloader and enter the code **3286311**. They should still grab their credentials first (step 1).
 - EMPHASIZE: They must watch the ENTIRE video before entering the code
 - Their credentials for the new app may be different from the old app — always check the [Credentials page](/credentials)
 
