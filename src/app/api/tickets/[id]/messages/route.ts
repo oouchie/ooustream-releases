@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCustomerSession } from "@/lib/auth";
 import { createServerClient } from "@/lib/supabase";
+import { sendCustomerReplyNotification } from "@/lib/email";
 
 // POST - Add reply to ticket
 export async function POST(
@@ -29,7 +30,7 @@ export async function POST(
     // Verify ticket ownership
     const { data: ticket } = await supabase
       .from("support_tickets")
-      .select("id, status")
+      .select("id, status, subject, ticket_number")
       .eq("id", id)
       .eq("customer_id", session.customerId)
       .single();
@@ -69,6 +70,16 @@ export async function POST(
         .update({ updated_at: new Date().toISOString() })
         .eq("id", id);
     }
+
+    // Fire-and-forget admin notification email
+    sendCustomerReplyNotification({
+      customerName: session.name,
+      customerEmail: session.email || '',
+      ticketId: ticket.id,
+      ticketNumber: ticket.ticket_number,
+      subject: ticket.subject,
+      replyMessage: message.trim(),
+    }).catch((err) => console.error("Customer reply notification email error:", err));
 
     return NextResponse.json({ success: true, message: newMessage });
   } catch (error) {
