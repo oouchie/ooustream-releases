@@ -21,6 +21,14 @@ export default async function PortalLayout({
       </main>
       <footer className="border-t border-[#334155] py-4 text-center text-sm text-[#94a3b8]">
         <p>&copy; {new Date().getFullYear()} Ooustream. All rights reserved.</p>
+        <a
+          href="https://1865freemoney.com"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs text-[#64748b] hover:text-[#00d4ff] transition-colors mt-1 inline-block"
+        >
+          Powered by 1865 Free Money
+        </a>
       </footer>
     </div>
   );
