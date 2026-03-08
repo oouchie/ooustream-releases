@@ -53,6 +53,25 @@ const tutorialData: Record<string, TutorialContent> = {
     ],
     relatedTutorials: ["ooustream-tutorial-pt1", "troubleshooting", "buffering-fix"],
   },
+  "firestick-find-app": {
+    id: "firestick-find-app",
+    title: "How to Find the App on Firestick",
+    description: "Learn how to locate and find the app on your Amazon Firestick device.",
+    category: "Setup",
+    duration: "Video",
+    videoUrl: "https://www.youtube.com/embed/FE7hTbIMlko",
+    steps: [
+      {
+        title: "Watch the Full Tutorial",
+        content: "This video shows you exactly how to find and access the app on your Amazon Firestick.",
+      },
+      {
+        title: "Need More Help?",
+        content: "Check out our Firestick Setup Guide for a complete walkthrough of setting up your device.",
+      },
+    ],
+    relatedTutorials: ["firestick-setup", "downloading-aurora", "getting-started"],
+  },
   "getting-started": {
     id: "getting-started",
     title: "Getting Started with Ooustream",

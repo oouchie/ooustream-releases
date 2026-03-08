@@ -42,6 +42,15 @@ const tutorials: Tutorial[] = [
     thumbnail: "https://img.youtube.com/vi/60FI37J-vao/maxresdefault.jpg",
   },
   {
+    id: "firestick-find-app",
+    title: "How to Find the App on Firestick",
+    description: "Learn how to locate and find the app on your Amazon Firestick device.",
+    category: "Setup",
+    duration: "Video",
+    videoUrl: "https://www.youtube.com/embed/FE7hTbIMlko",
+    thumbnail: "https://img.youtube.com/vi/FE7hTbIMlko/maxresdefault.jpg",
+  },
+  {
     id: "getting-started",
     title: "Getting Started with Ooustream",
     description: "Learn how to set up your IPTV service on any device in just a few minutes.",
