@@ -1843,14 +1843,17 @@ export default function LandingPage() {
             <p className="text-xs text-[#64748b]">
               &copy; {new Date().getFullYear()} Ooustream. All rights reserved.
             </p>
-            <a
-              href="https://1865freemoney.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-xs text-[#64748b] hover:text-[#00d4ff] transition-colors"
-            >
-              Powered by 1865 Free Money
-            </a>
+            <div className="text-xs text-[#64748b]">
+              <a
+                href="https://1865freemoney.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-[#00d4ff] transition-colors"
+              >
+                Powered by 1865 Free Money
+              </a>
+              <span className="block mt-0.5">Digital Excellence · Atlanta, GA</span>
+            </div>
           </div>
         </MotionReveal>
       </footer>
