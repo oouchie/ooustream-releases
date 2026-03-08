@@ -14,9 +14,11 @@ export default function CredentialsPage() {
   const [playlistUrl, setPlaylistUrl] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [showPasswords, setShowPasswords] = useState<Record<number, boolean>>({});
+  const [savedUsername, setSavedUsername] = useState<string | null>(null);
 
   useEffect(() => {
     fetchCredentials();
+    setSavedUsername(localStorage.getItem("ooustream_saved_username"));
   }, []);
 
   const fetchCredentials = async () => {
@@ -34,6 +36,18 @@ export default function CredentialsPage() {
       console.error("Failed to fetch credentials:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const saveUsernameForLogin = (usernameToSave: string) => {
+    if (savedUsername === usernameToSave) {
+      localStorage.removeItem("ooustream_saved_username");
+      setSavedUsername(null);
+      toast.success("Username removed from quick login");
+    } else {
+      localStorage.setItem("ooustream_saved_username", usernameToSave);
+      setSavedUsername(usernameToSave);
+      toast.success("Username saved! It will be pre-filled at login.");
     }
   };
 
@@ -194,7 +208,38 @@ export default function CredentialsPage() {
                         />
                       </svg>
                     </button>
+                    <button
+                      onClick={() => saveUsernameForLogin(cred.username)}
+                      className={`p-3 rounded-lg transition-colors ${
+                        savedUsername === cred.username
+                          ? "bg-[#22c55e]/20 hover:bg-[#22c55e]/30"
+                          : "bg-[#334155] hover:bg-[#475569]"
+                      }`}
+                      title={savedUsername === cred.username ? "Remove saved login" : "Save for quick login"}
+                    >
+                      <svg
+                        className={`w-5 h-5 ${savedUsername === cred.username ? "text-[#22c55e]" : "text-[#94a3b8]"}`}
+                        fill={savedUsername === cred.username ? "currentColor" : "none"}
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
+                        />
+                      </svg>
+                    </button>
                   </div>
+                  {savedUsername === cred.username && (
+                    <p className="text-xs text-[#22c55e] mt-1 flex items-center gap-1">
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                      </svg>
+                      Saved for quick login
+                    </p>
+                  )}
                 </div>
 
                 {/* Password */}

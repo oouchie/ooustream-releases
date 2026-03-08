@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -19,6 +19,16 @@ export default function LoginPage() {
   // Username lookup form
   const [username, setUsername] = useState("");
   const [verification, setVerification] = useState("");
+  const [rememberUsername, setRememberUsername] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("ooustream_saved_username");
+    if (saved) {
+      setUsername(saved);
+      setRememberUsername(true);
+      setMethod("username");
+    }
+  }, []);
 
   const handleMagicLink = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,6 +75,12 @@ export default function LoginPage() {
       if (!response.ok) {
         setError(data.error || "Login failed");
         return;
+      }
+
+      if (rememberUsername) {
+        localStorage.setItem("ooustream_saved_username", username);
+      } else {
+        localStorage.removeItem("ooustream_saved_username");
       }
 
       router.push("/dashboard");
@@ -183,6 +199,20 @@ export default function LoginPage() {
                   Example: 1234 or gmail.com
                 </p>
               </div>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={rememberUsername}
+                  onChange={(e) => {
+                    setRememberUsername(e.target.checked);
+                    if (!e.target.checked) {
+                      localStorage.removeItem("ooustream_saved_username");
+                    }
+                  }}
+                  className="w-4 h-4 rounded border-[#334155] bg-[#0f172a] text-[#6366f1] focus:ring-[#6366f1] focus:ring-offset-0"
+                />
+                <span className="text-sm text-[#94a3b8]">Remember my username</span>
+              </label>
               <button
                 type="submit"
                 disabled={loading}
