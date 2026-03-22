@@ -8,6 +8,10 @@ export default function AdminTicketsPage() {
   const [tickets, setTickets] = useState<SupportTicketWithCustomer[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>("all");
+  const [showBulkReply, setShowBulkReply] = useState(false);
+  const [bulkMessage, setBulkMessage] = useState("");
+  const [bulkSending, setBulkSending] = useState(false);
+  const [bulkResult, setBulkResult] = useState<string | null>(null);
 
   useEffect(() => {
     fetchTickets();
@@ -67,6 +71,31 @@ export default function AdminTicketsPage() {
     }
   };
 
+  const sendBulkReply = async () => {
+    if (!bulkMessage.trim()) return;
+    setBulkSending(true);
+    setBulkResult(null);
+    try {
+      const response = await fetch("/api/admin/tickets/bulk-reply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: bulkMessage.trim() }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setBulkResult(`Reply sent to ${data.replied} ticket(s)`);
+        setBulkMessage("");
+        fetchTickets();
+      } else {
+        setBulkResult(`Error: ${data.error}`);
+      }
+    } catch {
+      setBulkResult("Failed to send bulk reply");
+    } finally {
+      setBulkSending(false);
+    }
+  };
+
   const openCount = tickets.filter(
     (t) => t.status === "open" || t.status === "in_progress"
   ).length;
@@ -91,6 +120,12 @@ export default function AdminTicketsPage() {
           <p className="text-[#94a3b8] mt-1">Manage customer support requests</p>
         </div>
         <div className="flex items-center gap-4">
+          <button
+            onClick={() => setShowBulkReply(true)}
+            className="px-4 py-2 rounded-lg text-sm font-medium bg-[#f59e0b]/20 text-[#f59e0b] hover:bg-[#f59e0b]/30 transition-colors"
+          >
+            Reply All Open
+          </button>
           <div className="flex items-center gap-2 text-sm">
             <span className="px-2 py-1 rounded bg-[#22c55e]/20 text-[#22c55e]">
               {openCount} Open
@@ -213,6 +248,55 @@ export default function AdminTicketsPage() {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Bulk Reply Modal */}
+      {showBulkReply && (
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#1e293b] rounded-xl border border-[#334155] w-full max-w-lg p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold text-[#f1f5f9]">
+                Reply to All Open Tickets ({openCount})
+              </h2>
+              <button
+                onClick={() => { setShowBulkReply(false); setBulkResult(null); }}
+                className="text-[#94a3b8] hover:text-[#f1f5f9]"
+              >
+                X
+              </button>
+            </div>
+            <p className="text-sm text-[#94a3b8]">
+              This will send a reply to all open and in-progress tickets, and email each customer.
+            </p>
+            <textarea
+              value={bulkMessage}
+              onChange={(e) => setBulkMessage(e.target.value)}
+              placeholder="Type your message to all customers..."
+              rows={5}
+              className="w-full bg-[#0f172a] border border-[#334155] rounded-lg px-4 py-3 text-[#f1f5f9] placeholder-[#64748b] focus:outline-none focus:border-[#6366f1] resize-none"
+            />
+            {bulkResult && (
+              <p className={`text-sm ${bulkResult.startsWith("Error") ? "text-[#ef4444]" : "text-[#22c55e]"}`}>
+                {bulkResult}
+              </p>
+            )}
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => { setShowBulkReply(false); setBulkResult(null); }}
+                className="px-4 py-2 rounded-lg text-sm font-medium bg-[#334155] text-[#94a3b8] hover:text-[#f1f5f9] transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={sendBulkReply}
+                disabled={bulkSending || !bulkMessage.trim()}
+                className="px-4 py-2 rounded-lg text-sm font-medium bg-[#f59e0b] text-black hover:bg-[#f59e0b]/80 transition-colors disabled:opacity-50"
+              >
+                {bulkSending ? "Sending..." : "Send to All"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
