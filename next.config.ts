@@ -7,8 +7,8 @@ const nextConfig: NextConfig = {
         source: "/(.*)",
         headers: [
           {
-            key: "X-Frame-Options",
-            value: "DENY",
+            key: "Content-Security-Policy",
+            value: "frame-ancestors 'self' https://1865freemoney.com",
           },
           {
             key: "X-Content-Type-Options",
