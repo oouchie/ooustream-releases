@@ -15,22 +15,13 @@ interface Tutorial {
 
 const tutorials: Tutorial[] = [
   {
-    id: "ooustream-tutorial-pt1",
-    title: "Ooustream Setup Tutorial - Part 1",
+    id: "ooustream-tutorial",
+    title: "Ooustream Setup Tutorial",
     description: "Complete guide to getting started with Ooustream. Learn everything you need to know to set up your service.",
     category: "Setup",
     duration: "Video",
-    videoUrl: "https://www.youtube.com/embed/NiG6f0aTptQ",
-    thumbnail: "https://img.youtube.com/vi/NiG6f0aTptQ/maxresdefault.jpg",
-  },
-  {
-    id: "ooustream-tutorial-pt2",
-    title: "Ooustream Setup Tutorial - Part 2",
-    description: "Continue your setup with advanced features and tips for the best streaming experience.",
-    category: "Setup",
-    duration: "Video",
-    videoUrl: "https://www.youtube.com/embed/3qa4cgaLdIg",
-    thumbnail: "https://img.youtube.com/vi/3qa4cgaLdIg/maxresdefault.jpg",
+    videoUrl: "https://www.youtube.com/embed/i4D_ZX-KoBc",
+    thumbnail: "https://img.youtube.com/vi/i4D_ZX-KoBc/maxresdefault.jpg",
   },
   {
     id: "downloading-aurora",

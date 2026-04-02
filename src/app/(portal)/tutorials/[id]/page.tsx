@@ -15,43 +15,24 @@ interface TutorialContent {
 }
 
 const tutorialData: Record<string, TutorialContent> = {
-  "ooustream-tutorial-pt1": {
-    id: "ooustream-tutorial-pt1",
-    title: "Ooustream Setup Tutorial - Part 1",
+  "ooustream-tutorial": {
+    id: "ooustream-tutorial",
+    title: "Ooustream Setup Tutorial",
     description: "Complete guide to getting started with Ooustream. Learn everything you need to know to set up your service.",
     category: "Setup",
     duration: "Video",
-    videoUrl: "https://www.youtube.com/embed/NiG6f0aTptQ",
+    videoUrl: "https://www.youtube.com/embed/i4D_ZX-KoBc",
     steps: [
       {
         title: "Watch the Full Tutorial",
         content: "This video covers everything you need to get started with Ooustream.",
       },
       {
-        title: "Continue to Part 2",
-        content: "After watching this video, proceed to Part 2 for advanced setup options.",
+        title: "Need More Help?",
+        content: "Check out our other tutorials for device-specific setup guides and troubleshooting tips.",
       },
     ],
-    relatedTutorials: ["ooustream-tutorial-pt2", "firestick-setup", "apps"],
-  },
-  "ooustream-tutorial-pt2": {
-    id: "ooustream-tutorial-pt2",
-    title: "Ooustream Setup Tutorial - Part 2",
-    description: "Continue your setup with advanced features and tips for the best streaming experience.",
-    category: "Setup",
-    duration: "Video",
-    videoUrl: "https://www.youtube.com/embed/3qa4cgaLdIg",
-    steps: [
-      {
-        title: "Advanced Configuration",
-        content: "This video covers advanced settings and optimization tips.",
-      },
-      {
-        title: "Get the Best Experience",
-        content: "Learn how to get the most out of your Ooustream subscription.",
-      },
-    ],
-    relatedTutorials: ["ooustream-tutorial-pt1", "troubleshooting", "buffering-fix"],
+    relatedTutorials: ["downloading-aurora", "firestick-setup", "apps"],
   },
   "firestick-find-app": {
     id: "firestick-find-app",
