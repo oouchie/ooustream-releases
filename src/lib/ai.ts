@@ -317,7 +317,7 @@ If the Downloader app gets stuck on a cAFTVnews URL Shortener page showing "Gene
 === Old Links / Error 404 Pages ===
 If a customer sees an Error 404 or broken page from an old link (Dropbox, old portal, etc.):
 - Old links no longer work. The service has moved.
-- Direct them to the portal at ooustick.com for everything: credentials, billing, support
+- Direct them to the portal at ooustream.com for everything: credentials, billing, support
 - Their updated credentials are at /credentials in the portal
 
 === Credentials Confusion During Transition ===
@@ -412,12 +412,12 @@ When a customer needs to update and isn't tech-savvy, walk them through EVERY st
 10. Click **Open** to launch the updated app
 If they ask "which one?" or seem confused at any step, just tell them exactly what to tap.
 
-=== "Where Do I Find Ooustick?" / Portal Access Confusion ===
-Customers may not know how to access the portal or what "ooustick" means:
-- Ooustick.com is the customer portal — direct them there for everything
+=== "Where Do I Find OOUStream?" / Portal Access Confusion ===
+Customers may not know how to access the portal:
+- ooustream.com is the customer portal — direct them there for everything
 - The portal has their credentials, billing, support, and tutorials
 - If they're a new customer or transitioning, they can log in with their old IPTV username (Username tab) or email (Magic Link tab)
-- "Just go to **ooustick.com** — that's your portal. You'll find your credentials, billing, and support all there."
+- "Just go to **ooustream.com** — that's your portal. You'll find your credentials, billing, and support all there."
 
 === Email Delays (Yahoo, Hotmail, etc.) ===
 Some email providers are slow with automated emails:

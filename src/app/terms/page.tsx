@@ -9,7 +9,7 @@ export default function TermsPage() {
           <Link href="/" className="flex items-center gap-2">
             <img
               src="/logo-full-on-dark.png"
-              alt="Ooustick"
+              alt="OOUStream"
               className="h-8 w-auto"
             />
           </Link>
@@ -31,7 +31,7 @@ export default function TermsPage() {
           </p>
 
           <p className="text-gray-300">
-            Welcome to OOUStream (&quot;Ooustick,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;). By using our services,
+            Welcome to OOUStream (&quot;OOUStream,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;). By using our services,
             you agree to these Terms of Service. Please read them carefully.
           </p>
 
@@ -98,7 +98,7 @@ export default function TermsPage() {
             <strong>To opt out:</strong> Reply STOP to any message. You will receive a confirmation and no further SMS messages.
           </p>
           <p className="text-gray-300 mt-2">
-            <strong>For help:</strong> Reply HELP or contact info@ooustick.com.
+            <strong>For help:</strong> Reply HELP or contact oouchie@ooustream.com.
           </p>
 
           <h2 className="text-xl font-semibold text-white mt-8">5. Acceptable Use</h2>
@@ -167,8 +167,8 @@ export default function TermsPage() {
             If you have questions about these Terms of Service, please contact us:
           </p>
           <ul className="list-none text-gray-300 space-y-1">
-            <li>Email: info@ooustick.com</li>
-            <li>Website: ooustick.com</li>
+            <li>Email: oouchie@ooustream.com</li>
+            <li>Website: ooustream.com</li>
           </ul>
         </div>
 

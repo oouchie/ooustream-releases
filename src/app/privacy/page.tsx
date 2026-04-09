@@ -9,7 +9,7 @@ export default function PrivacyPage() {
           <Link href="/" className="flex items-center gap-2">
             <img
               src="/logo-full-on-dark.png"
-              alt="Ooustick"
+              alt="OOUStream"
               className="h-8 w-auto"
             />
           </Link>
@@ -31,7 +31,7 @@ export default function PrivacyPage() {
           </p>
 
           <p className="text-gray-300">
-            OOUStream (&quot;Ooustick,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) is committed to protecting your privacy.
+            OOUStream (&quot;OOUStream,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) is committed to protecting your privacy.
             This Privacy Policy explains how we collect, use, and safeguard your information when you use our streaming services.
           </p>
 
@@ -128,8 +128,8 @@ export default function PrivacyPage() {
             If you have questions about this Privacy Policy or your personal data, please contact us:
           </p>
           <ul className="list-none text-gray-300 space-y-1">
-            <li>Email: info@ooustick.com</li>
-            <li>Website: ooustick.com</li>
+            <li>Email: oouchie@ooustream.com</li>
+            <li>Website: ooustream.com</li>
           </ul>
         </div>
 

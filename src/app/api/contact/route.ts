@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Notify admin at info@ooustick.com
+    // Notify admin at oouchie@ooustream.com
     try {
       await sendNewCustomerNotification({
         customerEmail: normalizedEmail,

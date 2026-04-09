@@ -10,13 +10,13 @@ function initSendGrid() {
 }
 
 const EMAIL_FROM = process.env.EMAIL_FROM || 'Ooustream <oouchie@1865freemoney.com>';
-const PORTAL_URL = process.env.NEXT_PUBLIC_PORTAL_URL || 'https://ooustick.com';
-const ADMIN_EMAIL = 'info@ooustick.com';
+const PORTAL_URL = process.env.NEXT_PUBLIC_PORTAL_URL || 'https://ooustream.com';
+const ADMIN_EMAIL = 'oouchie@ooustream.com';
 
 function brandHeader(): string {
   return `
     <div style="background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
-      <img src="https://ooustick.com/logo-iptv.png" alt="Ooustick" style="height: 120px; width: auto;" />
+      <img src="https://ooustream.com/logo-iptv.png" alt="OOUStream" style="height: 120px; width: auto;" />
     </div>`;
 }
 

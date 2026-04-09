@@ -246,7 +246,7 @@ export default function LoginPage() {
 
         {/* Footer */}
         <p className="text-center text-[#94a3b8] text-xs mt-6">
-          Need help? Contact support at info@ooustick.com
+          Need help? Contact support at oouchie@ooustream.com
         </p>
       </div>
     </div>
