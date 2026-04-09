@@ -17,8 +17,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ooustream IPTV — Seamless Streaming Technology",
-  description: "Premium IPTV with 10,000+ live channels, movies and shows on demand, live sports and PPV events — all in HD and 4K on any device.",
+  metadataBase: new URL("https://ooustream.com"),
+  title: "OOUStream | Premium IPTV Streaming Service — 10,000+ Channels in HD & 4K",
+  description: "Premium IPTV with 10,000+ live channels, movies and shows on demand, live sports and PPV events — all in HD and 4K on any device. Try OOUStream free today.",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -30,16 +31,23 @@ export const metadata: Metadata = {
     ],
   },
   openGraph: {
-    title: "Ooustream IPTV — Seamless Streaming Technology",
-    description: "Premium IPTV with 10,000+ live channels, movies and shows on demand, live sports and PPV events — all in HD and 4K on any device.",
+    title: "OOUStream | Premium IPTV Streaming Service — 10,000+ Channels in HD & 4K",
+    description: "Premium IPTV with 10,000+ live channels, movies and shows on demand, live sports and PPV events — all in HD and 4K on any device. Try OOUStream free today.",
+    siteName: "OOUStream",
     images: [{ url: "/og-image.png", width: 1200, height: 630 }],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Ooustream IPTV — Seamless Streaming Technology",
-    description: "Premium IPTV with 10,000+ live channels, movies and shows on demand, live sports and PPV events — all in HD and 4K on any device.",
+    title: "OOUStream | Premium IPTV Streaming Service — 10,000+ Channels in HD & 4K",
+    description: "Premium IPTV with 10,000+ live channels, movies and shows on demand, live sports and PPV events — all in HD and 4K on any device. Try OOUStream free today.",
     images: ["/og-image.png"],
+  },
+  other: {
+    "application-name": "OOUStream",
+  },
+  alternates: {
+    canonical: "https://ooustream.com",
   },
 };
 
@@ -51,6 +59,41 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "Organization",
+                  "name": "OOUStream",
+                  "url": "https://ooustream.com",
+                  "logo": "https://ooustream.com/logo-full-on-dark.png",
+                  "contactPoint": {
+                    "@type": "ContactPoint",
+                    "telephone": "+1-323-539-7508",
+                    "contactType": "customer service",
+                    "areaServed": "US",
+                    "availableLanguage": "English",
+                  },
+                  "address": {
+                    "@type": "PostalAddress",
+                    "addressLocality": "Atlanta",
+                    "addressRegion": "GA",
+                    "addressCountry": "US",
+                  },
+                },
+                {
+                  "@type": "WebSite",
+                  "name": "OOUStream",
+                  "alternateName": ["OOUStream IPTV", "Ooustream"],
+                  "url": "https://ooustream.com",
+                },
+              ],
+            }),
+          }}
+        />
         <noscript>
           <img
             height="1"
