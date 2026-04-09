@@ -673,7 +673,7 @@ export default function BestIPTVServicePage() {
               {
                 step: "2",
                 title: "Download the App",
-                desc: "Install the OOUStream app or your preferred IPTV player on your device. We support all major platforms including Fire Stick, Smart TVs, and mobile devices.",
+                desc: "Install the OOUStream app on your device. On Fire Stick or Android TV, install the Downloader app and enter the code below. On mobile, download from your app store.",
               },
               {
                 step: "3",
@@ -699,6 +699,64 @@ export default function BestIPTVServicePage() {
               </MotionStaggerChild>
             ))}
           </MotionStagger>
+
+          {/* Download Code Card */}
+          <MotionReveal>
+            <div
+              className="mt-12 rounded-xl p-6 md:p-8 text-center"
+              style={{
+                background: "linear-gradient(135deg, rgba(0,212,255,0.08), rgba(124,58,237,0.08))",
+                border: "1px solid rgba(0,212,255,0.2)",
+              }}
+            >
+              <h3 className="text-xl font-semibold text-[#f1f5f9] mb-2">
+                Fire Stick &amp; Android TV Download Code
+              </h3>
+              <p className="text-sm text-[#94a3b8] mb-5">
+                Install the <strong className="text-[#f1f5f9]">Downloader</strong> app from the Amazon Appstore, then enter this code in the URL bar:
+              </p>
+              <div
+                className="inline-block px-8 py-4 rounded-xl mb-5"
+                style={{
+                  background: "rgba(0,0,0,0.4)",
+                  border: "2px solid rgba(0,212,255,0.4)",
+                  boxShadow: "0 0 30px rgba(0,212,255,0.15)",
+                }}
+              >
+                <span
+                  className="text-4xl md:text-5xl font-bold tracking-[0.2em]"
+                  style={{
+                    fontFamily: "var(--font-jetbrains-mono), monospace",
+                    color: "#00d4ff",
+                    textShadow: "0 0 20px rgba(0,212,255,0.5)",
+                  }}
+                >
+                  2770918
+                </span>
+              </div>
+              <div className="space-y-2 text-sm text-[#94a3b8] max-w-md mx-auto">
+                <p className="flex items-center justify-center gap-2">
+                  <span className="text-[#22c55e]">&#x2713;</span>
+                  Works on all Fire Stick and Android TV devices
+                </p>
+                <p className="flex items-center justify-center gap-2">
+                  <span className="text-[#22c55e]">&#x2713;</span>
+                  App installs in under 2 minutes
+                </p>
+                <p className="flex items-center justify-center gap-2">
+                  <span className="text-[#22c55e]">&#x2713;</span>
+                  Then just log in with your credentials and start streaming
+                </p>
+              </div>
+              <p className="text-xs text-[#64748b] mt-5">
+                Don&apos;t have credentials yet?{" "}
+                <Link href="/#contact" className="text-[#00d4ff] hover:underline">
+                  Request a free trial
+                </Link>{" "}
+                to get your login details and start watching.
+              </p>
+            </div>
+          </MotionReveal>
         </div>
       </section>
 
