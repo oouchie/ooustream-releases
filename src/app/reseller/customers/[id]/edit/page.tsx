@@ -33,6 +33,7 @@ export default function ResellerEditCustomerPage() {
     custom_price_monthly: "",
     custom_price_6month: "",
     custom_price_yearly: "",
+    sms_consent: false,
   });
 
   useEffect(() => {
@@ -66,6 +67,7 @@ export default function ResellerEditCustomerPage() {
           custom_price_monthly: data.custom_price_monthly ? String(data.custom_price_monthly / 100) : "",
           custom_price_6month: data.custom_price_6month ? String(data.custom_price_6month / 100) : "",
           custom_price_yearly: data.custom_price_yearly ? String(data.custom_price_yearly / 100) : "",
+          sms_consent: data.sms_consent || false,
         });
       } else {
         router.push("/reseller/customers");
@@ -90,6 +92,7 @@ export default function ResellerEditCustomerPage() {
       custom_price_6month: form.custom_price_6month ? Math.round(parseFloat(form.custom_price_6month) * 100) : null,
       custom_price_yearly: form.custom_price_yearly ? Math.round(parseFloat(form.custom_price_yearly) * 100) : null,
       expiry_date: form.expiry_date || null,
+      sms_consent_at: form.sms_consent ? new Date().toISOString() : null,
     };
 
     try {
@@ -113,7 +116,9 @@ export default function ResellerEditCustomerPage() {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const target = e.target;
+    const value = target instanceof HTMLInputElement && target.type === 'checkbox' ? target.checked : target.value;
+    setForm({ ...form, [target.name]: value });
   };
 
   if (loading) {
@@ -181,6 +186,19 @@ export default function ResellerEditCustomerPage() {
                 onChange={handleChange}
                 className="input w-full"
               />
+            </div>
+            <div className="md:col-span-2 flex items-start gap-3 mt-1">
+              <input
+                type="checkbox"
+                name="sms_consent"
+                checked={form.sms_consent}
+                onChange={handleChange}
+                id="sms_consent"
+                className="mt-1 h-4 w-4 rounded border-[#334155] bg-[#0f172a] text-[#00d4ff] focus:ring-[#00d4ff]"
+              />
+              <label htmlFor="sms_consent" className="text-sm text-[#94a3b8] leading-snug">
+                Customer agrees to receive SMS messages from OOUStream including subscription reminders, login credentials, portal access links, and service updates. Message frequency varies. Message and data rates may apply. Reply STOP to opt out.
+              </label>
             </div>
             <div>
               <label className="label">Service Type *</label>

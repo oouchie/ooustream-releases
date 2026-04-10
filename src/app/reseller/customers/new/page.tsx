@@ -21,6 +21,7 @@ export default function ResellerNewCustomerPage() {
     username_2: "",
     password_2: "",
     notes: "",
+    sms_consent: false,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,10 +30,15 @@ export default function ResellerNewCustomerPage() {
     setError("");
 
     try {
+      const submitData = {
+        ...form,
+        sms_consent_at: form.sms_consent ? new Date().toISOString() : null,
+      };
+
       const res = await fetch("/api/reseller/customers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(submitData),
       });
 
       if (res.ok) {
@@ -50,7 +56,9 @@ export default function ResellerNewCustomerPage() {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const target = e.target;
+    const value = target instanceof HTMLInputElement && target.type === 'checkbox' ? target.checked : target.value;
+    setForm({ ...form, [target.name]: value });
   };
 
   return (
@@ -110,6 +118,19 @@ export default function ResellerNewCustomerPage() {
                 onChange={handleChange}
                 className="input w-full"
               />
+            </div>
+            <div className="md:col-span-2 flex items-start gap-3 mt-1">
+              <input
+                type="checkbox"
+                name="sms_consent"
+                checked={form.sms_consent}
+                onChange={handleChange}
+                id="sms_consent"
+                className="mt-1 h-4 w-4 rounded border-[#334155] bg-[#0f172a] text-[#00d4ff] focus:ring-[#00d4ff]"
+              />
+              <label htmlFor="sms_consent" className="text-sm text-[#94a3b8] leading-snug">
+                Customer agrees to receive SMS messages from OOUStream including subscription reminders, login credentials, portal access links, and service updates. Message frequency varies. Message and data rates may apply. Reply STOP to opt out.
+              </label>
             </div>
             <div>
               <label className="label">Service Type *</label>

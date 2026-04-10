@@ -29,6 +29,8 @@ export interface Customer {
   custom_price_yearly: number | null;
   auto_renew_enabled: boolean;
   plan_type: PlanType;
+  sms_consent: boolean;
+  sms_consent_at: string | null;
 }
 
 export type BillingPeriod = 'monthly' | '6month' | 'yearly';
