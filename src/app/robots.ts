@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/api/", "/admin/", "/reseller/", "/(portal)/"],
+      disallow: ["/api/", "/admin/", "/reseller/"],
     },
     sitemap: "https://ooustream.com/sitemap.xml",
   };

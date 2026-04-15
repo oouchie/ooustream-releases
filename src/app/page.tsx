@@ -1773,6 +1773,22 @@ export default function LandingPage() {
                 ))}
                 <li>
                   <Link
+                    href="/best-iptv-service"
+                    className="text-sm text-[#64748b] hover:text-[#00d4ff] transition-colors"
+                  >
+                    Best IPTV Service
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/subscribe/pro"
+                    className="text-sm text-[#64748b] hover:text-[#00d4ff] transition-colors"
+                  >
+                    Subscribe Pro
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href="/login"
                     className="text-sm text-[#64748b] hover:text-[#00d4ff] transition-colors"
                   >
