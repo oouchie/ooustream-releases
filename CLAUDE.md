@@ -92,6 +92,8 @@ Public-facing marketing page with:
 - **Billing types**: Auto-renew (subscription) or Manual (one-time)
 - **Webhook**: `/api/webhooks/stripe` handles payment completion
 - **Direct Pro checkout**: `/subscribe/pro` for in-app links
+- **Billing blocker**: Customers with a `reseller` value (non-null) CANNOT access the billing page or make payments. To enable portal payments for a reseller customer, set `reseller` to `null` in the `customers` table. The checkout API (`/api/payments/checkout`) also enforces this check.
+- **Required fields for billing**: `plan_type` (standard/pro), `billing_period` (monthly/6month/yearly), `billing_type` (manual/auto). Optional: `custom_price_monthly`, `custom_price_6month`, `custom_price_yearly` (integer cents, overrides default pricing). `stripe_customer_id` auto-populates on first payment.
 
 ## Environment Variables
 ```
