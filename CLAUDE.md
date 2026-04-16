@@ -1,34 +1,69 @@
 # OOUStream Portal
 
-Customer-facing portal and reseller management system.
+Customer-facing portal, landing page, and reseller management system.
 
 ## Tech Stack
 - Next.js 16 (App Router)
 - Supabase (shared with CRM)
 - Stripe (payments)
 - SendGrid (email)
+- Anthropic Claude API (AI support chat)
 - JWT (customer sessions)
-- Tailwind CSS
+- Tailwind CSS v4
+- Framer Motion 12 (animations)
+- GSAP + @gsap/react (scroll-linked transforms, future use)
 
 ## Design
 - **Primary color**: Cyan #00d4ff
 - **Secondary color**: Purple #7c3aed
 - **Background**: Near-black #0a0a0f
-- **Fonts**: Space Grotesk (headings), JetBrains Mono (code)
-- Dark theme with glow effects
+- **Surface**: #12121a, #1a1a24, #22222e
+- **Fonts**: Space Grotesk (headings), JetBrains Mono (code/credentials)
+- Dark theme with glow effects, grain noise texture
+
+## Project Structure
+
+### Landing Page (`src/app/page.tsx`)
+Public-facing marketing page with:
+- **Channel Wall** — 70 real channel names in scroll-parallax grid behind hero (RAF-driven, no React re-renders)
+- **Channel Marquee** — two-row infinite CSS scroll of channel pills with live dots, pause-on-hover
+- **Hero** — "10,000 Live Channels. One App. Every Device." with word-by-word reveal, trust pills
+- **Magnetic Nav** — pointer-tracked spring-pull nav links (desktop only, degrades gracefully on touch)
+- **Scroll Progress Bar** — cyan→purple gradient at header bottom (desktop only)
+- **Bento Features** — 2 hero cards + 4 standard with pointer-tracked spotlight radial gradient
+- **App Showcase** — 3D perspective TV frame with pointer tilt (mouse only), floor reflection, scroll-scrubbed video (desktop) / autoplay loop (mobile)
+- **Pricing** — animated savings pill (AnimatedCounter), pathLength-drawn checkmarks, period switcher
+- **How It Works** — 3-step connector with drawing line
+- **Testimonials** — fetched from Supabase reviews
+- **Contact Form** — sends to API
+
+### Animation Components (`src/components/motion.tsx`)
+- `MotionReveal` — viewport-triggered fade+slide
+- `MotionStagger` / `MotionStaggerChild` — orchestrated stagger reveals
+- `AnimatedCounter` — count-up with easing
+- `MagneticLink` — pointer-tracked spring translate (desktop)
+- `ScrollProgressBar` — scroll-linked scaleX with spring
+
+### Portal Navigation (`src/components/portal/PortalNav.tsx`)
+- **Desktop**: top header with full 7-item horizontal nav
+- **Mobile**: fixed bottom tab bar with 4 tabs (Credentials, Learn, Support, Account)
+- `env(safe-area-inset-bottom)` for notched iPhones
+- Active tab indicator (cyan dot + glow)
 
 ## Portals
 
 ### Customer Portal (/)
 - Magic link login (email/SMS)
 - Username lookup login
+- Login redirects to `/credentials` (customer's #1 need)
 - View subscription status
-- View credentials
+- **Credentials page** — tap-to-copy fields with inline "Copied!" feedback, large monospace text with wide letter-spacing for TV remote entry, labeled action buttons, "Email My Credentials" above cards
 - **Expiry date with countdown** (days remaining, color-coded warnings)
 - **Billing page** - Pay via Stripe Checkout
 - Payment history
 - Support tickets
 - Tutorial videos (YouTube embeds)
+- Help / FAQ with tappable links
 
 ### Admin Portal (/admin)
 - Password: `ADMIN_PASSWORD` env var
@@ -69,6 +104,7 @@ SENDGRID_API_KEY=
 EMAIL_FROM=Ooustream <oouchie@1865freemoney.com>
 NEXT_PUBLIC_PORTAL_URL=https://ooustreamportal.vercel.app
 NEXT_PUBLIC_CRM_URL=https://ooustream-crm.vercel.app
+ANTHROPIC_API_KEY=
 RESELLER_SHUN_PASSWORD=shun2024
 RESELLER_PRIME_PASSWORD=prime2024
 RESELLER_JK_PASSWORD=jk2024
@@ -84,53 +120,74 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 ## Routes
 
 ### Public
-- `/subscribe/pro` - Direct Pro plan checkout (for in-app links)
+- `/` — Landing page (marketing)
+- `/best-iptv-service` — SEO landing page
+- `/subscribe/pro` — Direct Pro plan checkout (for in-app links)
+- `/privacy` — Privacy policy
+- `/terms` — Terms of service
 
 ### Auth
-- `/login` - Customer login (magic link or username)
-- `/verify` - Magic link verification
-- `/admin-login` - Admin password login
-- `/reseller-login` - Reseller login (select reseller + password)
+- `/login` — Customer login (magic link or username)
+- `/verify` — Magic link verification
+- `/admin-login` — Admin password login
+- `/reseller-login` — Reseller login (select reseller + password)
 
 ### Customer (protected)
-- `/` - Dashboard with expiry date, status, quick actions
-- `/subscription` - Account status and plan details
-- `/billing` - Make payment via Stripe
-- `/billing/history` - Payment history
-- `/billing/success` - Payment success page
-- `/billing/cancel` - Payment cancelled page
-- `/credentials` - View login credentials
-- `/support` - Ticket list
-- `/support/new` - Create ticket
-- `/support/[id]` - View ticket
-- `/help` - FAQ and guides
-- `/tutorials` - Video tutorials (YouTube embeds)
-- `/tutorials/[id]` - Individual tutorial
+- `/dashboard` — Status, expiry, quick actions (includes Billing link)
+- `/subscription` — Account status and plan details
+- `/billing` — Make payment via Stripe
+- `/billing/history` — Payment history
+- `/billing/success` — Payment success page
+- `/billing/cancel` — Payment cancelled page
+- `/credentials` — View login credentials (default landing after login)
+- `/support` — Ticket list
+- `/support/new` — Create ticket (progressive disclosure)
+- `/support/[id]` — View ticket
+- `/help` — FAQ and device setup guides
+- `/tutorials` — Video tutorials (YouTube embeds)
+- `/tutorials/[id]` — Individual tutorial
 
 ### Admin (protected)
-- `/admin` - Dashboard
-- `/admin/tickets` - All support tickets
-- `/admin/tickets/[id]` - Ticket detail
-- `/admin/announcements` - Manage announcements
+- `/admin` — Dashboard
+- `/admin/tickets` — All support tickets
+- `/admin/tickets/[id]` — Ticket detail
+- `/admin/announcements` — Manage announcements
 
 ### Reseller (protected)
-- `/reseller` - Dashboard with stats
-- `/reseller/customers` - Customer list (filtered to their reseller)
-- `/reseller/customers/new` - Add customer (auto-tagged with reseller)
-- `/reseller/customers/[id]` - View customer + send buttons
-- `/reseller/customers/[id]/edit` - Edit customer
+- `/reseller` — Dashboard with stats
+- `/reseller/customers` — Customer list (filtered to their reseller)
+- `/reseller/customers/new` — Add customer (auto-tagged with reseller)
+- `/reseller/customers/[id]` — View customer + send buttons
+- `/reseller/customers/[id]/edit` — Edit customer
 
-## Tutorial Videos
-- Ooustream Setup Tutorial - Part 1 (YouTube)
-- Ooustream Setup Tutorial - Part 2 (YouTube)
-- Downloading Aurora (YouTube)
-- Plus placeholder guides for setup, apps, troubleshooting
+## SEO
+- Sitemap at `/sitemap.xml` (homepage, best-iptv-service, subscribe/pro, login, privacy, terms)
+- Robots at `/robots.txt` (disallows /api/, /admin/, /reseller/)
+- Metadata with canonical URLs on all public pages
+- OpenGraph + Twitter cards
+- JSON-LD: Organization + WebSite schema
+- `application-name` meta tag for Google site name
+
+## Download Code
+- **Current**: `1360541`
+- **Android link**: `http://aftv.news/1360541`
+- Referenced in: `src/lib/ai.ts`, `src/app/best-iptv-service/page.tsx`, `src/app/(portal)/help/page.tsx`
+
+## Mobile Performance Notes
+- Channel Wall uses `useRef` + `requestAnimationFrame` (no setState in scroll handler)
+- ChannelPill uses solid background, no `backdrop-filter` (68 pills would spike GPU memory)
+- Hero uses `min-h-dvh` not `min-h-screen` (iOS address bar)
+- Scroll-scrubbed video falls back to autoplay loop on touch devices
+- SpotlightCard and TV frame 3D tilt are mouse-only (gate via `pointerType`)
+- ScrollProgressBar hidden on mobile (`hidden md:block`)
+- All `.btn` elements have `min-height: 44px` (Apple HIG)
+- `prefers-reduced-motion` kills all animations + fixes opacity flash on stagger reveals
 
 ## Auth Flow
 1. Customer clicks magic link from email
 2. `/verify?token=xxx` validates token
 3. JWT session cookie set (7 days)
-4. Redirected to dashboard
+4. Redirected to `/credentials`
 
 ## Database (shared with CRM)
 Uses same Supabase instance as CRM:
@@ -141,12 +198,14 @@ Uses same Supabase instance as CRM:
 - ticket_messages
 - service_announcements
 - audit_logs
+- reviews
 
 ## Brand Assets (public/)
 - favicon.ico, icon-192.png, icon-512.png
 - apple-touch-icon.png
-- logo-full-on-dark.png, logo-mark-transparent.png
+- logo-full-on-dark.png, logo-mark-transparent.png, logo-iptv.png
 - og-image.png
+- showcase-reel.mp4 (App Showcase scroll-scrub video)
 
 ## Email Templates
 All emails include logo and use brand gradient (#00d4ff to #7c3aed):
@@ -158,32 +217,21 @@ All emails include logo and use brand gradient (#00d4ff to #7c3aed):
 ## Deployment
 - Vercel
 - URL: https://ooustreamportal.vercel.app
+- Auto-deploys from `main` branch
+- Remote: `github.com/oouchie/ooustream-releases`
 
-## Planned: AI Support System
+## CSS Architecture (`globals.css`)
+- CSS variables for all design tokens (colors, fonts, borders)
+- Tailwind v4 with `@theme inline` for custom tokens
+- Custom keyframes: fadeIn, slideUp, glow, spin, marquee-left, marquee-right
+- `.spotlight-card` — pointer-tracked radial gradient via CSS vars `--mx`/`--my`
+- `.noise-overlay` — SVG feTurbulence noise at 4% opacity
+- `.marquee-track` / `.marquee-mask` — infinite horizontal scroll with edge fade
+- `@media (prefers-reduced-motion: reduce)` — kills all animations, forces opacity:1
 
-### Goal
-Integrate AI into the ticket system for instant customer support.
-
-### Approach (Option 1 + 2 Combined)
-
-**AI Chat Assistant (Pre-Ticket)** - on `/support` page:
-- Chatbot resolves issues before a ticket is created
-- Answers common questions (setup, apps, troubleshooting, billing)
-- Pulls customer account data (expiry, status, credentials) for personalized answers
-- Only creates a ticket if AI can't resolve, passing conversation as context
-
-**AI Auto-Reply on Ticket Creation**:
-- When customer submits a ticket, AI immediately posts a first reply
-- Includes relevant troubleshooting steps based on issue description
-- Links to matching tutorial videos
-- Account-specific info (e.g., "Your subscription expires in 3 days")
-- Ticket stays open for human follow-up if needed
-
-### Future Considerations
-- **AI-Assisted Admin Responses**: Draft replies for admins to edit and send
-- **Smart Triage**: Auto-categorize tickets (billing, technical, setup, account), auto-resolve simple ones, prioritize urgent ones
-
-### Tech Approach
-- Claude API or OpenAI with system prompt loaded with service knowledge
-- Feed customer context from Supabase (account data, subscription status)
-- Knowledge base: setup guides, common issues, troubleshooting steps, tutorial links
+## AI Support System (`src/lib/ai.ts`)
+- Claude API integration for customer support chat
+- System prompt loaded with service knowledge, setup guides, troubleshooting
+- Pulls customer context from Supabase (account data, credentials, subscription)
+- Pre-ticket chatbot on `/support` page
+- Auto-reply on ticket creation with personalized troubleshooting
