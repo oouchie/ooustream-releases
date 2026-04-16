@@ -255,9 +255,14 @@ function SpotlightCard({
     e.currentTarget.style.setProperty("--mx", `${x}%`);
     e.currentTarget.style.setProperty("--my", `${y}%`);
   };
+  const handleLeave = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.currentTarget.style.setProperty("--mx", "50%");
+    e.currentTarget.style.setProperty("--my", "50%");
+  };
   return (
     <div
       onPointerMove={handleMove}
+      onPointerLeave={handleLeave}
       className={`spotlight-card ${className}`}
       style={
         {
@@ -303,10 +308,9 @@ function ChannelPill({ name }: { name: string }) {
     <div
       className="flex items-center gap-2 px-5 py-3 rounded-xl whitespace-nowrap font-mono text-sm tracking-wide"
       style={{
-        background: "rgba(18,18,26,0.6)",
+        background: "rgba(18,18,26,0.85)",
         border: "1px solid rgba(255,255,255,0.06)",
         color: "#e2e8f0",
-        backdropFilter: "blur(8px)",
       }}
     >
       <span
@@ -873,18 +877,37 @@ const WALL_ROWS = [
 
 function ChannelWall() {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const [progress, setProgress] = useState(0);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const rowRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const rafId = useRef(0);
 
   useEffect(() => {
     const handleScroll = () => {
-      if (!sectionRef.current) return;
-      const rect = sectionRef.current.getBoundingClientRect();
-      const vh = window.innerHeight;
-      const p = Math.max(0, Math.min(1, -rect.top / (vh * 0.6)));
-      setProgress(p);
+      cancelAnimationFrame(rafId.current);
+      rafId.current = requestAnimationFrame(() => {
+        const section = sectionRef.current;
+        const grid = gridRef.current;
+        if (!section || !grid) return;
+        const rect = section.getBoundingClientRect();
+        const vh = window.innerHeight;
+        const p = Math.max(0, Math.min(1, -rect.top / (vh * 0.6)));
+
+        grid.style.opacity = `${0.1 - p * 0.08}`;
+        grid.style.transform = `perspective(1200px) scale(${1 - p * 0.15}) rotateX(${p * 12}deg)`;
+
+        rowRefs.current.forEach((row, i) => {
+          if (!row) return;
+          const dir = i % 2 === 0 ? 1 : -1;
+          const speed = 0.8 + (i % 3) * 0.4;
+          row.style.transform = `translate3d(${p * dir * speed * 120}px, 0, 0)`;
+        });
+      });
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(rafId.current);
+    };
   }, []);
 
   return (
@@ -898,43 +921,35 @@ function ChannelWall() {
       }}
     >
       <div
+        ref={gridRef}
         className="absolute inset-0 flex flex-col items-center justify-center gap-3"
         style={{
-          opacity: 0.1 - progress * 0.08,
-          transform: `perspective(1200px) scale(${1 - progress * 0.15}) rotateX(${progress * 12}deg)`,
+          opacity: 0.1,
           transformOrigin: "center top",
-          transition: "none",
           willChange: "transform, opacity",
         }}
       >
-        {WALL_ROWS.map((row, rowIdx) => {
-          const direction = rowIdx % 2 === 0 ? 1 : -1;
-          const speed = 0.8 + (rowIdx % 3) * 0.4;
-          const shift = progress * direction * speed * 120;
-          return (
-            <div
-              key={rowIdx}
-              className="flex gap-3 whitespace-nowrap"
-              style={{
-                transform: `translate3d(${shift}px, 0, 0)`,
-              }}
-            >
-              {row.map((name) => (
-                <div
-                  key={name}
-                  className="px-4 py-2 rounded-lg font-mono text-xs tracking-wide"
-                  style={{
-                    background: "rgba(18,18,26,0.5)",
-                    border: "1px solid rgba(255,255,255,0.04)",
-                    color: "rgba(225,232,240,0.6)",
-                  }}
-                >
-                  {name}
-                </div>
-              ))}
-            </div>
-          );
-        })}
+        {WALL_ROWS.map((row, rowIdx) => (
+          <div
+            key={rowIdx}
+            ref={(el) => { rowRefs.current[rowIdx] = el; }}
+            className="flex gap-3 whitespace-nowrap"
+          >
+            {row.map((name) => (
+              <div
+                key={name}
+                className="px-4 py-2 rounded-lg font-mono text-xs tracking-wide"
+                style={{
+                  background: "rgba(18,18,26,0.5)",
+                  border: "1px solid rgba(255,255,255,0.04)",
+                  color: "rgba(225,232,240,0.6)",
+                }}
+              >
+                {name}
+              </div>
+            ))}
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -951,17 +966,32 @@ function ScrollScrubbedVideo({ src }: { src: string }) {
     const container = containerRef.current;
     if (!video || !container) return;
 
+    const isTouch = !window.matchMedia("(pointer: fine)").matches;
+
+    if (isTouch) {
+      video.loop = true;
+      video.play().catch(() => {});
+      return;
+    }
+
+    const rafId = { current: 0 };
     const handleScroll = () => {
-      const rect = container.getBoundingClientRect();
-      const vh = window.innerHeight;
-      const progress = Math.max(0, Math.min(1, 1 - (rect.top + rect.height) / (vh + rect.height)));
-      if (video.duration) {
-        video.currentTime = progress * video.duration;
-      }
+      cancelAnimationFrame(rafId.current);
+      rafId.current = requestAnimationFrame(() => {
+        const rect = container.getBoundingClientRect();
+        const vh = window.innerHeight;
+        const progress = Math.max(0, Math.min(1, 1 - (rect.top + rect.height) / (vh + rect.height)));
+        if (video.duration) {
+          video.currentTime = progress * video.duration;
+        }
+      });
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(rafId.current);
+    };
   }, []);
 
   return (
@@ -1008,6 +1038,7 @@ function AppShowcase() {
 
   // Pointer-tracked 3D tilt on the TV frame
   const handleFrameMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType !== "mouse") return;
     const el = tvRef.current;
     if (!el) return;
     const rect = el.getBoundingClientRect();
@@ -1388,11 +1419,11 @@ export default function LandingPage() {
         </AnimatePresence>
 
         {/* Scroll progress bar — pinned to header bottom edge */}
-        <ScrollProgressBar className="absolute left-0 right-0 bottom-0 h-[1.5px] origin-left" />
+        <ScrollProgressBar className="hidden md:block absolute left-0 right-0 bottom-0 h-[1.5px] origin-left" />
       </header>
 
       {/* ── Hero ─────────────────────────────────────────────────────────────── */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-4">
+      <section className="relative min-h-dvh flex items-center justify-center overflow-hidden px-4">
         {/* Channel Wall — grid of real channel names behind the hero text */}
         <ChannelWall />
 
@@ -1439,7 +1470,7 @@ export default function LandingPage() {
           >
             <motion.span
               className="gradient-text inline-block"
-              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.25, 0.1, 0.25, 1] } } }}
+              variants={{ hidden: { opacity: 1, y: 0 }, visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.25, 0.1, 0.25, 1] } } }}
             >
               10,000
             </motion.span>{" "}
@@ -1649,7 +1680,7 @@ export default function LandingPage() {
           </MotionReveal>
 
           {/* Devices — horizontal scroll on mobile, grid on desktop */}
-          <MotionStagger className="flex md:grid md:grid-cols-4 gap-4 overflow-x-auto pb-4 md:pb-0 scrollbar-thin" staggerDelay={0.1}>
+          <MotionStagger className="flex md:grid md:grid-cols-4 gap-4 overflow-x-auto pb-4 md:pb-0 scrollbar-thin marquee-mask md:[mask-image:none] md:[-webkit-mask-image:none]" staggerDelay={0.1}>
             {DEVICES.map((device) => (
               <MotionStaggerChild
                 key={device.name}
