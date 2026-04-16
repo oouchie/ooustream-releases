@@ -2,16 +2,24 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
 
-const navItems = [
+// Full nav for desktop
+const desktopNavItems = [
   { href: "/dashboard", label: "Dashboard", icon: HomeIcon },
+  { href: "/credentials", label: "Credentials", icon: KeyIcon },
   { href: "/subscription", label: "Subscription", icon: CreditCardIcon },
   { href: "/billing", label: "Billing", icon: BillingIcon },
-  { href: "/credentials", label: "Credentials", icon: KeyIcon },
   { href: "/tutorials", label: "Tutorials", icon: PlayIcon },
   { href: "/support", label: "Support", icon: TicketIcon },
   { href: "/help", label: "Help", icon: QuestionIcon },
+];
+
+// Consolidated bottom tabs for mobile — 4 items, thumb-reachable
+const mobileTabItems = [
+  { href: "/credentials", label: "Credentials", icon: KeyIcon },
+  { href: "/tutorials", label: "Learn", icon: PlayIcon, matchAlso: ["/help"] },
+  { href: "/support", label: "Support", icon: TicketIcon },
+  { href: "/dashboard", label: "Account", icon: UserIcon, matchAlso: ["/subscription", "/billing"] },
 ];
 
 function HomeIcon({ className }: { className?: string }) {
@@ -70,104 +78,114 @@ function BillingIcon({ className }: { className?: string }) {
   );
 }
 
+function UserIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+    </svg>
+  );
+}
+
 export default function PortalNav({ customerName }: { customerName: string }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     await fetch("/api/auth/logout", { method: "POST" });
     router.push("/login");
   };
 
+  const isDesktopActive = (href: string) =>
+    pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
+
+  const isMobileActive = (item: typeof mobileTabItems[number]) => {
+    if (pathname === item.href || pathname.startsWith(item.href)) return true;
+    return item.matchAlso?.some((p) => pathname === p || pathname.startsWith(p)) ?? false;
+  };
+
   return (
-    <nav className="bg-[#12121a] border-b border-[#2a2a3a]">
-      <div className="max-w-6xl mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <img
-              src="/logo-full-on-dark.png"
-              alt="Ooustream"
-              className="h-12 w-auto"
-            />
-          </Link>
+    <>
+      {/* ─── Top Header Bar ─────────────────────────────────────────────── */}
+      <nav className="bg-[#12121a] border-b border-[#2a2a3a]">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="flex items-center justify-between h-14 md:h-16">
+            {/* Logo */}
+            <Link href="/credentials" className="flex items-center gap-2">
+              <img
+                src="/logo-full-on-dark.png"
+                alt="Ooustream"
+                className="h-10 md:h-12 w-auto"
+              />
+            </Link>
 
-          {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-1">
-            {navItems.map((item) => {
-              const isActive = pathname === item.href ||
-                (pathname.startsWith(item.href));
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    isActive
-                      ? "bg-[#00d4ff]/20 text-[#00d4ff]"
-                      : "text-[#94a3b8] hover:text-[#f1f5f9] hover:bg-[#1a1a24]"
-                  }`}
-                >
-                  <item.icon className="w-4 h-4" />
-                  {item.label}
-                </Link>
-              );
-            })}
-          </div>
+            {/* Desktop Nav — full 7-item horizontal */}
+            <div className="hidden md:flex items-center gap-1">
+              {desktopNavItems.map((item) => {
+                const active = isDesktopActive(item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      active
+                        ? "bg-[#00d4ff]/20 text-[#00d4ff]"
+                        : "text-[#94a3b8] hover:text-[#f1f5f9] hover:bg-[#1a1a24]"
+                    }`}
+                  >
+                    <item.icon className="w-4 h-4" />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
 
-          {/* User Menu */}
-          <div className="flex items-center gap-4">
-            <span className="hidden sm:block text-sm text-[#94a3b8]">
-              {customerName}
-            </span>
-            <button
-              onClick={handleLogout}
-              className="text-sm text-[#94a3b8] hover:text-[#ef4444] transition-colors"
-            >
-              Logout
-            </button>
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-[#94a3b8] hover:text-[#f1f5f9]"
-            >
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                {mobileMenuOpen ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
-            </button>
+            {/* User info + logout */}
+            <div className="flex items-center gap-3">
+              <span className="hidden sm:block text-sm text-[#94a3b8] truncate max-w-[140px]">
+                {customerName}
+              </span>
+              <button
+                onClick={handleLogout}
+                className="text-sm text-[#94a3b8] hover:text-[#ef4444] transition-colors px-2 py-1"
+              >
+                Logout
+              </button>
+            </div>
           </div>
         </div>
+      </nav>
 
-        {/* Mobile Nav */}
-        {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-[#334155]">
-            {navItems.map((item) => {
-              const isActive = pathname === item.href ||
-                (pathname.startsWith(item.href));
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors ${
-                    isActive
-                      ? "bg-[#00d4ff]/20 text-[#00d4ff]"
-                      : "text-[#94a3b8] hover:text-[#f1f5f9] hover:bg-[#1a1a24]"
-                  }`}
-                >
-                  <item.icon className="w-5 h-5" />
-                  {item.label}
-                </Link>
-              );
-            })}
-          </div>
-        )}
+      {/* ─── Mobile Bottom Tab Bar ──────────────────────────────────────── */}
+      <div
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-[#12121a] border-t border-[#2a2a3a]"
+        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
+      >
+        <div className="flex items-stretch">
+          {mobileTabItems.map((item) => {
+            const active = isMobileActive(item);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex-1 flex flex-col items-center justify-center gap-1 py-2.5 min-h-[56px] transition-colors ${
+                  active
+                    ? "text-[#00d4ff]"
+                    : "text-[#64748b] active:text-[#94a3b8]"
+                }`}
+              >
+                <item.icon className="w-5 h-5" />
+                <span className="text-[10px] font-medium tracking-wide">{item.label}</span>
+                {active && (
+                  <span
+                    className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-[2px] rounded-full"
+                    style={{ background: "#00d4ff", boxShadow: "0 0 8px rgba(0,212,255,0.5)" }}
+                  />
+                )}
+              </Link>
+            );
+          })}
+        </div>
       </div>
-    </nav>
+    </>
   );
 }

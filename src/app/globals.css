@@ -429,3 +429,114 @@ h1, h2, h3, h4, h5, h6 {
   background: var(--primary);
   box-shadow: 0 0 10px var(--primary-glow);
 }
+
+/* Channel logo marquee — infinite horizontal scroll, pause on hover */
+@keyframes marquee-left {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-50%, 0, 0); }
+}
+
+@keyframes marquee-right {
+  from { transform: translate3d(-50%, 0, 0); }
+  to { transform: translate3d(0, 0, 0); }
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  gap: 2.5rem;
+  animation: marquee-left 60s linear infinite;
+  will-change: transform;
+}
+
+.marquee-track.reverse {
+  animation-name: marquee-right;
+}
+
+.marquee-group:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+.marquee-mask {
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+/* Spotlight-follow card — uses --mx/--my CSS vars set via pointermove */
+.spotlight-card {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.spotlight-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    600px circle at var(--mx, 50%) var(--my, 50%),
+    var(--spotlight-color, rgba(0, 212, 255, 0.15)),
+    transparent 40%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.spotlight-card:hover {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  transform: translateY(-3px);
+}
+
+.spotlight-card:hover::before {
+  opacity: 1;
+}
+
+.spotlight-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Grain/noise overlay — subtle, premium feel */
+.noise-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.04;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.5 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+/* Accessibility: respect user's reduced-motion preference (WCAG 2.3.3) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .marquee-track,
+  .marquee-track.reverse {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  /* Prevent flash: elements starting at opacity-0 for animation should be visible */
+  .animate-slideUp,
+  .animate-fadeIn {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* Mobile: kill expensive blur/animation for perf */
+@media (max-width: 640px) {
+  .marquee-track {
+    animation-duration: 80s;
+  }
+}

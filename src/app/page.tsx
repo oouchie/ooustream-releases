@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, AnimatePresence, MotionReveal, MotionStagger, MotionStaggerChild, AnimatedCounter } from "@/components/motion";
+import { motion, AnimatePresence, MotionReveal, MotionStagger, MotionStaggerChild, AnimatedCounter, MagneticLink, ScrollProgressBar } from "@/components/motion";
 
 declare global {
   interface Window {
@@ -53,7 +53,7 @@ const PLAN_TIERS: PlanTier[] = [
     ],
     billingOptions: [
       { period: "monthly", label: "1 Month", price: 20, perMonth: "$20.00/mo" },
-      { period: "6month", label: "6 Months", price: 90, perMonth: "$15.00/mo", badge: "MOST POPULAR" },
+      { period: "6month", label: "6 Months", price: 90, perMonth: "$15.00/mo" },
       { period: "yearly", label: "1 Year", price: 170, perMonth: "$14.17/mo", badge: "BEST VALUE" },
     ],
   },
@@ -75,7 +75,7 @@ const PLAN_TIERS: PlanTier[] = [
     ],
     billingOptions: [
       { period: "monthly", label: "1 Month", price: 35, perMonth: "$35.00/mo" },
-      { period: "6month", label: "6 Months", price: 175, perMonth: "$29.17/mo", badge: "MOST POPULAR" },
+      { period: "6month", label: "6 Months", price: 175, perMonth: "$29.17/mo" },
       { period: "yearly", label: "1 Year", price: 335, perMonth: "$27.92/mo", badge: "BEST VALUE" },
     ],
   },
@@ -225,6 +225,98 @@ const STEPS = [
     ),
   },
 ];
+
+// ─── Channel directory (marquee placeholders) ────────────────────────────────
+
+const CHANNEL_ROW_1 = [
+  "ESPN", "HBO", "CNN", "Fox Sports", "NBC", "ABC", "CBS", "Discovery",
+  "Hallmark", "TNT", "TBS", "Disney", "Bravo", "USA", "Syfy", "FX", "AMC",
+];
+
+const CHANNEL_ROW_2 = [
+  "MTV", "VH1", "Lifetime", "Comedy Central", "MSNBC", "Food Network",
+  "Nat Geo", "Paramount", "Showtime", "Starz", "Cinemax", "BET",
+  "History", "TLC", "A&E", "Oxygen", "HGTV",
+];
+
+function SpotlightCard({
+  children,
+  className = "",
+  accentColor = "rgba(0,212,255,0.15)",
+}: {
+  children: ReactNode;
+  className?: string;
+  accentColor?: string;
+}) {
+  const handleMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    e.currentTarget.style.setProperty("--mx", `${x}%`);
+    e.currentTarget.style.setProperty("--my", `${y}%`);
+  };
+  return (
+    <div
+      onPointerMove={handleMove}
+      className={`spotlight-card ${className}`}
+      style={
+        {
+          background: "#12121a",
+          border: "1px solid #2a2a3a",
+          borderRadius: "1rem",
+          padding: "1.75rem",
+          "--spotlight-color": accentColor,
+          transition: "border-color 0.3s ease, transform 0.3s cubic-bezier(0.4,0,0.2,1)",
+        } as React.CSSProperties
+      }
+    >
+      {children}
+    </div>
+  );
+}
+
+function DrawingCheck({ color = "#22c55e", delay = 0 }: { color?: string; delay?: number }) {
+  return (
+    <motion.svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke={color}
+      strokeWidth={2.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="w-4 h-4 flex-shrink-0"
+      aria-hidden="true"
+    >
+      <motion.path
+        d="M4.5 12.75l6 6 9-13.5"
+        initial={{ pathLength: 0, opacity: 0 }}
+        whileInView={{ pathLength: 1, opacity: 1 }}
+        viewport={{ once: true, amount: 0.5 }}
+        transition={{ duration: 0.5, delay, ease: [0.25, 0.1, 0.25, 1] }}
+      />
+    </motion.svg>
+  );
+}
+
+function ChannelPill({ name }: { name: string }) {
+  return (
+    <div
+      className="flex items-center gap-2 px-5 py-3 rounded-xl whitespace-nowrap font-mono text-sm tracking-wide"
+      style={{
+        background: "rgba(18,18,26,0.6)",
+        border: "1px solid rgba(255,255,255,0.06)",
+        color: "#e2e8f0",
+        backdropFilter: "blur(8px)",
+      }}
+    >
+      <span
+        className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+        style={{ background: "#22c55e", boxShadow: "0 0 6px rgba(34,197,94,0.6)" }}
+      />
+      {name}
+    </div>
+  );
+}
 
 // ─── Framer Motion powered (see @/components/motion.tsx) ─────────────────────
 
@@ -767,12 +859,136 @@ function ContactForm() {
   );
 }
 
+// ─── Channel Wall — the signature hero backdrop ──────────────────────────────
+
+const WALL_ROWS = [
+  ["ESPN", "HBO", "CNN", "Fox Sports", "NBC", "ABC", "CBS", "Discovery", "Hallmark", "TNT"],
+  ["TBS", "Disney", "Bravo", "USA", "Syfy", "FX", "AMC", "BET", "MTV", "VH1"],
+  ["Lifetime", "Comedy Central", "MSNBC", "Food Network", "Nat Geo", "Paramount", "Showtime", "Starz", "Cinemax", "History"],
+  ["TLC", "A&E", "Oxygen", "HGTV", "Cartoon Network", "Nickelodeon", "BBC", "Sky Sports", "beIN Sports", "ESPN+"],
+  ["HBO Max", "Fox News", "CNBC", "PBS", "Animal Planet", "Travel", "Sci-Fi", "truTV", "Freeform", "OWN"],
+  ["Telemundo", "Univision", "MLB Network", "NFL Network", "NBA TV", "NHL Network", "Golf", "Tennis Channel", "FS1", "ESPN2"],
+  ["VICE", "Reelz", "Pop TV", "BET+", "WE tv", "Court TV", "ION", "Newsmax", "One America", "Revolt"],
+];
+
+function ChannelWall() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!sectionRef.current) return;
+      const rect = sectionRef.current.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const p = Math.max(0, Math.min(1, -rect.top / (vh * 0.6)));
+      setProgress(p);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  return (
+    <div
+      ref={sectionRef}
+      aria-hidden="true"
+      className="absolute inset-0 overflow-hidden pointer-events-none"
+      style={{
+        maskImage: "radial-gradient(ellipse at center, black 30%, transparent 80%)",
+        WebkitMaskImage: "radial-gradient(ellipse at center, black 30%, transparent 80%)",
+      }}
+    >
+      <div
+        className="absolute inset-0 flex flex-col items-center justify-center gap-3"
+        style={{
+          opacity: 0.1 - progress * 0.08,
+          transform: `perspective(1200px) scale(${1 - progress * 0.15}) rotateX(${progress * 12}deg)`,
+          transformOrigin: "center top",
+          transition: "none",
+          willChange: "transform, opacity",
+        }}
+      >
+        {WALL_ROWS.map((row, rowIdx) => {
+          const direction = rowIdx % 2 === 0 ? 1 : -1;
+          const speed = 0.8 + (rowIdx % 3) * 0.4;
+          const shift = progress * direction * speed * 120;
+          return (
+            <div
+              key={rowIdx}
+              className="flex gap-3 whitespace-nowrap"
+              style={{
+                transform: `translate3d(${shift}px, 0, 0)`,
+              }}
+            >
+              {row.map((name) => (
+                <div
+                  key={name}
+                  className="px-4 py-2 rounded-lg font-mono text-xs tracking-wide"
+                  style={{
+                    background: "rgba(18,18,26,0.5)",
+                    border: "1px solid rgba(255,255,255,0.04)",
+                    color: "rgba(225,232,240,0.6)",
+                  }}
+                >
+                  {name}
+                </div>
+              ))}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ─── Scroll-Scrubbed Video — drives <video>.currentTime from scroll position ──
+
+function ScrollScrubbedVideo({ src }: { src: string }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    const container = containerRef.current;
+    if (!video || !container) return;
+
+    const handleScroll = () => {
+      const rect = container.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const progress = Math.max(0, Math.min(1, 1 - (rect.top + rect.height) / (vh + rect.height)));
+      if (video.duration) {
+        video.currentTime = progress * video.duration;
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  return (
+    <div ref={containerRef} className="absolute inset-0">
+      <video
+        ref={videoRef}
+        src={src}
+        muted
+        playsInline
+        preload="auto"
+        className="w-full h-full object-cover"
+      />
+    </div>
+  );
+}
+
 // ─── App Showcase ─────────────────────────────────────────────────────────────
+
+// Drop a muted 8-10s H.264 loop at /public/showcase-reel.mp4 and set this true.
+// When present, the TV frame renders a video whose currentTime scrubs with scroll.
+const SHOWCASE_VIDEO_SRC: string | null = "/showcase-reel.mp4";
 
 function AppShowcase() {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const tvRef = useRef<HTMLDivElement | null>(null);
 
   // Auto-rotate every 4 seconds, pause on manual interaction for 10s
   useEffect(() => {
@@ -789,6 +1005,21 @@ function AppShowcase() {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
     timeoutRef.current = setTimeout(() => setPaused(false), 10000);
   }, []);
+
+  // Pointer-tracked 3D tilt on the TV frame
+  const handleFrameMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const el = tvRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    el.style.transform = `perspective(1400px) rotateY(${x * 5}deg) rotateX(${-y * 4}deg)`;
+  };
+  const handleFrameLeave = () => {
+    if (tvRef.current) {
+      tvRef.current.style.transform = "perspective(1400px) rotateY(0) rotateX(0)";
+    }
+  };
 
   return (
     <section id="showcase" className="py-24 px-4" style={{ borderTop: "1px solid #1a1a24" }}>
@@ -845,15 +1076,23 @@ function AppShowcase() {
             ))}
           </div>
 
-          {/* Screenshot Display */}
-          <div className="relative">
-            {/* TV frame with glow pulse */}
+          {/* Screenshot Display — 3D-tilted TV frame with reflection */}
+          <div
+            className="relative"
+            style={{ perspective: "1400px" }}
+            onPointerMove={handleFrameMove}
+            onPointerLeave={handleFrameLeave}
+          >
             <motion.div
+              ref={tvRef}
               className="relative mx-auto rounded-2xl overflow-hidden"
               style={{
                 maxWidth: 900,
                 border: "3px solid #2a2a3a",
                 background: "#0a0a0f",
+                transformStyle: "preserve-3d",
+                transition: "transform 0.4s cubic-bezier(0.22, 1, 0.36, 1)",
+                willChange: "transform",
               }}
               animate={{
                 boxShadow: [
@@ -864,40 +1103,68 @@ function AppShowcase() {
               }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
             >
-              {/* Screenshot with AnimatePresence */}
               <div className="relative" style={{ aspectRatio: "16/10" }}>
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={active}
-                    initial={{ opacity: 0, scale: 1.02 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.98 }}
-                    transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-                    className="absolute inset-0"
-                  >
-                    <Image
-                      src={SCREENSHOTS[active].src}
-                      alt={`Ooustream IPTV - ${SCREENSHOTS[active].label}`}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 900px"
-                      className="object-cover"
-                      priority={active === 0}
-                    />
-                  </motion.div>
-                </AnimatePresence>
+                {SHOWCASE_VIDEO_SRC ? (
+                  <ScrollScrubbedVideo src={SHOWCASE_VIDEO_SRC} />
+                ) : (
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={active}
+                      initial={{ opacity: 0, scale: 1.02 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+                      className="absolute inset-0"
+                    >
+                      <Image
+                        src={SCREENSHOTS[active].src}
+                        alt={`Ooustream IPTV - ${SCREENSHOTS[active].label}`}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 900px"
+                        className="object-cover"
+                        priority={active === 0}
+                      />
+                    </motion.div>
+                  </AnimatePresence>
+                )}
+                {/* Soft glare sweep across the screen — premium feel */}
+                <div
+                  aria-hidden="true"
+                  className="absolute inset-0 pointer-events-none"
+                  style={{
+                    background:
+                      "linear-gradient(125deg, transparent 40%, rgba(255,255,255,0.04) 50%, transparent 60%)",
+                    mixBlendMode: "overlay",
+                  }}
+                />
               </div>
             </motion.div>
 
-            {/* Stand / base decoration */}
-            <div className="flex justify-center mt-[-1px]">
-              <div
-                style={{
-                  width: 200,
-                  height: 4,
-                  background: "linear-gradient(90deg, transparent, #2a2a3a, transparent)",
-                  borderRadius: "0 0 4px 4px",
-                }}
-              />
+            {/* Floor reflection — fades out, matches the frame */}
+            <div
+              aria-hidden="true"
+              className="relative mx-auto -mt-px overflow-hidden"
+              style={{
+                maxWidth: 900,
+                height: 140,
+                transform: "scaleY(-1)",
+                maskImage: "linear-gradient(to bottom, rgba(0,0,0,0.22), transparent 70%)",
+                WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,0.22), transparent 70%)",
+                opacity: 0.5,
+                filter: "blur(0.5px)",
+              }}
+            >
+              <div className="relative" style={{ aspectRatio: "16/10" }}>
+                {!SHOWCASE_VIDEO_SRC && (
+                  <Image
+                    src={SCREENSHOTS[active].src}
+                    alt=""
+                    fill
+                    sizes="900px"
+                    className="object-cover"
+                  />
+                )}
+              </div>
             </div>
           </div>
 
@@ -917,28 +1184,7 @@ function AppShowcase() {
             </AnimatePresence>
           </div>
 
-          {/* Feature highlights */}
-          <MotionStagger className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12" staggerDelay={0.08}>
-            {[
-              { label: "AI Recommendations", desc: "Personalized content just for you" },
-              { label: "Binge Mode", desc: "Auto-play next episode" },
-              { label: "Continue Watching", desc: "Pick up where you left off" },
-              { label: "Voice Search", desc: "Find anything instantly" },
-            ].map((feat) => (
-              <MotionStaggerChild key={feat.label}>
-                <div
-                  className="text-center p-4 rounded-xl transition-all duration-300"
-                  style={{
-                    background: "rgba(30,41,59,0.3)",
-                    border: "1px solid #1e293b",
-                  }}
-                >
-                  <p className="text-sm font-semibold text-[#f1f5f9] mb-1">{feat.label}</p>
-                  <p className="text-xs text-[#64748b]">{feat.desc}</p>
-                </div>
-              </MotionStaggerChild>
-            ))}
-          </MotionStagger>
+          {/* Feature highlights removed — redundant with Features bento section */}
         </MotionReveal>
       </div>
     </section>
@@ -1031,21 +1277,37 @@ export default function LandingPage() {
               />
             </a>
 
-            {/* Desktop nav */}
-            <div className="hidden md:flex items-center gap-8">
+            {/* Desktop nav — magnetic links */}
+            <div className="hidden md:flex items-center gap-2">
               {navLinks.map((link) => (
-                <button
+                <MagneticLink
                   key={link.id}
                   onClick={() => scrollTo(link.id)}
-                  className="text-sm font-medium text-[#94a3b8] hover:text-[#f1f5f9] transition-colors duration-200"
+                  className="px-3 py-2 rounded-lg text-sm font-medium text-[#94a3b8] hover:text-[#f1f5f9] transition-colors duration-200"
                 >
                   {link.label}
-                </button>
+                </MagneticLink>
               ))}
             </div>
 
-            {/* Desktop CTA */}
+            {/* Desktop CTA — ⌘K + login */}
             <div className="hidden md:flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => scrollTo("features")}
+                className="hidden lg:inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-mono text-[#94a3b8] hover:text-[#f1f5f9] transition-colors"
+                style={{
+                  background: "rgba(18,18,26,0.6)",
+                  border: "1px solid rgba(42,42,58,0.8)",
+                }}
+                aria-label="Open quick search"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-3.5 h-3.5">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M10.5 18a7.5 7.5 0 100-15 7.5 7.5 0 000 15z" />
+                </svg>
+                <span>Quick Search</span>
+                <kbd className="px-1.5 py-0.5 rounded text-[10px] font-semibold" style={{ background: "rgba(42,42,58,0.9)", color: "#cbd5e1" }}>⌘K</kbd>
+              </button>
               <Link
                 href="/login"
                 className="btn btn-secondary text-sm py-2 px-5"
@@ -1124,56 +1386,30 @@ export default function LandingPage() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        {/* Scroll progress bar — pinned to header bottom edge */}
+        <ScrollProgressBar className="absolute left-0 right-0 bottom-0 h-[1.5px] origin-left" />
       </header>
 
       {/* ── Hero ─────────────────────────────────────────────────────────────── */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden px-4">
-        {/* Ambient glow orbs — floating */}
-        <motion.div
-          aria-hidden="true"
-          className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none"
-          style={{
-            background: "radial-gradient(circle, rgba(0,212,255,0.08) 0%, transparent 70%)",
-            filter: "blur(40px)",
-          }}
-          animate={{ y: [0, -15, 0], x: [0, 8, 0] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          aria-hidden="true"
-          className="absolute bottom-0 right-0 w-[400px] h-[400px] rounded-full pointer-events-none"
-          style={{
-            background: "radial-gradient(circle, rgba(124,58,237,0.06) 0%, transparent 70%)",
-            filter: "blur(60px)",
-          }}
-          animate={{ y: [0, 10, 0], x: [0, -6, 0] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          aria-hidden="true"
-          className="absolute top-20 left-10 w-[200px] h-[200px] rounded-full pointer-events-none"
-          style={{
-            background: "radial-gradient(circle, rgba(251,191,36,0.04) 0%, transparent 70%)",
-            filter: "blur(40px)",
-          }}
-          animate={{ y: [0, -8, 0] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        />
+        {/* Channel Wall — grid of real channel names behind the hero text */}
+        <ChannelWall />
 
-        {/* Subtle grid overlay */}
+        {/* Grain/noise overlay — premium depth */}
+        <div aria-hidden="true" className="noise-overlay" />
+
+        {/* Radial spotlight under headline for depth */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 pointer-events-none"
+          className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[900px] h-[500px] pointer-events-none"
           style={{
-            backgroundImage: `
-              linear-gradient(rgba(0,212,255,0.02) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(0,212,255,0.02) 1px, transparent 1px)
-            `,
-            backgroundSize: "64px 64px",
+            background:
+              "radial-gradient(ellipse at center, rgba(0,212,255,0.08) 0%, transparent 60%)",
           }}
         />
 
-        <div className="relative z-10 max-w-5xl mx-auto text-center pt-24 pb-16">
+        <div className="relative z-20 max-w-5xl mx-auto text-center pt-24 pb-40 md:pb-44">
           {/* Pill badge */}
           <motion.div
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-mono font-semibold tracking-widest uppercase mb-8"
@@ -1195,32 +1431,39 @@ export default function LandingPage() {
 
           {/* Headline — word-by-word reveal */}
           <motion.h1
-            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-tight mb-6"
-            style={{ letterSpacing: "-0.03em" }}
+            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold leading-[1.05] mb-6"
+            style={{ letterSpacing: "-0.035em" }}
             initial="hidden"
             animate="visible"
             variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.08, delayChildren: 0.4 } } }}
           >
-            {["Stream", " "].map((word, i) => (
-              <motion.span
-                key={i}
-                variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] } } }}
-              >
-                {word}
-              </motion.span>
-            ))}
             <motion.span
-              className="gradient-text"
-              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] } } }}
+              className="gradient-text inline-block"
+              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.25, 0.1, 0.25, 1] } } }}
             >
-              Everything.
+              10,000
+            </motion.span>{" "}
+            <motion.span
+              style={{ color: "#f1f5f9" }}
+              className="inline-block"
+              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.25, 0.1, 0.25, 1] } } }}
+            >
+              Live Channels.
             </motion.span>
             <br />
             <motion.span
               style={{ color: "#f1f5f9" }}
-              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.25, 0.1, 0.25, 1] } } }}
+              className="inline-block"
+              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.25, 0.1, 0.25, 1] } } }}
             >
-              Anywhere.
+              One App.
+            </motion.span>{" "}
+            <motion.span
+              style={{ color: "#f1f5f9" }}
+              className="inline-block"
+              variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.25, 0.1, 0.25, 1] } } }}
+            >
+              Every Device.
             </motion.span>
           </motion.h1>
 
@@ -1231,8 +1474,8 @@ export default function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
           >
-            Premium IPTV with 10,000+ live channels, an on-demand library of movies and shows,
-            live sports and PPV events — all in HD and 4K on any device.
+            Live TV, full VOD library, sports and PPV — in HD and 4K on any device you already own.
+            No cable box. No contracts.
           </motion.p>
 
           {/* CTA buttons */}
@@ -1269,65 +1512,53 @@ export default function LandingPage() {
             </motion.div>
           </motion.div>
 
-          {/* Social proof with animated counter */}
+          {/* Trust pills — real claims, not fluff stats */}
           <motion.div
-            className="mt-14 flex flex-wrap items-center justify-center gap-8"
-            initial="hidden"
-            animate="visible"
-            variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1, delayChildren: 1.2 } } }}
+            className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-[#94a3b8]"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.2 }}
           >
-            <motion.div
-              className="text-center"
-              variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
-            >
-              <p className="text-2xl font-bold" style={{ color: "#00d4ff" }}>
-                <AnimatedCounter value={10000} suffix="+" />
-              </p>
-              <p className="text-xs text-[#64748b] font-medium uppercase tracking-wider mt-0.5">Live Channels</p>
-            </motion.div>
             {[
-              { value: "HD & 4K", label: "Quality" },
-              { value: "All Devices", label: "Compatible" },
-              { value: "24/7", label: "Support" },
-            ].map((stat) => (
-              <motion.div
-                key={stat.label}
-                className="text-center"
-                variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
-              >
-                <p className="text-2xl font-bold" style={{ color: "#00d4ff" }}>{stat.value}</p>
-                <p className="text-xs text-[#64748b] font-medium uppercase tracking-wider mt-0.5">{stat.label}</p>
-              </motion.div>
+              "No contracts",
+              "Instant activation",
+              "Works on everything you own",
+            ].map((pill, i) => (
+              <div key={pill} className="flex items-center gap-2">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#00d4ff" strokeWidth={2.5} className="w-4 h-4 flex-shrink-0">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+                <span>{pill}</span>
+                {i < 2 && <span className="hidden sm:inline text-[#334155] ml-4">·</span>}
+              </div>
             ))}
           </motion.div>
         </div>
 
-        {/* Scroll indicator */}
+        {/* Channel logo marquee — the social proof */}
         <motion.div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5, duration: 0.6 }}
+          className="absolute left-0 right-0 bottom-4 md:bottom-8 z-10"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 1.6 }}
+          aria-label="Channel directory"
         >
-          <button
-            onClick={() => scrollTo("features")}
-            aria-label="Scroll to features"
-            className="flex flex-col items-center gap-2 text-[#64748b] hover:text-[#94a3b8] transition-colors"
-          >
-            <span className="text-xs font-mono uppercase tracking-widest">Scroll</span>
-            <motion.svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={1.5}
-              className="w-5 h-5"
-              animate={{ y: [0, 6, 0] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-            </motion.svg>
-          </button>
+          <div className="marquee-group marquee-mask py-2 overflow-hidden">
+            <div className="marquee-track">
+              {[...CHANNEL_ROW_1, ...CHANNEL_ROW_1].map((name, i) => (
+                <ChannelPill key={`r1-${i}`} name={name} />
+              ))}
+            </div>
+          </div>
+          <div className="marquee-group marquee-mask py-2 mt-2 overflow-hidden">
+            <div className="marquee-track reverse">
+              {[...CHANNEL_ROW_2, ...CHANNEL_ROW_2].map((name, i) => (
+                <ChannelPill key={`r2-${i}`} name={name} />
+              ))}
+            </div>
+          </div>
         </motion.div>
+
       </section>
 
       {/* ── Features ─────────────────────────────────────────────────────────── */}
@@ -1354,26 +1585,38 @@ export default function LandingPage() {
             </p>
           </MotionReveal>
 
-          {/* Grid — staggered cascade */}
-          <MotionStagger className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" staggerDelay={0.1}>
-            {FEATURES.map((feature) => (
-              <MotionStaggerChild key={feature.title}>
-                <motion.div
-                  className="card card-hover group h-full"
-                  style={{ "--glow-color": feature.glow } as React.CSSProperties}
-                  whileHover={{ y: -6, transition: { type: "spring", stiffness: 300, damping: 20 } }}
-                >
-                  <div
-                    className={`inline-flex items-center justify-center w-12 h-12 rounded-xl mb-5 ${feature.color} transition-transform duration-300 group-hover:scale-110`}
-                    style={{ background: feature.glow, border: `1px solid ${feature.glow}` }}
-                  >
-                    {feature.icon}
-                  </div>
-                  <h3 className="text-lg font-bold text-[#f1f5f9] mb-2">{feature.title}</h3>
-                  <p className="text-[#94a3b8] text-sm leading-relaxed">{feature.description}</p>
-                </motion.div>
-              </MotionStaggerChild>
-            ))}
+          {/* Bento grid — 2 hero cells + 4 standard, each with pointer-tracked spotlight */}
+          <MotionStagger className="grid grid-cols-1 md:grid-cols-4 gap-4" staggerDelay={0.08}>
+            {FEATURES.map((feature, idx) => {
+              const isHero = idx < 2;
+              return (
+                <MotionStaggerChild key={feature.title} className={isHero ? "md:col-span-2" : "md:col-span-1"}>
+                  <SpotlightCard accentColor={feature.glow} className="h-full flex flex-col">
+                    <div
+                      className={`inline-flex items-center justify-center w-12 h-12 rounded-xl mb-5 ${feature.color}`}
+                      style={{ background: feature.glow, border: `1px solid ${feature.glow}` }}
+                    >
+                      {feature.icon}
+                    </div>
+                    <h3 className={`font-bold text-[#f1f5f9] mb-2 ${isHero ? "text-2xl" : "text-lg"}`}>
+                      {feature.title}
+                    </h3>
+                    <p className={`text-[#94a3b8] leading-relaxed ${isHero ? "text-base" : "text-sm"}`}>
+                      {feature.description}
+                    </p>
+                    {isHero && (
+                      <div className="mt-6 pt-6 flex items-center gap-2 text-xs font-mono tracking-wider uppercase" style={{ borderTop: "1px solid rgba(255,255,255,0.06)", color: feature.color.replace("text-[", "").replace("]", "") }}>
+                        <span
+                          className="w-1.5 h-1.5 rounded-full"
+                          style={{ background: feature.color.replace("text-[", "").replace("]", ""), boxShadow: `0 0 6px ${feature.glow}` }}
+                        />
+                        {idx === 0 ? "Live Right Now" : "Updated Daily"}
+                      </div>
+                    )}
+                  </SpotlightCard>
+                </MotionStaggerChild>
+              );
+            })}
           </MotionStagger>
         </div>
       </section>
@@ -1569,7 +1812,7 @@ export default function LandingPage() {
                       <AnimatePresence mode="wait">
                         <motion.p
                           key={currentOption.perMonth}
-                          className="text-sm text-[#64748b] mb-8"
+                          className="text-sm text-[#64748b] mb-3"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
@@ -1580,20 +1823,44 @@ export default function LandingPage() {
                         </motion.p>
                       </AnimatePresence>
 
-                      {/* Feature list */}
+                      {/* Animated savings pill — slides in when user selects 6mo or yearly */}
+                      <div className="mb-8 h-7">
+                        <AnimatePresence mode="wait">
+                          {currentOption.period !== "monthly" && (() => {
+                            const months = currentOption.period === "6month" ? 6 : 12;
+                            const monthlyPrice = plan.billingOptions[0].price;
+                            const savings = monthlyPrice * months - currentOption.price;
+                            return (
+                              <motion.div
+                                key={currentOption.period}
+                                initial={{ opacity: 0, x: -12 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 12 }}
+                                transition={{ type: "spring", stiffness: 320, damping: 26 }}
+                                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold"
+                                style={{
+                                  background: "rgba(34,197,94,0.12)",
+                                  border: "1px solid rgba(34,197,94,0.3)",
+                                  color: "#4ade80",
+                                }}
+                              >
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} className="w-3 h-3">
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                </svg>
+                                <span>Save</span>
+                                <AnimatedCounter value={savings} prefix="$" />
+                                <span className="text-[#4ade80]/70">vs monthly</span>
+                              </motion.div>
+                            );
+                          })()}
+                        </AnimatePresence>
+                      </div>
+
+                      {/* Feature list — checkmarks draw themselves in stagger */}
                       <ul className="space-y-3 mb-8 flex-1" role="list">
-                        {plan.features.map((f) => (
+                        {plan.features.map((f, fi) => (
                           <li key={f} className="flex items-center gap-3 text-sm text-[#94a3b8]">
-                            <svg
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke={plan.featured ? "#00d4ff" : "#22c55e"}
-                              strokeWidth={2.5}
-                              className="w-4 h-4 flex-shrink-0"
-                              aria-hidden="true"
-                            >
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                            </svg>
+                            <DrawingCheck color={plan.featured ? "#00d4ff" : "#22c55e"} delay={fi * 0.04} />
                             {f}
                           </li>
                         ))}

@@ -21,7 +21,7 @@ const faqSections: FAQSection[] = [
       {
         question: "How do I set up Ooustream?",
         answer:
-          "Ooustream has its own dedicated app! On Firestick/Android TV: install the Downloader app, enter code 1360541, and install the Ooustream app. Then enter your credentials from the Credentials page in this portal. Watch the full setup video for a step-by-step walkthrough: https://youtu.be/XIsThctDUxI — make sure to watch all the way to the end before entering the code.",
+          'Ooustream has its own dedicated app! On Firestick/Android TV: install the Downloader app, enter code 1360541, and install the Ooustream app. Then enter your credentials from the Credentials page in this portal. Watch the full setup video for a step-by-step walkthrough: <a href="https://youtu.be/XIsThctDUxI" target="_blank" rel="noopener noreferrer" class="text-[#00d4ff] underline">youtu.be/XIsThctDUxI</a> — make sure to watch all the way to the end before entering the code.',
       },
       {
         question: "What devices are supported?",
@@ -320,9 +320,10 @@ export default function HelpPage() {
                         </svg>
                       </button>
                       {isOpen && (
-                        <div className="px-4 pb-4 text-[#94a3b8]">
-                          {item.answer}
-                        </div>
+                        <div
+                          className="px-4 pb-4 text-[#94a3b8]"
+                          dangerouslySetInnerHTML={{ __html: item.answer }}
+                        />
                       )}
                     </div>
                   );
@@ -347,7 +348,7 @@ export default function HelpPage() {
               onClick={() =>
                 setActiveGuide(activeGuide === guide.name ? null : guide.name)
               }
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-4 py-3 rounded-lg font-medium transition-colors text-sm ${
                 activeGuide === guide.name
                   ? "bg-[#00d4ff] text-white"
                   : "bg-[#12121a] text-[#94a3b8] hover:text-[#f1f5f9] hover:bg-[#2a2a3a]"

@@ -1,7 +1,16 @@
 "use client";
 
-import { motion, useMotionValue, useTransform, animate, useInView, AnimatePresence } from "framer-motion";
-import { useEffect, useRef, type ReactNode } from "react";
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+  useScroll,
+  animate,
+  useInView,
+  AnimatePresence,
+} from "framer-motion";
+import { useEffect, useRef, type ReactNode, type MouseEvent } from "react";
 
 // ─── Shared Easings ──────────────────────────────────────────────────────────
 
@@ -123,6 +132,71 @@ export function AnimatedCounter({ value, suffix = "", prefix = "", className = "
   }, [isInView, motionVal, value]);
 
   return <motion.span ref={ref} className={className}>{display}</motion.span>;
+}
+
+// ─── MagneticLink — pointer-tracked spring translate ──────────────────────────
+
+interface MagneticLinkProps {
+  children: ReactNode;
+  className?: string;
+  strength?: number; // max pixels of pull (default 6)
+  onClick?: () => void;
+}
+
+export function MagneticLink({ children, className = "", strength = 6, onClick }: MagneticLinkProps) {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const sx = useSpring(x, { stiffness: 300, damping: 20, mass: 0.4 });
+  const sy = useSpring(y, { stiffness: 300, damping: 20, mass: 0.4 });
+
+  const handleMove = (e: MouseEvent<HTMLButtonElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = (e.clientX - cx) / (rect.width / 2);
+    const dy = (e.clientY - cy) / (rect.height / 2);
+    x.set(dx * strength);
+    y.set(dy * strength);
+  };
+
+  const handleLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <motion.button
+      type="button"
+      onClick={onClick}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+      style={{ x: sx, y: sy }}
+      className={className}
+    >
+      <motion.span style={{ x: useTransform(sx, (v) => v * 0.4), y: useTransform(sy, (v) => v * 0.4), display: "inline-block" }}>
+        {children}
+      </motion.span>
+    </motion.button>
+  );
+}
+
+// ─── ScrollProgressBar — page-scroll indicator ────────────────────────────────
+
+export function ScrollProgressBar({ className = "" }: { className?: string }) {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 180, damping: 24, mass: 0.4 });
+  return (
+    <motion.div
+      aria-hidden="true"
+      className={className}
+      style={{
+        scaleX,
+        transformOrigin: "left",
+        background: "linear-gradient(90deg, #00d4ff, #7c3aed)",
+        boxShadow: "0 0 10px rgba(0,212,255,0.5)",
+      }}
+    />
+  );
 }
 
 // ─── Re-exports for convenience ──────────────────────────────────────────────

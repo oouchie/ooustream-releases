@@ -83,7 +83,7 @@ export default function LoginPage() {
         localStorage.removeItem("ooustream_saved_username");
       }
 
-      router.push("/dashboard");
+      router.push("/credentials");
     } catch {
       setError("An error occurred. Please try again.");
     } finally {

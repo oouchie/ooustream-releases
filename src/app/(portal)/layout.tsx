@@ -16,7 +16,7 @@ export default async function PortalLayout({
   return (
     <div className="min-h-screen flex flex-col">
       <PortalNav customerName={session.name} />
-      <main className="flex-1 p-4 md:p-8">
+      <main className="flex-1 p-4 md:p-8 pb-24 md:pb-8">
         <div className="max-w-6xl mx-auto">{children}</div>
       </main>
       <footer className="border-t border-[#334155] py-4 text-center text-sm text-[#94a3b8]">
