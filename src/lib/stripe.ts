@@ -23,14 +23,22 @@ export async function getOrCreateStripeCustomer(
   name: string,
   existingStripeCustomerId?: string | null
 ): Promise<string> {
-  // Return existing if we have it
-  if (existingStripeCustomerId) {
-    return existingStripeCustomerId;
-  }
-
   const stripe = getStripe();
 
-  // Create new Stripe customer
+  // Verify existing ID is valid on the current Stripe account — otherwise
+  // a stale ID (from a prior account) causes "No such customer" at checkout.
+  if (existingStripeCustomerId) {
+    try {
+      const existing = await stripe.customers.retrieve(existingStripeCustomerId);
+      if (!('deleted' in existing && existing.deleted)) {
+        return existingStripeCustomerId;
+      }
+    } catch (err) {
+      const code = (err as { code?: string }).code;
+      if (code !== 'resource_missing') throw err;
+    }
+  }
+
   const stripeCustomer = await stripe.customers.create({
     email,
     name,

@@ -50,8 +50,8 @@ export async function POST(request: NextRequest) {
       customer.stripe_customer_id
     );
 
-    // Update customer with Stripe ID if new
-    if (!customer.stripe_customer_id) {
+    // Persist Stripe ID if new or if the stored one was stale/replaced
+    if (customer.stripe_customer_id !== stripeCustomerId) {
       await supabase
         .from('customers')
         .update({ stripe_customer_id: stripeCustomerId })
