@@ -94,6 +94,15 @@ Public-facing marketing page with:
 - **Direct Pro checkout**: `/subscribe/pro` for in-app links
 - **Billing blocker**: Customers with a `reseller` value (non-null) CANNOT access the billing page or make payments. To enable portal payments for a reseller customer, set `reseller` to `null` in the `customers` table. The checkout API (`/api/payments/checkout`) also enforces this check.
 - **Required fields for billing**: `plan_type` (standard/pro), `billing_period` (monthly/6month/yearly), `billing_type` (manual/auto). Optional: `custom_price_monthly`, `custom_price_6month`, `custom_price_yearly` (integer cents, overrides default pricing). `stripe_customer_id` auto-populates on first payment.
+- **Stored `stripe_customer_id` is self-healing**: `getOrCreateStripeCustomer` (`src/lib/stripe.ts`) verifies the stored ID via `stripe.customers.retrieve()` before reuse. On `resource_missing` (stale ID from a prior Stripe account) or soft-deleted customer, it creates a fresh one and the checkout route persists the new ID back to Supabase. Rotating Stripe accounts no longer bricks existing customers.
+
+## Stripe Account / Key Rotation
+If you ever rotate Stripe accounts (new `sk_live_...`, `pk_live_...`, `whsec_...`):
+1. Update the three env vars on Vercel (`STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`) in Production + Development. Preview requires a specific git branch.
+2. Register the webhook endpoint in the new Stripe account at `https://ooustreamportal.vercel.app/api/webhooks/stripe` with events: `checkout.session.completed`, `invoice.paid`, `invoice.payment_failed`. Copy the new `whsec_...` signing secret into `STRIPE_WEBHOOK_SECRET`.
+3. Redeploy production so the new lambda picks up the new env vars.
+4. Existing customers in `customers.stripe_customer_id` hold IDs scoped to the OLD account. The self-healing logic handles this on each customer's next checkout — no manual DB cleanup needed.
+5. If Stripe says "Your account cannot currently make live charges" after activation, hit `/api/admin/stripe-status?key=<ADMIN_PASSWORD>` to see `charges_enabled`, `capabilities`, and `requirements` — definitive source of truth vs the dashboard.
 
 ## Environment Variables
 ```
