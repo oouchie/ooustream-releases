@@ -1,9 +1,13 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { verifyAdminAuth } from '@/lib/auth';
 
-export async function GET() {
-  const isAdmin = await verifyAdminAuth();
+export async function GET(request: NextRequest) {
+  const key = request.nextUrl.searchParams.get('key');
+  const isAdmin =
+    (key && process.env.ADMIN_PASSWORD && key === process.env.ADMIN_PASSWORD) ||
+    (await verifyAdminAuth());
+
   if (!isAdmin) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
