@@ -180,8 +180,8 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 - `application-name` meta tag for Google site name
 
 ## Download Code
-- **Current**: `1360541`
-- **Android link**: `http://aftv.news/1360541`
+- **Current**: `7309199`
+- **Android link**: `http://aftv.news/7309199`
 - Referenced in: `src/lib/ai.ts`, `src/app/best-iptv-service/page.tsx`, `src/app/(portal)/help/page.tsx`
 
 ## Mobile Performance Notes

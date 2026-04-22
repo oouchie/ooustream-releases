@@ -731,7 +731,7 @@ export default function BestIPTVServicePage() {
                     textShadow: "0 0 20px rgba(0,212,255,0.5)",
                   }}
                 >
-                  1360541
+                  7309199
                 </span>
               </div>
               <div className="space-y-2 text-sm text-[#94a3b8] max-w-md mx-auto">
@@ -752,12 +752,12 @@ export default function BestIPTVServicePage() {
                 <strong className="text-[#f1f5f9]">On Android phone?</strong>{" "}
                 Open your browser and go to{" "}
                 <a
-                  href="http://aftv.news/1360541"
+                  href="http://aftv.news/7309199"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[#00d4ff] hover:underline font-mono"
                 >
-                  aftv.news/1360541
+                  aftv.news/7309199
                 </a>{" "}
                 to download the app directly.
               </p>

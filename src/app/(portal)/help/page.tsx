@@ -21,7 +21,7 @@ const faqSections: FAQSection[] = [
       {
         question: "How do I set up Ooustream?",
         answer:
-          'Ooustream has its own dedicated app! On Firestick/Android TV: install the Downloader app, enter code 1360541, and install the Ooustream app. Then enter your credentials from the Credentials page in this portal. Watch the full setup video for a step-by-step walkthrough: <a href="https://youtu.be/XIsThctDUxI" target="_blank" rel="noopener noreferrer" class="text-[#00d4ff] underline">youtu.be/XIsThctDUxI</a> — make sure to watch all the way to the end before entering the code.',
+          'Ooustream has its own dedicated app! On Firestick/Android TV: install the Downloader app, enter code 7309199, and install the Ooustream app. Then enter your credentials from the Credentials page in this portal. Watch the full setup video for a step-by-step walkthrough: <a href="https://youtu.be/XIsThctDUxI" target="_blank" rel="noopener noreferrer" class="text-[#00d4ff] underline">youtu.be/XIsThctDUxI</a> — make sure to watch all the way to the end before entering the code.',
       },
       {
         question: "What devices are supported?",
@@ -100,7 +100,7 @@ const deviceGuides: DeviceGuide[] = [
       "From the home screen, go to 'Find' then 'Search'",
       "Search for 'Downloader' and install it",
       "Open Downloader and enable 'Unknown Sources' when prompted (Settings > My Fire TV > Developer Options)",
-      "In the Downloader URL bar, enter the code: 1360541",
+      "In the Downloader URL bar, enter the code: 7309199",
       "Install the Ooustream app when the download completes",
       "Open Ooustream and enter your credentials from the Credentials page in this portal",
     ],
@@ -112,7 +112,7 @@ const deviceGuides: DeviceGuide[] = [
     steps: [
       "Watch the full setup video before starting: https://youtu.be/XIsThctDUxI",
       "Install the 'Downloader' app from the Google Play Store",
-      "Open Downloader and in the URL bar, enter the code: 1360541",
+      "Open Downloader and in the URL bar, enter the code: 7309199",
       "Install the Ooustream app when the download completes",
       "Open Ooustream and enter your credentials from the Credentials page in this portal",
       "Wait for channels to load and start watching",
