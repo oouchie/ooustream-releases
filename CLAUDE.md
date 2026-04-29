@@ -179,6 +179,18 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 - JSON-LD: Organization + WebSite schema
 - `application-name` meta tag for Google site name
 
+### Canonical URL pattern (IMPORTANT)
+The root `src/app/layout.tsx` declares `alternates.canonical: "https://ooustream.com"` for the homepage. In Next.js App Router, child pages **inherit** the parent canonical unless they declare their own. **Every public, indexable page MUST declare its own `alternates.canonical`** — otherwise it tells Google the homepage is its canonical and Google skips indexing it ("Discovered – currently not indexed").
+
+Where canonicals are declared per-page:
+- `/best-iptv-service` → `src/app/best-iptv-service/layout.tsx`
+- `/subscribe/pro` → `src/app/subscribe/pro/layout.tsx`
+- `/login` → `src/app/(auth)/login/layout.tsx` (page is `"use client"`, so layout owns metadata)
+- `/privacy` → metadata exported directly from `src/app/privacy/page.tsx`
+- `/terms` → metadata exported directly from `src/app/terms/page.tsx`
+
+**Rule for new public pages:** add a `metadata` export with `alternates.canonical` pointing at the page's own URL. If the page is a client component (`"use client"`), create a sibling `layout.tsx` to hold metadata.
+
 ## Download Code
 - **Current**: `7309199`
 - **Android link**: `http://aftv.news/7309199`
