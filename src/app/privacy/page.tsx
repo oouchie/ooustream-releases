@@ -1,4 +1,30 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "OOUStream | Privacy Policy",
+  description:
+    "Read the OOUStream privacy policy. Learn what information we collect, how we use it, how we protect your data, and your rights as a customer of our IPTV service.",
+  alternates: {
+    canonical: "https://ooustream.com/privacy",
+  },
+  openGraph: {
+    title: "OOUStream | Privacy Policy",
+    description:
+      "Read the OOUStream privacy policy. Learn what information we collect, how we use it, how we protect your data, and your rights as a customer.",
+    url: "https://ooustream.com/privacy",
+    siteName: "OOUStream",
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+    type: "article",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "OOUStream | Privacy Policy",
+    description:
+      "Read the OOUStream privacy policy. Learn what information we collect, how we use it, how we protect your data, and your rights as a customer.",
+    images: ["/og-image.png"],
+  },
+};
 
 export default function PrivacyPage() {
   return (

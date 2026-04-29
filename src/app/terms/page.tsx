@@ -1,4 +1,30 @@
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "OOUStream | Terms of Service",
+  description:
+    "Read the OOUStream Terms of Service. Subscription terms, billing, acceptable use, refunds, and account responsibilities for our IPTV streaming service.",
+  alternates: {
+    canonical: "https://ooustream.com/terms",
+  },
+  openGraph: {
+    title: "OOUStream | Terms of Service",
+    description:
+      "Read the OOUStream Terms of Service. Subscription terms, billing, acceptable use, refunds, and account responsibilities for our IPTV streaming service.",
+    url: "https://ooustream.com/terms",
+    siteName: "OOUStream",
+    images: [{ url: "/og-image.png", width: 1200, height: 630 }],
+    type: "article",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "OOUStream | Terms of Service",
+    description:
+      "Read the OOUStream Terms of Service. Subscription terms, billing, acceptable use, refunds, and account responsibilities for our IPTV streaming service.",
+    images: ["/og-image.png"],
+  },
+};
 
 export default function TermsPage() {
   return (
