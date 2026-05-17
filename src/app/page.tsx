@@ -2079,6 +2079,14 @@ export default function LandingPage() {
                 </li>
                 <li>
                   <Link
+                    href="/blog"
+                    className="text-sm text-[#64748b] hover:text-[#00d4ff] transition-colors"
+                  >
+                    Blog
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href="/subscribe/pro"
                     className="text-sm text-[#64748b] hover:text-[#00d4ff] transition-colors"
                   >

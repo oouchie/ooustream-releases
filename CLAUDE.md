@@ -133,6 +133,8 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 ### Public
 - `/` — Landing page (marketing)
 - `/best-iptv-service` — SEO landing page
+- `/blog` — Blog index (list of all posts)
+- `/blog/[slug]` — Individual blog post
 - `/subscribe/pro` — Direct Pro plan checkout (for in-app links)
 - `/privacy` — Privacy policy
 - `/terms` — Terms of service
@@ -172,11 +174,11 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 - `/reseller/customers/[id]/edit` — Edit customer
 
 ## SEO
-- Sitemap at `/sitemap.xml` (homepage, best-iptv-service, subscribe/pro, login, privacy, terms)
+- Sitemap at `/sitemap.xml` (homepage, best-iptv-service, blog, blog posts, subscribe/pro, login, privacy, terms)
 - Robots at `/robots.txt` (disallows /api/, /admin/, /reseller/)
 - Metadata with canonical URLs on all public pages
 - OpenGraph + Twitter cards
-- JSON-LD: Organization + WebSite schema
+- JSON-LD: Organization + WebSite schema (root layout) + Article schema (per blog post)
 - `application-name` meta tag for Google site name
 
 ### Canonical URL pattern (IMPORTANT)
@@ -184,12 +186,24 @@ The root `src/app/layout.tsx` declares `alternates.canonical: "https://ooustream
 
 Where canonicals are declared per-page:
 - `/best-iptv-service` → `src/app/best-iptv-service/layout.tsx`
+- `/blog` → metadata exported directly from `src/app/blog/page.tsx`
+- `/blog/[slug]` → `generateMetadata` in `src/app/blog/[slug]/page.tsx`
 - `/subscribe/pro` → `src/app/subscribe/pro/layout.tsx`
 - `/login` → `src/app/(auth)/login/layout.tsx` (page is `"use client"`, so layout owns metadata)
 - `/privacy` → metadata exported directly from `src/app/privacy/page.tsx`
 - `/terms` → metadata exported directly from `src/app/terms/page.tsx`
 
 **Rule for new public pages:** add a `metadata` export with `alternates.canonical` pointing at the page's own URL. If the page is a client component (`"use client"`), create a sibling `layout.tsx` to hold metadata.
+
+## Blog System
+- **Content lives in** `src/content/blog/*.tsx` — one file per post
+- **Each post file exports** `meta: BlogPostMeta` (slug, title, description, publishedAt, readingTime, etc.) and a default React component for the body
+- **Registry**: `src/lib/blog.ts` imports each post module and exposes `getAllPosts()`, `getPostBySlug()`, `getAllSlugs()`. To add a new post, create the file then add the import + entry in `src/lib/blog.ts`
+- **Routes**: `src/app/blog/page.tsx` (listing) and `src/app/blog/[slug]/page.tsx` (post) — fully server-rendered, statically generated via `generateStaticParams`
+- **Typography**: `.blog-content` styles in `globals.css` (cyan link underlines, sized h2/h3, list spacing)
+- **Per-post SEO**: `generateMetadata` builds canonical, OpenGraph article tags, and Twitter card. Article JSON-LD injected via `<script type="application/ld+json">`
+- **Sitemap**: blog posts auto-added by `src/app/sitemap.ts` via `getAllPosts()`
+- **Footer link**: `/blog` is linked from the homepage footer Quick Links so it's crawlable from the index page
 
 ## Download Code
 - **Current**: `7309199`
