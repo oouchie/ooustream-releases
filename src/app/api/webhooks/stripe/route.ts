@@ -32,7 +32,8 @@ export async function POST(request: NextRequest) {
         break;
       }
 
-      case 'invoice.paid': {
+      case 'invoice.paid':
+      case 'invoice.payment_succeeded': {
         const invoice = event.data.object as Stripe.Invoice;
         await handleInvoicePaid(supabase, invoice);
         break;
@@ -296,6 +297,19 @@ async function handleInvoicePaid(
 
   if (!customer) {
     console.error('Customer not found for Stripe ID:', stripeCustomerId);
+    return;
+  }
+
+  // Idempotency: skip if we already processed this invoice
+  // (both invoice.paid and invoice.payment_succeeded fire for the same invoice)
+  const { data: existingPayment } = await supabase
+    .from('payments')
+    .select('id')
+    .eq('stripe_invoice_id', invoice.id)
+    .maybeSingle();
+
+  if (existingPayment) {
+    console.log(`Invoice ${invoice.id} already processed, skipping`);
     return;
   }
 
