@@ -189,7 +189,7 @@ export async function sendMagicLinkSMS(
         body: new URLSearchParams({
           To: formattedPhone,
           From: fromNumber,
-          Body: `Your Ooustream login link (expires in 15 min): ${verifyUrl}`,
+          Body: `Your OOUStream login link (expires in 15 min): ${verifyUrl}`,
         }),
       }
     );

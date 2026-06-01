@@ -155,7 +155,28 @@ export default function LoginPage() {
                 />
               </div>
               <p className="text-xs text-[#94a3b8]">
-                We&apos;ll send you a secure login link
+                We&apos;ll send you a secure login link. If you enter a phone
+                number, you agree to receive a one-time login text from
+                OOUStream. Msg &amp; data rates may apply. Reply STOP to opt out,
+                HELP for help. See our{" "}
+                <a
+                  href="https://ooustream.com/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#00d4ff] underline"
+                >
+                  Privacy Policy
+                </a>{" "}
+                and{" "}
+                <a
+                  href="https://ooustream.com/terms"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#00d4ff] underline"
+                >
+                  Terms
+                </a>
+                .
               </p>
               <button
                 type="submit"
