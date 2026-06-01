@@ -206,9 +206,9 @@ Where canonicals are declared per-page:
 - **Footer link**: `/blog` is linked from the homepage footer Quick Links so it's crawlable from the index page
 
 ## Download Code
-- **Current**: `7309199`
-- **Android link**: `http://aftv.news/7309199`
-- Referenced in: `src/lib/ai.ts`, `src/app/best-iptv-service/page.tsx`, `src/app/(portal)/help/page.tsx`
+- **Current**: `8332050`
+- **Android link**: `http://aftv.news/8332050`
+- Referenced in: `src/lib/ai.ts`, `src/app/best-iptv-service/page.tsx`, `src/app/(portal)/help/page.tsx`, `src/content/blog/how-to-set-up-iptv-fire-stick.tsx`
 
 ## Mobile Performance Notes
 - Channel Wall uses `useRef` + `requestAnimationFrame` (no setState in scroll handler)
