@@ -1,9 +1,20 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { createServerClient } from "@/lib/supabase";
 
+// maxRetries: 0 — our generateAIResponse loop owns retry/backoff. The SDK
+// default (maxRetries: 2, 10-min timeout, retries timeouts) would stack
+// multiplicatively on top of our loop and blow the Vercel function budget,
+// turning overload spikes into 504s (non-JSON) that the chat widget surfaces
+// as "AI assistant temporarily unavailable".
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
+  maxRetries: 0,
 });
+
+// Hard cap on a single Anthropic request so one call can never hang the
+// function. Combined with our 3-attempt loop (+1s/+2s backoff) the worst-case
+// wall clock is ~48s, comfortably under the route's maxDuration of 60s.
+const REQUEST_TIMEOUT_MS = 15_000;
 
 export interface CustomerContext {
   name: string;
@@ -534,12 +545,15 @@ export async function generateAIResponse(
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      const response = await anthropic.messages.create({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1024,
-        system: buildSystemPrompt(customerContext),
-        messages: apiMessages,
-      });
+      const response = await anthropic.messages.create(
+        {
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1024,
+          system: buildSystemPrompt(customerContext),
+          messages: apiMessages,
+        },
+        { timeout: REQUEST_TIMEOUT_MS }
+      );
 
       const textBlock = response.content.find(
         (b: { type: string }) => b.type === "text"
@@ -558,14 +572,28 @@ export async function generateAIResponse(
         error instanceof Error &&
         (error.message?.includes("rate_limit") ||
           (error as { status?: number }).status === 429);
+      // A per-request timeout (REQUEST_TIMEOUT_MS) or transient connection
+      // drop. Treat as retryable, and surface as "busy" rather than a hard
+      // failure — these are the conditions that previously ran long enough to
+      // 504 the function.
+      const isTimeoutOrConnection =
+        error instanceof Error &&
+        (error.name === "APIConnectionTimeoutError" ||
+          error.name === "APIConnectionError" ||
+          error.message?.toLowerCase().includes("timeout") ||
+          error.message?.toLowerCase().includes("aborted") ||
+          error.message?.toLowerCase().includes("connection error"));
 
-      if ((isOverloaded || isRateLimit) && attempt < maxRetries) {
+      if (
+        (isOverloaded || isRateLimit || isTimeoutOrConnection) &&
+        attempt < maxRetries
+      ) {
         // Wait before retrying: 1s, 2s, 4s
         await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, attempt - 1)));
         continue;
       }
 
-      if (isOverloaded) {
+      if (isOverloaded || isTimeoutOrConnection) {
         throw new Error("AI_OVERLOADED");
       }
       if (isRateLimit) {

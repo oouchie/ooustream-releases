@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCustomerSession } from "@/lib/auth";
 import { buildCustomerContext, generateAIResponse, ChatMessage } from "@/lib/ai";
 
+// Define the function budget so the handler always returns JSON. Without this,
+// a long retry/overload window could exceed the platform default and return a
+// non-JSON 504, which the chat widget reports as "temporarily unavailable".
+// The AI retry path is bounded to ~48s worst case (see ai.ts), under this cap.
+export const maxDuration = 60;
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getCustomerSession();
