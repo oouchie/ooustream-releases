@@ -176,6 +176,15 @@ export default function LoginPage() {
                 >
                   Terms
                 </a>
+                . For SMS program details, see our{" "}
+                <a
+                  href="https://ooustream.com/sms"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#00d4ff] underline"
+                >
+                  SMS Terms
+                </a>
                 .
               </p>
               <button

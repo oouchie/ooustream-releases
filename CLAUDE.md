@@ -113,7 +113,7 @@ JWT_SECRET=
 ADMIN_PASSWORD=oostream2024
 SENDGRID_API_KEY=
 EMAIL_FROM=Ooustream <oouchie@1865freemoney.com>
-NEXT_PUBLIC_PORTAL_URL=https://ooustreamportal.vercel.app
+NEXT_PUBLIC_PORTAL_URL=https://ooustream.com
 NEXT_PUBLIC_CRM_URL=https://ooustream-crm.vercel.app
 ANTHROPIC_API_KEY=
 RESELLER_SHUN_PASSWORD=shun2024
@@ -228,7 +228,7 @@ Where canonicals are declared per-page:
 
 ## Database (shared with CRM)
 Uses same Supabase instance as CRM:
-- customers (with expiry_date, billing fields, custom prices)
+- customers (with expiry_date, billing fields, custom prices, `sms_consent` boolean + `sms_consent_at` timestamptz for A2P opt-in tracking)
 - payments (Stripe payment records)
 - magic_links
 - support_tickets
