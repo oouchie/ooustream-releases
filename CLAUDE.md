@@ -138,6 +138,7 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 - `/subscribe/pro` — Direct Pro plan checkout (for in-app links)
 - `/privacy` — Privacy policy
 - `/terms` — Terms of service
+- `/sms` — SMS messaging terms & opt-in page (A2P 10DLC CTA proof; login-text program only)
 
 ### Auth
 - `/login` — Customer login (magic link or username)
@@ -174,7 +175,7 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 - `/reseller/customers/[id]/edit` — Edit customer
 
 ## SEO
-- Sitemap at `/sitemap.xml` (homepage, best-iptv-service, blog, blog posts, subscribe/pro, login, privacy, terms)
+- Sitemap at `/sitemap.xml` (homepage, best-iptv-service, blog, blog posts, subscribe/pro, login, sms, privacy, terms)
 - Robots at `/robots.txt` (disallows /api/, /admin/, /reseller/)
 - Metadata with canonical URLs on all public pages
 - OpenGraph + Twitter cards
@@ -192,6 +193,7 @@ Where canonicals are declared per-page:
 - `/login` → `src/app/(auth)/login/layout.tsx` (page is `"use client"`, so layout owns metadata)
 - `/privacy` → metadata exported directly from `src/app/privacy/page.tsx`
 - `/terms` → metadata exported directly from `src/app/terms/page.tsx`
+- `/sms` → metadata exported directly from `src/app/sms/page.tsx`
 
 **Rule for new public pages:** add a `metadata` export with `alternates.canonical` pointing at the page's own URL. If the page is a client component (`"use client"`), create a sibling `layout.tsx` to hold metadata.
 
@@ -272,3 +274,10 @@ All emails include logo and use brand gradient (#00d4ff to #7c3aed):
 - Pulls customer context from Supabase (account data, credentials, subscription)
 - Pre-ticket chatbot on `/support` page
 - Auto-reply on ticket creation with personalized troubleshooting
+- **Timeout hardening (do not regress)**: the Anthropic client uses `maxRetries: 0` (the `generateAIResponse` loop owns retries) and each `messages.create` call passes a 15s `timeout`. The route `src/app/api/ai/chat/route.ts` exports `maxDuration = 60`. Without these, a 529 overload spike compounded the SDK's default retries (maxRetries 2, 10-min timeout) past the function budget → non-JSON 504 → the chat widget's `catch` showed "AI assistant temporarily unavailable". Worst-case bounded path is ~48s < 60s, so the function always returns JSON.
+
+## SMS / A2P 10DLC
+- **Only SMS sent**: the magic-link login text (`sendMagicLinkSMS` in `src/lib/magic-link.ts`). Body leads with brand + `Reply STOP to opt out, HELP for help`. Gated by `SMS_ENABLED` (must be `true`).
+- **Opt-in (CTA)**: disclosure under the phone field on `/login` (`method === "magic"` tab, the default) + dedicated public `/sms` terms page. Privacy `/privacy` §3 covers SMS. These must stay live — A2P vetting verifies the CTA on the live site.
+- **Campaign scope**: transactional one-time login/verification links only. Do NOT register marketing/renewal/credentials-over-SMS use cases (credentials-via-SMS is a rejection trigger and contradicts the credentials-only-on-`/credentials` policy).
+- Verify links use `NEXT_PUBLIC_PORTAL_URL` (now `https://ooustream.com`).
