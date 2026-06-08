@@ -259,6 +259,10 @@ All emails include logo and use brand gradient (#00d4ff to #7c3aed):
 - Auto-deploys from `main` branch
 - Remote: `github.com/oouchie/ooustream-releases`
 
+## Analytics & Ads (root layout `src/app/layout.tsx`)
+- **Meta Pixel** (`438320842295241`) — `next/script` `afterInteractive` + `<noscript>` fallback img in `<head>`.
+- **Google AdSense** (publisher `ca-pub-0330206908249817`) — raw `<script async ... crossOrigin="anonymous">` rendered **directly inside `<head>`** (not `next/script`), so the loader appears in server-rendered HTML for AdSense site verification. Loads site-wide on every page. **Auto Ads** are toggled on in the AdSense dashboard (no extra code; the deprecated `enable_page_level_ads` push snippet is intentionally NOT used). Verify live tag via `view-source:https://ooustream.com` → search `ca-pub-0330206908249817`.
+
 ## CSS Architecture (`globals.css`)
 - CSS variables for all design tokens (colors, fonts, borders)
 - Tailwind v4 with `@theme inline` for custom tokens
@@ -281,3 +285,13 @@ All emails include logo and use brand gradient (#00d4ff to #7c3aed):
 - **Opt-in (CTA)**: disclosure under the phone field on `/login` (`method === "magic"` tab, the default) + dedicated public `/sms` terms page. Privacy `/privacy` §3 covers SMS. These must stay live — A2P vetting verifies the CTA on the live site.
 - **Campaign scope**: transactional one-time login/verification links only. Do NOT register marketing/renewal/credentials-over-SMS use cases (credentials-via-SMS is a rejection trigger and contradicts the credentials-only-on-`/credentials` policy).
 - Verify links use `NEXT_PUBLIC_PORTAL_URL` (now `https://ooustream.com`).
+
+### Twilio A2P Campaign Registration (approved copy)
+The campaign is registered in the Twilio Console / The Campaign Registry (TCR) — these are **registration fields, not code**. A prior submission was rejected with **error 30886 (invalid campaign description)**: the description was too vague / not aligned with use case + sample. Edit and **resubmit the existing campaign** (don't create a new one). Every claim below is verifiable on the live site (`/login` CTA + `/sms` terms + matching sample), which is what the TCR reviewer checks.
+- **Use case**: Account Notification (or 2FA) — NOT Marketing/Mixed (mismatch alone triggers 30886).
+- **Privacy Policy URL**: `https://ooustream.com/privacy` (live, has §3 SMS section + "do not sell/rent/share phone number" language).
+- **Terms URL**: `https://ooustream.com/terms`.
+- **Campaign Description**: "OOUStream is an IPTV streaming subscription service. This campaign sends one-time, customer-initiated account login (verification) links by SMS to existing OOUStream customers who request access to their account portal. When a customer enters their own mobile number on the login page at ooustream.com/login and submits the request, OOUStream sends a single SMS containing a secure, time-limited link used to verify identity and sign in (passwordless authentication). These are strictly transactional account-authentication messages triggered by the customer's own login request. OOUStream does not send marketing, promotional, or recurring messages, and never sends passwords or login credentials by SMS. Customers can reply STOP to opt out and HELP for help at any time."
+- **Opt-in / Message Flow (CTA)**: "End users opt in directly on OOUStream's public login page at https://ooustream.com/login. On the 'Email / Phone' tab, the user enters their mobile phone number to request a login link. A consent disclosure is displayed directly beneath the phone input: 'If you enter a phone number, you agree to receive a one-time login text from OOUStream. Msg & data rates may apply. Reply STOP to opt out, HELP for help.' Submitting the number constitutes consent, and consent is not a condition of purchase. Full SMS program terms are published at https://ooustream.com/sms."
+- **Sample message**: "OOUStream: your login link (expires in 15 min): https://ooustream.com/verify?token=ab12cd34 Reply STOP to opt out, HELP for help."
+- **Brand/entity name** must be the actual registered business (OOUStream / legal entity), used consistently — not an ISV/platform name.
