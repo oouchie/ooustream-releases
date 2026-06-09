@@ -96,10 +96,17 @@ Public-facing marketing page with:
 - **Required fields for billing**: `plan_type` (standard/pro), `billing_period` (monthly/6month/yearly), `billing_type` (manual/auto). Optional: `custom_price_monthly`, `custom_price_6month`, `custom_price_yearly` (integer cents, overrides default pricing). `stripe_customer_id` auto-populates on first payment.
 - **Stored `stripe_customer_id` is self-healing**: `getOrCreateStripeCustomer` (`src/lib/stripe.ts`) verifies the stored ID via `stripe.customers.retrieve()` before reuse. On `resource_missing` (stale ID from a prior Stripe account) or soft-deleted customer, it creates a fresh one and the checkout route persists the new ID back to Supabase. Rotating Stripe accounts no longer bricks existing customers.
 
+## Webhook URL must be the apex domain (no `www`, no trailing slash)
+Register the Stripe webhook at **`https://ooustream.com/api/webhooks/stripe`** — bare apex, no `www`, no trailing slash. The `www.ooustream.com` host **307-redirects** to the apex, the trailing-slash form **308-redirects**, and `http://` likewise. **Stripe does not follow 3xx redirects** — it marks the delivery failed and the handler never runs (symptom: payment succeeds in Stripe but NO `customers` row, NO `audit_logs` entry, NO welcome/admin email). Diagnose by checking the failed delivery's HTTP status in Stripe → Webhooks: `307`/`308` = wrong URL (redirect), `400` = signing-secret mismatch, `500` = handler threw. A bare `curl -X POST` to the correct apex URL should return **400 "No signature"** (proves it reaches the handler). Root-caused 2026-06-08: webhook had been registered with `www.`, silently dropping every payment.
+
+**Note: this redirect is a Vercel *domain-level* redirect (`server: Vercel`, fires at the edge before any function/middleware runs) — it CANNOT be fixed in `middleware.ts`/`next.config.ts`. The safeguard is detection, not interception.**
+
+**Webhook health check:** `GET /api/admin/webhook-health?key=<ADMIN_PASSWORD>` (`src/app/api/admin/webhook-health/route.ts`) calls `stripe.webhookEndpoints.list()` and flags any registered endpoint that uses `www.`, a trailing slash, `http://`, is disabled, or is missing a required event — plus whether `STRIPE_WEBHOOK_SECRET` is set. Returns `{ ok: boolean, issues: [...] }`. **Run this after any Stripe webhook/account change** to confirm you didn't reintroduce the redirect bug.
+
 ## Stripe Account / Key Rotation
 If you ever rotate Stripe accounts (new `sk_live_...`, `pk_live_...`, `whsec_...`):
 1. Update the three env vars on Vercel (`STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`) in Production + Development. Preview requires a specific git branch.
-2. Register the webhook endpoint in the new Stripe account at `https://ooustreamportal.vercel.app/api/webhooks/stripe` with events: `checkout.session.completed`, `invoice.paid`, `invoice.payment_failed`. Copy the new `whsec_...` signing secret into `STRIPE_WEBHOOK_SECRET`.
+2. Register the webhook endpoint in the new Stripe account at `https://ooustream.com/api/webhooks/stripe` (apex — see the "Webhook URL" note above) with events: `checkout.session.completed`, `invoice.paid`, `invoice.payment_failed`. Copy the new `whsec_...` signing secret into `STRIPE_WEBHOOK_SECRET`.
 3. Redeploy production so the new lambda picks up the new env vars.
 4. Existing customers in `customers.stripe_customer_id` hold IDs scoped to the OLD account. The self-healing logic handles this on each customer's next checkout — no manual DB cleanup needed.
 5. If Stripe says "Your account cannot currently make live charges" after activation, hit `/api/admin/stripe-status?key=<ADMIN_PASSWORD>` to see `charges_enabled`, `capabilities`, and `requirements` — definitive source of truth vs the dashboard.
@@ -112,7 +119,7 @@ SUPABASE_SERVICE_ROLE_KEY=
 JWT_SECRET=
 ADMIN_PASSWORD=oostream2024
 SENDGRID_API_KEY=
-EMAIL_FROM=Ooustream <oouchie@1865freemoney.com>
+EMAIL_FROM=Ooustream <oouchie@ooustream.com>
 NEXT_PUBLIC_PORTAL_URL=https://ooustream.com
 NEXT_PUBLIC_CRM_URL=https://ooustream-crm.vercel.app
 ANTHROPIC_API_KEY=
@@ -251,7 +258,8 @@ All emails include logo and use brand gradient (#00d4ff to #7c3aed):
 - Magic link login
 - Credentials
 - Portal access
-- Welcome emails
+- Welcome emails (landing-page signups/renewals — `sendWelcomeEmail`, shows "Active Until")
+- **Payment receipt** (`sendPaymentReceipt`) — sent on existing-customer renewals via `/billing` (`handleCheckoutCompleted`) AND auto-renew subscription charges (`handleInvoicePaid`). Shows amount paid + updated "Active Until" due date. Added 2026-06-08 because both renewal webhook paths previously updated the CRM expiry but sent NO email, while `/billing/success` told the customer "A receipt has been sent." All paid paths now email a receipt. Sender is `EMAIL_FROM` (now `oouchie@ooustream.com`).
 
 ## Deployment
 - Vercel

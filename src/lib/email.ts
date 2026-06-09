@@ -9,7 +9,7 @@ function initSendGrid() {
   }
 }
 
-const EMAIL_FROM = process.env.EMAIL_FROM || 'Ooustream <oouchie@1865freemoney.com>';
+const EMAIL_FROM = process.env.EMAIL_FROM || 'Ooustream <oouchie@ooustream.com>';
 const PORTAL_URL = process.env.NEXT_PUBLIC_PORTAL_URL || 'https://ooustream.com';
 const ADMIN_EMAIL = 'oouchie@ooustream.com';
 
@@ -108,6 +108,69 @@ export async function sendWelcomeEmail({
     from: EMAIL_FROM,
     to: email,
     subject: 'Welcome to Ooustream - Payment Confirmed',
+    html: emailWrapper(content),
+  });
+}
+
+// Payment receipt for existing customers (portal renewal or auto-renew subscription)
+export async function sendPaymentReceipt({
+  email,
+  name,
+  planType,
+  billingPeriod,
+  amount,
+  expiryDate,
+  isSubscription = false,
+}: {
+  email: string;
+  name: string;
+  planType: string;
+  billingPeriod: string;
+  amount: number; // in cents
+  expiryDate: string;
+  isSubscription?: boolean;
+}): Promise<void> {
+  initSendGrid();
+
+  const planLabel = planType === 'pro' ? 'Pro' : 'Standard';
+  const periodLabels: Record<string, string> = {
+    monthly: '1 Month',
+    '6month': '6 Months',
+    yearly: '1 Year',
+  };
+  const periodLabel = periodLabels[billingPeriod] || billingPeriod;
+  const formattedExpiry = new Date(expiryDate).toLocaleDateString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+  const formattedAmount = `$${(amount / 100).toFixed(2)}`;
+
+  const content = `
+    <h2 style="color: #111827; margin-top: 0;">Payment Received, ${name}!</h2>
+    <p style="color: #4b5563;">Thank you${isSubscription ? ' — your subscription renewed automatically' : ''}. Your payment has been received and your account is active.</p>
+
+    <div style="background-color: #f3f4f6; padding: 16px; border-radius: 8px; margin: 20px 0;">
+      <p style="margin: 0 0 8px 0; color: #4b5563;">Amount Paid: <strong style="color: #111827;">${formattedAmount}</strong></p>
+      <p style="margin: 0 0 8px 0; color: #4b5563;">Plan: <strong style="color: #111827;">${planLabel}</strong></p>
+      <p style="margin: 0 0 8px 0; color: #4b5563;">Period: <strong style="color: #111827;">${periodLabel}</strong></p>
+      <p style="margin: 0; color: #4b5563;">Active Until: <strong style="color: #111827;">${formattedExpiry}</strong></p>
+    </div>
+
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="${PORTAL_URL}/billing/history" style="background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%); color: white; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; display: inline-block;">
+        View Payment History
+      </a>
+    </div>
+
+    <p style="color: #9ca3af; font-size: 14px; margin-top: 24px; margin-bottom: 0;">
+      Questions about this charge? Reply to this email or open a support ticket in the portal.
+    </p>`;
+
+  await sgMail.send({
+    from: EMAIL_FROM,
+    to: email,
+    subject: `Ooustream Payment Receipt - Active Until ${formattedExpiry}`,
     html: emailWrapper(content),
   });
 }

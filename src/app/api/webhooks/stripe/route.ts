@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { constructWebhookEvent } from '@/lib/stripe';
 import { createServerClient } from '@/lib/supabase';
 import { calculateNewExpiry } from '@/lib/pricing';
-import { sendWelcomeEmail, sendNewCustomerNotification } from '@/lib/email';
+import { sendWelcomeEmail, sendNewCustomerNotification, sendPaymentReceipt } from '@/lib/email';
 import { BillingPeriod } from '@/types';
 import Stripe from 'stripe';
 
@@ -100,7 +100,7 @@ async function handleCheckoutCompleted(
   // Get current customer data
   const { data: customer } = await supabase
     .from('customers')
-    .select('expiry_date')
+    .select('name, email, expiry_date')
     .eq('id', customerId)
     .single();
 
@@ -144,6 +144,22 @@ async function handleCheckoutCompleted(
       new_expiry: newExpiry.toISOString(),
     },
   });
+
+  // Send payment receipt with updated due date (don't let email failures break the webhook)
+  if (customer?.email) {
+    try {
+      await sendPaymentReceipt({
+        email: customer.email,
+        name: customer.name || customer.email.split('@')[0],
+        planType,
+        billingPeriod,
+        amount: session.amount_total || 0,
+        expiryDate: newExpiry.toISOString().split('T')[0],
+      });
+    } catch (err) {
+      console.error('Failed to send payment receipt:', err);
+    }
+  }
 
   console.log(`Payment successful for customer ${customerId}, new expiry: ${newExpiry}`);
 }
@@ -291,7 +307,7 @@ async function handleInvoicePaid(
   // Find customer by Stripe ID
   const { data: customer } = await supabase
     .from('customers')
-    .select('id, billing_period, expiry_date')
+    .select('id, name, email, plan_type, billing_period, expiry_date')
     .eq('stripe_customer_id', stripeCustomerId)
     .single();
 
@@ -345,6 +361,23 @@ async function handleInvoicePaid(
       status: 'Active',
     })
     .eq('id', customer.id);
+
+  // Send renewal receipt with updated due date (don't let email failures break the webhook)
+  if (customer.email) {
+    try {
+      await sendPaymentReceipt({
+        email: customer.email,
+        name: customer.name || customer.email.split('@')[0],
+        planType: customer.plan_type || 'standard',
+        billingPeriod,
+        amount: invoice.amount_paid,
+        expiryDate: newExpiry.toISOString().split('T')[0],
+        isSubscription: true,
+      });
+    } catch (err) {
+      console.error('Failed to send renewal receipt:', err);
+    }
+  }
 
   console.log(`Subscription payment for customer ${customer.id}, new expiry: ${newExpiry}`);
 }
