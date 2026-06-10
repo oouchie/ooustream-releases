@@ -2,6 +2,7 @@ import { getCustomerSession } from "@/lib/auth";
 import { createServerClient } from "@/lib/supabase";
 import Link from "next/link";
 import ReviewCard from "@/components/portal/ReviewCard";
+import SmsConsentToggle from "@/components/portal/SmsConsentToggle";
 
 async function getCustomerData(customerId: string) {
   const supabase = createServerClient();
@@ -180,6 +181,12 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* SMS Notifications opt-in */}
+      <SmsConsentToggle
+        initialConsent={Boolean(customer.sms_consent)}
+        phone={customer.phone ?? null}
+      />
 
       {/* Quick Actions */}
       <div>

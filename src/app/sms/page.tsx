@@ -167,7 +167,10 @@ export default function SmsPage() {
         </div>
 
         {/* Footer links */}
-        <div className="mt-12 pt-8 border-t border-[#1e293b] flex gap-6 text-sm text-gray-400">
+        <div className="mt-12 pt-8 border-t border-[#1e293b] flex flex-wrap gap-6 text-sm text-gray-400">
+          <Link href="/sms-alerts" className="hover:text-cyan-400 transition-colors">
+            SMS Renewal &amp; Service Alerts
+          </Link>
           <Link href="/terms" className="hover:text-cyan-400 transition-colors">
             Terms of Service
           </Link>

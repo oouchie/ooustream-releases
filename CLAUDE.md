@@ -128,6 +128,10 @@ RESELLER_PRIME_PASSWORD=prime2024
 RESELLER_JK_PASSWORD=jk2024
 RESELLER_EVAN_PASSWORD=evan2024
 SMS_ENABLED=false
+TWILIO_ACCOUNT_SID=AC...
+TWILIO_AUTH_TOKEN=...
+TWILIO_PHONE_NUMBER=+1...
+TWILIO_MESSAGING_SERVICE_SID=MG...   # A2P campaign is attached here; send routes through this
 
 # Stripe
 STRIPE_SECRET_KEY=sk_live_...
@@ -146,6 +150,7 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 - `/privacy` — Privacy policy
 - `/terms` — Terms of service
 - `/sms` — SMS messaging terms & opt-in page (A2P 10DLC CTA proof; login-text program only)
+- `/sms-alerts` — SMS terms for the renewal-reminders + service-notifications program (CTA proof for the 2nd A2P campaign; opt-in is the `/dashboard` toggle)
 
 ### Auth
 - `/login` — Customer login (magic link or username)
@@ -182,7 +187,7 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 - `/reseller/customers/[id]/edit` — Edit customer
 
 ## SEO
-- Sitemap at `/sitemap.xml` (homepage, best-iptv-service, blog, blog posts, subscribe/pro, login, sms, privacy, terms)
+- Sitemap at `/sitemap.xml` (homepage, best-iptv-service, blog, blog posts, subscribe/pro, login, sms, sms-alerts, privacy, terms)
 - Robots at `/robots.txt` (disallows /api/, /admin/, /reseller/)
 - Metadata with canonical URLs on all public pages
 - OpenGraph + Twitter cards
@@ -201,6 +206,7 @@ Where canonicals are declared per-page:
 - `/privacy` → metadata exported directly from `src/app/privacy/page.tsx`
 - `/terms` → metadata exported directly from `src/app/terms/page.tsx`
 - `/sms` → metadata exported directly from `src/app/sms/page.tsx`
+- `/sms-alerts` → metadata exported directly from `src/app/sms-alerts/page.tsx`
 
 **Rule for new public pages:** add a `metadata` export with `alternates.canonical` pointing at the page's own URL. If the page is a client component (`"use client"`), create a sibling `layout.tsx` to hold metadata.
 
@@ -290,6 +296,8 @@ All emails include logo and use brand gradient (#00d4ff to #7c3aed):
 
 ## SMS / A2P 10DLC
 - **Only SMS sent**: the magic-link login text (`sendMagicLinkSMS` in `src/lib/magic-link.ts`). Body leads with brand + `Reply STOP to opt out, HELP for help`. Gated by `SMS_ENABLED` (must be `true`).
+- **Campaign was APPROVED 2026-06-09.** To go live: set `SMS_ENABLED=true` on Vercel Production + redeploy.
+- **Sender routing (A2P compliance)**: `sendMagicLinkSMS` prefers `TWILIO_MESSAGING_SERVICE_SID` (`MGee134cc169169e8ed8e9eb45c3a762ba`) and sends `MessagingServiceSid` — NOT a bare `From`. The approved A2P campaign is attached to the Messaging Service, and `+16786806598` (Phone Number SID `PN6fa4e3b7484c158ab718ffe530596eb7`) lives in that service's sender pool. Sending with a raw `From` bypasses the campaign registration and risks carrier filtering. Falls back to `From: TWILIO_PHONE_NUMBER` only if the service SID is unset.
 - **Opt-in (CTA)**: disclosure under the phone field on `/login` (`method === "magic"` tab, the default) + dedicated public `/sms` terms page. Privacy `/privacy` §3 covers SMS. These must stay live — A2P vetting verifies the CTA on the live site.
 - **Campaign scope**: transactional one-time login/verification links only. Do NOT register marketing/renewal/credentials-over-SMS use cases (credentials-via-SMS is a rejection trigger and contradicts the credentials-only-on-`/credentials` policy).
 - Verify links use `NEXT_PUBLIC_PORTAL_URL` (now `https://ooustream.com`).
@@ -303,3 +311,24 @@ The campaign is registered in the Twilio Console / The Campaign Registry (TCR) �
 - **Opt-in / Message Flow (CTA)**: "End users opt in directly on OOUStream's public login page at https://ooustream.com/login. On the 'Email / Phone' tab, the user enters their mobile phone number to request a login link. A consent disclosure is displayed directly beneath the phone input: 'If you enter a phone number, you agree to receive a one-time login text from OOUStream. Msg & data rates may apply. Reply STOP to opt out, HELP for help.' Submitting the number constitutes consent, and consent is not a condition of purchase. Full SMS program terms are published at https://ooustream.com/sms."
 - **Sample message**: "OOUStream: your login link (expires in 15 min): https://ooustream.com/verify?token=ab12cd34 Reply STOP to opt out, HELP for help."
 - **Brand/entity name** must be the actual registered business (OOUStream / legal entity), used consistently — not an ISV/platform name.
+
+### Second Campaign — Renewal Reminders & Service Notifications (Account Notification)
+Renewal/billing reminders and service notifications are **out of scope for the approved login campaign** — that campaign's own description states OOUStream "does not send marketing, promotional, or **recurring** messages," and its sample is a login link. Sending reminders through it risks carrier 30007 filtering AND TCR suspension of the working login texts. So they run as a **separate, second A2P campaign**.
+
+**Twilio topology (hard constraint):** 1 Messaging Service = 1 campaign; 1 phone number = 1 Messaging Service. The second campaign therefore needs its **own Messaging Service + its own dedicated phone number** — it CANNOT reuse `+16786806598` / `MGee134cc169169e8ed8e9eb45c3a762ba` (those are bound to the login campaign). Capture the new service SID into env `TWILIO_BILLING_MESSAGING_SERVICE_SID`.
+
+**Live CTA + terms (already shipped, required for vetting):**
+- Opt-in is **self-service in the portal**: `SmsConsentToggle` on `/dashboard` ("Text me account updates") → POSTs `/api/customer/sms-consent` → writes `customers.sms_consent` + `sms_consent_at`. Requires a phone on file.
+- Public program terms: **`/sms-alerts`** (`src/app/sms-alerts/page.tsx`) — separate from `/sms` (login program) for a clean 1:1 TCR mapping. Cross-linked from `/sms`, `/privacy` §3, and the sitemap.
+- Reseller consent checkbox label (`reseller/customers/new` + `[id]/edit`) and `/privacy` §3 were corrected to **remove "login credentials via SMS"** (a rejection trigger) and scope to renewal reminders + service notifications.
+
+**TCR registration copy (campaign 2 — submit these fields):**
+- **Use case**: Account Notification — NOT Marketing/Mixed.
+- **Privacy Policy URL**: `https://ooustream.com/privacy` · **Terms URL**: `https://ooustream.com/terms`
+- **Campaign Description**: "OOUStream is an IPTV streaming subscription service. This campaign sends account notification texts to existing OOUStream customers who have opted in: (1) subscription renewal reminders sent shortly before a customer's subscription expires so their service does not lapse, and (2) service notifications such as outage and scheduled-maintenance alerts. These are transactional, account-related messages tied to the customer's existing subscription. Customers opt in from within their authenticated customer portal by enabling a 'Text me account updates' toggle on their dashboard at ooustream.com/dashboard, and consent is recorded with a timestamp. OOUStream does not send marketing or promotional messages under this campaign, and never sends passwords or login credentials by SMS. Customers can reply STOP to opt out and HELP for help at any time, or disable the toggle in their portal."
+- **Opt-in / Message Flow (CTA)**: "End users opt in from inside their authenticated OOUStream customer portal. After logging in at ooustream.com/login, the customer opens their dashboard (ooustream.com/dashboard) and turns on a 'Text me account updates' toggle. The disclosure next to the toggle reads: 'Get a text before your subscription expires, plus important service notifications (outages, maintenance). Up to a few messages per billing cycle. Msg & data rates may apply. Reply STOP to opt out, HELP for help. Consent is not a condition of purchase.' Enabling the toggle records express consent with a timestamp. Full program terms are published publicly at https://ooustream.com/sms-alerts." (Because the opt-in is behind login, include a screenshot of the dashboard toggle with the submission.)
+- **Sample messages**:
+  - "OOUStream: your subscription expires in 7 days (Jun 30). Renew to avoid interruption: https://ooustream.com/billing Reply STOP to opt out, HELP for help."
+  - "OOUStream: scheduled maintenance tonight 1-3am ET may briefly affect streaming. Reply STOP to opt out, HELP for help."
+
+**Phase 3 (build AFTER campaign approval — not yet done):** `sendBillingReminderSMS` routed via `TWILIO_BILLING_MESSAGING_SERVICE_SID`; a daily Vercel cron (no `vercel.json` exists yet) that finds `customers` with `expiry_date` in the 7-day and 1-day windows AND `sms_consent = true`, sends once per window (dedupe marker), gated behind `SMS_BILLING_REMINDERS_ENABLED` (default off).

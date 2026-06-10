@@ -83,17 +83,33 @@ export default function PrivacyPage() {
 
           <h2 className="text-xl font-semibold text-white mt-8">3. SMS/Text Messaging</h2>
           <p className="text-gray-300">
-            By providing your phone number, you consent to receive SMS messages from OOUStream related to your account, including:
+            OOUStream uses SMS only for transactional, account-related messages. We never
+            send passwords or login credentials by SMS. There are two separate programs,
+            each requiring its own opt-in:
           </p>
           <ul className="list-disc list-inside text-gray-300 space-y-2">
-            <li>Payment and subscription reminders</li>
-            <li>Login credentials delivery</li>
-            <li>Portal access links</li>
-            <li>Service status updates</li>
+            <li>
+              <strong>Login texts</strong> — one-time account login (verification) links
+              you request on the login page. See our{" "}
+              <a href="/sms" className="text-cyan-400 underline hover:text-cyan-300">
+                SMS Login Terms
+              </a>
+              .
+            </li>
+            <li>
+              <strong>Renewal reminders &amp; service notifications</strong> — subscription
+              expiry reminders and service updates (outages, maintenance), which you opt
+              into from your portal dashboard. See our{" "}
+              <a href="/sms-alerts" className="text-cyan-400 underline hover:text-cyan-300">
+                SMS Renewal &amp; Service Alerts Terms
+              </a>
+              .
+            </li>
           </ul>
           <p className="text-gray-300 mt-4">
-            <strong>Message frequency varies.</strong> Message and data rates may apply.
-            Reply STOP to opt out of SMS messages at any time. Reply HELP for assistance.
+            <strong>Message frequency varies by program.</strong> Message and data rates
+            may apply. Reply STOP to opt out at any time. Reply HELP for assistance.
+            Consent is not a condition of purchase.
           </p>
           <p className="text-gray-300">
             We do not sell, rent, or share your phone number with third parties for marketing purposes.
