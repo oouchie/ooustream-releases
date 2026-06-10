@@ -2,16 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "OOUStream | SMS Renewal Reminders & Service Notifications",
+  title: "OOUStream | SMS Account Notifications",
   description:
-    "How OOUStream's account-notification SMS program works: renewal reminders and service notifications for existing customers. Opt-in, message frequency, rates, STOP/HELP.",
+    "How OOUStream's account-notification SMS program works: renewal & payment reminders, service notifications, and account updates for existing customers. Opt-in, message frequency, rates, STOP/HELP.",
   alternates: {
     canonical: "https://ooustream.com/sms-alerts",
   },
   openGraph: {
-    title: "OOUStream | SMS Renewal Reminders & Service Notifications",
+    title: "OOUStream | SMS Account Notifications",
     description:
-      "Account-notification SMS: renewal reminders + service notifications. Opt-in, frequency, rates, STOP/HELP.",
+      "Account-notification SMS: renewal & payment reminders, service notifications, account updates. Opt-in, frequency, rates, STOP/HELP.",
     url: "https://ooustream.com/sms-alerts",
     siteName: "OOUStream",
     images: [{ url: "/og-image.png", width: 1200, height: 630 }],
@@ -19,9 +19,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "OOUStream | SMS Renewal Reminders & Service Notifications",
+    title: "OOUStream | SMS Account Notifications",
     description:
-      "Account-notification SMS: renewal reminders + service notifications. Opt-in, frequency, rates, STOP/HELP.",
+      "Account-notification SMS: renewal & payment reminders, service notifications, account updates. Opt-in, frequency, rates, STOP/HELP.",
     images: ["/og-image.png"],
   },
 };
@@ -49,10 +49,11 @@ export default function SmsAlertsPage() {
 
       <main className="max-w-4xl mx-auto px-4 py-12">
         <h1 className="text-3xl font-bold text-white mb-2">
-          SMS Renewal Reminders &amp; Service Notifications
+          SMS Account Notifications
         </h1>
         <p className="text-gray-400 mb-8">
-          OOUStream Account Notification Texts — program details and consent
+          OOUStream Account Notification Texts — renewal &amp; payment reminders,
+          service notifications, and account updates
         </p>
 
         <div className="prose prose-invert max-w-none space-y-6">
@@ -75,22 +76,32 @@ export default function SmsAlertsPage() {
           </h2>
           <p className="text-gray-300">
             OOUStream sends <strong>account notification</strong> text messages to
-            existing customers who opt in. These messages are limited to:
+            existing customers who opt in. These transactional, account-related messages
+            are limited to:
           </p>
           <ul className="list-disc list-inside text-gray-300 space-y-2">
             <li>
-              <strong>Renewal reminders</strong> — a reminder before your subscription
-              expires so your service does not lapse.
+              <strong>Renewal &amp; expiry reminders</strong> — a reminder before your
+              subscription expires so your service does not lapse.
             </li>
             <li>
-              <strong>Service notifications</strong> — important account and service
-              updates such as outages or scheduled maintenance.
+              <strong>Payment reminders &amp; receipts</strong> — upcoming or overdue
+              payment reminders, failed-payment notices, and payment confirmations.
+            </li>
+            <li>
+              <strong>Service notifications</strong> — outages, scheduled maintenance,
+              and service-status updates.
+            </li>
+            <li>
+              <strong>Account updates</strong> — status or plan changes, notices that
+              account information is ready to view in your portal, and support-ticket
+              updates.
             </li>
           </ul>
           <p className="text-gray-300">
-            These are transactional account-related messages. We do <strong>not</strong>{" "}
-            send marketing or promotional texts under this program, and we{" "}
-            <strong>never</strong> send passwords or login credentials by SMS.
+            We do <strong>not</strong> send marketing or promotional texts under this
+            program, and we <strong>never</strong> send passwords or login credentials by
+            SMS.
           </p>
 
           {/* How to opt in — the CTA */}
@@ -107,10 +118,10 @@ export default function SmsAlertsPage() {
             disclosure shown next to the toggle reads:
           </p>
           <blockquote className="border-l-2 border-cyan-500/50 pl-4 text-gray-300 italic">
-            &quot;Get a text before your subscription expires, plus important service
-            notifications (outages, maintenance). Up to a few messages per billing cycle.
-            Msg &amp; data rates may apply. Reply STOP to opt out, HELP for help. Consent
-            is not a condition of purchase.&quot;
+            &quot;Get account texts from OOUStream — renewal &amp; payment reminders,
+            service notifications (outages, maintenance), and account updates. Message
+            frequency varies. Msg &amp; data rates may apply. Reply STOP to opt out, HELP
+            for help. Consent is not a condition of purchase.&quot;
           </blockquote>
           <p className="text-gray-300">
             Turning the toggle on constitutes your express consent to receive the account
@@ -127,8 +138,17 @@ export default function SmsAlertsPage() {
               help.
             </p>
             <p>
+              OOUStream: we couldn&apos;t process your payment. Update your billing to keep
+              your service active: https://ooustream.com/billing Reply STOP to opt out,
+              HELP for help.
+            </p>
+            <p>
               OOUStream: scheduled maintenance tonight 1-3am ET may briefly affect
               streaming. Reply STOP to opt out, HELP for help.
+            </p>
+            <p>
+              OOUStream: your support ticket #1234 has been updated. View it:
+              https://ooustream.com/support Reply STOP to opt out, HELP for help.
             </p>
           </blockquote>
 
@@ -137,8 +157,9 @@ export default function SmsAlertsPage() {
             4. Message Frequency &amp; Rates
           </h2>
           <p className="text-gray-300">
-            Up to a few messages per billing cycle (typically renewal reminders around 7
-            days and 1 day before expiry, plus occasional service notifications).{" "}
+            Message frequency varies by your account activity (for example, renewal
+            reminders around 7 days and 1 day before expiry, payment reminders tied to
+            your billing, and occasional service notifications).{" "}
             <strong>Message and data rates may apply.</strong>
           </p>
 

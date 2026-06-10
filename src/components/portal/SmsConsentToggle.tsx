@@ -54,8 +54,8 @@ export default function SmsConsentToggle({
         <div className="flex-1">
           <h3 className="font-medium text-[#f1f5f9]">Text me account updates</h3>
           <p className="text-sm text-[#94a3b8] mt-1 leading-snug">
-            Get a text before your subscription expires, plus important service
-            notifications (outages, maintenance).
+            Get account texts from OOUStream — renewal &amp; payment reminders,
+            service notifications (outages, maintenance), and account updates.
             {hasPhone && (
               <>
                 {" "}

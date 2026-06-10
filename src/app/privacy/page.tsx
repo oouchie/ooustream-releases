@@ -97,11 +97,12 @@ export default function PrivacyPage() {
               .
             </li>
             <li>
-              <strong>Renewal reminders &amp; service notifications</strong> — subscription
-              expiry reminders and service updates (outages, maintenance), which you opt
-              into from your portal dashboard. See our{" "}
+              <strong>Account notifications</strong> — renewal &amp; payment reminders,
+              service notifications (outages, maintenance), and account updates (status or
+              plan changes, support-ticket updates), which you opt into from your portal
+              dashboard. See our{" "}
               <a href="/sms-alerts" className="text-cyan-400 underline hover:text-cyan-300">
-                SMS Renewal &amp; Service Alerts Terms
+                SMS Account Notifications Terms
               </a>
               .
             </li>
