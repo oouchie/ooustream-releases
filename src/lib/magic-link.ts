@@ -165,8 +165,11 @@ export async function sendMagicLinkSMS(
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
     const authToken = process.env.TWILIO_AUTH_TOKEN;
     const fromNumber = process.env.TWILIO_PHONE_NUMBER;
+    const messagingServiceSid = process.env.TWILIO_MESSAGING_SERVICE_SID;
 
-    if (!accountSid || !authToken || !fromNumber) {
+    // A2P 10DLC: the approved campaign is attached to the Messaging Service,
+    // so route through it when available. Fall back to a bare From number.
+    if (!accountSid || !authToken || (!messagingServiceSid && !fromNumber)) {
       return { success: false, error: 'SMS not configured' };
     }
 
@@ -178,6 +181,17 @@ export async function sendMagicLinkSMS(
       formattedPhone = '+' + formattedPhone;
     }
 
+    const params: Record<string, string> = {
+      To: formattedPhone,
+      Body: `OOUStream: your login link (expires in 15 min): ${verifyUrl} Reply STOP to opt out, HELP for help.`,
+    };
+    // Prefer the campaign-linked Messaging Service; send only one sender param.
+    if (messagingServiceSid) {
+      params.MessagingServiceSid = messagingServiceSid;
+    } else {
+      params.From = fromNumber!;
+    }
+
     const response = await fetch(
       `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
       {
@@ -186,11 +200,7 @@ export async function sendMagicLinkSMS(
           'Authorization': 'Basic ' + Buffer.from(`${accountSid}:${authToken}`).toString('base64'),
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: new URLSearchParams({
-          To: formattedPhone,
-          From: fromNumber,
-          Body: `OOUStream: your login link (expires in 15 min): ${verifyUrl} Reply STOP to opt out, HELP for help.`,
-        }),
+        body: new URLSearchParams(params),
       }
     );
 
