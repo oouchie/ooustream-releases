@@ -313,6 +313,14 @@ The campaign is registered in the Twilio Console / The Campaign Registry (TCR) �
 - **Brand/entity name** must be the actual registered business (OOUStream / legal entity), used consistently — not an ISV/platform name.
 
 ### Second Campaign — Account Notifications (broad transactional: renewal, payment, service, account)
+**STATUS (2026-06-11): registration SUBMITTED to TCR by the owner — awaiting vetting/approval. Holding until approved.** All site-side prerequisites are LIVE (consent toggle, `/sms-alerts` terms, broadened consent wording, opt-in confirmation send wired). Nothing more to build until approval.
+
+**To resume once approved:**
+1. Capture the 2nd Messaging Service's SID (the new service this campaign is attached to) and set **`TWILIO_BILLING_MESSAGING_SERVICE_SID`** on Vercel **Production** (`vercel env add`). Setting it auto-activates the opt-in confirmation text (no code change — see the confirmation bullet below).
+2. Confirm the 2nd dedicated phone number is in that service's sender pool (login number `+16786806598` is bound to campaign 1 — must NOT be reused).
+3. Build Phase 3 sending code (see Phase 3 note at the end of this section).
+4. Smoke test: log in → dashboard → toggle on → confirm the confirmation text arrives via the new number.
+
 Scoped **deliberately broad** (decided 2026-06-10) so ONE approval covers every transactional/account text we'll ever send — renewal & payment reminders, service notifications, and account updates — instead of going back to TCR per message type. **Marketing/promotional SMS (e.g. the CRM SMS blast, deals, win-back) is NOT covered and CANNOT be folded in** — Account-Notification use case + promo content is an auto-reject (30886) and gets filtered; that needs its own separate Marketing campaign.
 
 These are **out of scope for the approved login campaign** — that campaign's own description states OOUStream "does not send marketing, promotional, or **recurring** messages," and its sample is a login link. There is NO wording that makes a reminder ride the login campaign; doing so risks carrier 30007 filtering AND TCR suspension of the working login texts. So they run as a **separate, second A2P campaign**.
