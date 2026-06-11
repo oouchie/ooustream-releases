@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCustomerSession } from "@/lib/auth";
 import { createServerClient } from "@/lib/supabase";
+import { sendSmsConsentConfirmation } from "@/lib/sms-notifications";
 
 // Customer self-service opt-in/out for the renewal reminders + service
 // notifications SMS program (second A2P campaign — Account Notification).
@@ -23,11 +24,14 @@ export async function POST(request: Request) {
 
     const supabase = createServerClient();
 
-    // A phone number must be on file for consent to mean anything.
+    // Read current state: phone is required for opt-in, and prior sms_consent lets us
+    // fire the confirmation text only on an actual false→true opt-in (not re-toggles).
+    let phone: string | null = null;
+    let wasConsented = false;
     if (consent) {
       const { data: customer } = await supabase
         .from("customers")
-        .select("phone")
+        .select("phone, sms_consent")
         .eq("id", session.customerId)
         .single();
       if (!customer?.phone) {
@@ -36,6 +40,8 @@ export async function POST(request: Request) {
           { status: 422 }
         );
       }
+      phone = customer.phone;
+      wasConsented = Boolean(customer.sms_consent);
     }
 
     const { error } = await supabase
@@ -51,6 +57,16 @@ export async function POST(request: Request) {
         { error: "Failed to update preference" },
         { status: 500 }
       );
+    }
+
+    // Fire a one-time opt-in confirmation on a true transition. Best-effort: a send
+    // failure (or no campaign-2 service configured yet) must not fail the opt-in.
+    if (consent && !wasConsented && phone) {
+      try {
+        await sendSmsConsentConfirmation(phone);
+      } catch {
+        // ignore — consent is already recorded
+      }
     }
 
     return NextResponse.json({ success: true, consent });
