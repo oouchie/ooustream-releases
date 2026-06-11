@@ -133,14 +133,13 @@ export default function SmsAlertsPage() {
           <h2 className="text-xl font-semibold text-white mt-8">3. Sample Messages</h2>
           <blockquote className="border-l-2 border-cyan-500/50 pl-4 text-gray-300 font-mono text-sm space-y-3">
             <p>
-              OOUStream: your subscription expires in 7 days (Jun 30). Renew to avoid
-              interruption: https://ooustream.com/billing Reply STOP to opt out, HELP for
-              help.
+              OOUStream: your subscription expires on Jun 30. Manage your account:
+              https://ooustream.com/billing Reply STOP to opt out, HELP for help.
             </p>
             <p>
-              OOUStream: we couldn&apos;t process your payment. Update your billing to keep
-              your service active: https://ooustream.com/billing Reply STOP to opt out,
-              HELP for help.
+              OOUStream: we were unable to process your recent payment. View details in
+              your account: https://ooustream.com/billing Reply STOP to opt out, HELP for
+              help.
             </p>
             <p>
               OOUStream: scheduled maintenance tonight 1-3am ET may briefly affect
