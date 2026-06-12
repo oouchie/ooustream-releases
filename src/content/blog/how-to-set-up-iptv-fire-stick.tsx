@@ -69,7 +69,7 @@ export default function Post() {
       <ol>
         <li>In Downloader, select the <strong>URL</strong> input field</li>
         <li>
-          Type <strong className="font-mono text-cyan-400">8332050</strong> and
+          Type <strong className="font-mono text-cyan-400">1853282</strong> and
           press <strong>Go</strong>
         </li>
         <li>Wait for the APK to download (about 30 seconds)</li>
