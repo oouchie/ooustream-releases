@@ -154,7 +154,7 @@ Recommended app: Ooustream (our own dedicated app)
 Recommended app: Ooustream (our own dedicated app)
 
 == Device Setup: Android Phone/Tablet ==
-1. Open a browser on the phone and go to: http://aftv.news/1853282
+1. Open a browser on the phone and go to: http://aftv.news/4006995 (this is the phone/tablet download link — the code 1853282 is for Firestick/Android TV only)
 2. Download and install the Ooustream app (you may need to allow installs from unknown sources in your phone settings)
 3. Open Ooustream and enter your credentials from the /credentials page
 Recommended app: Ooustream (our own dedicated app)

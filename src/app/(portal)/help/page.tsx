@@ -21,7 +21,7 @@ const faqSections: FAQSection[] = [
       {
         question: "How do I set up Ooustream?",
         answer:
-          'Ooustream has its own dedicated app! On Firestick/Android TV: install the Downloader app, enter code 1853282, and install the Ooustream app. Then enter your credentials from the Credentials page in this portal. Watch the full setup video for a step-by-step walkthrough: <a href="https://youtu.be/XIsThctDUxI" target="_blank" rel="noopener noreferrer" class="text-[#00d4ff] underline">youtu.be/XIsThctDUxI</a> — make sure to watch all the way to the end before entering the code.',
+          'Ooustream has its own dedicated app! On Firestick/Android TV: install the Downloader app, enter code 1853282, and install the Ooustream app. On Android phones/tablets: download the app directly at <a href="http://aftv.news/4006995" target="_blank" rel="noopener noreferrer" class="text-[#00d4ff] underline">aftv.news/4006995</a>. Then enter your credentials from the Credentials page in this portal. Watch the full setup video for a step-by-step walkthrough: <a href="https://youtu.be/XIsThctDUxI" target="_blank" rel="noopener noreferrer" class="text-[#00d4ff] underline">youtu.be/XIsThctDUxI</a> — make sure to watch all the way to the end before entering the code.',
       },
       {
         question: "What devices are supported?",
@@ -89,6 +89,7 @@ type DeviceGuide = {
   icon: string;
   steps: string[];
   recommendedApps: string[];
+  downloadLink?: { href: string; label: string };
 };
 
 const deviceGuides: DeviceGuide[] = [
@@ -118,6 +119,21 @@ const deviceGuides: DeviceGuide[] = [
       "Wait for channels to load and start watching",
     ],
     recommendedApps: ["Ooustream"],
+  },
+  {
+    name: "Android Phone / Tablet",
+    icon: "M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z",
+    steps: [
+      "Tap the download button below to get the Ooustream app on your phone or tablet",
+      "If your phone asks, allow installs from unknown sources / your browser",
+      "Install the Ooustream app when the download completes",
+      "Open Ooustream and enter your credentials from the Credentials page in this portal",
+    ],
+    recommendedApps: ["Ooustream"],
+    downloadLink: {
+      href: "http://aftv.news/4006995",
+      label: "Download Ooustream for Android",
+    },
   },
   {
     name: "iPhone / iPad",
@@ -405,6 +421,33 @@ export default function HelpPage() {
                       </div>
                     ))}
                   </div>
+
+                  {/* Download Link */}
+                  {guide.downloadLink && (
+                    <div className="mb-6">
+                      <a
+                        href={guide.downloadLink.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-primary inline-flex items-center gap-2"
+                      >
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                          />
+                        </svg>
+                        {guide.downloadLink.label}
+                      </a>
+                    </div>
+                  )}
 
                   {/* Recommended Apps */}
                   <div className="pt-4 border-t border-[#2a2a3a]">
