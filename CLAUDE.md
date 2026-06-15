@@ -112,13 +112,18 @@ Public `/trial` page grants a 24-hour free trial, gated by a layered anti-abuse 
 
 **Admin review queue:** `/admin/trials` (+ `GET/PATCH /api/admin/trials[/[id]]`) — approve (provisions) / deny. Filter tabs: review / denied / active / all.
 
+**Hardening (do not regress — added after an adversarial review):**
+- **Card fingerprint is required**: a confirmed SetupIntent that yields no `card.fingerprint` is refused (400). The spine signal can't be silently dropped.
+- **DB-enforced dedup (race/replay-proof)**: migration `004` has **partial unique indexes** on `card_fingerprint` and `email_normalized` (live statuses `active`/`review`/`converted` only, so denied attempts still accumulate as signals) plus a unique index on `setup_intent_id` (each card-verification is single-use). `createTrial` returns a conflict-aware result, and `/api/trial` **records the trial BEFORE provisioning** so two concurrent same-card requests can't both win — a conflict becomes a hard deny. On provisioning failure the trial row is rolled back (retryable).
+- **Spoof-resistant IP**: `getClientIp` prefers the edge-set `x-vercel-forwarded-for`/`x-real-ip` over the forgeable left-most `x-forwarded-for`.
+
 **Provisioning reality (IMPORTANT):** there is **NO IPTV-panel integration** anywhere in this codebase — every trial/customer path stores EMPTY `username_1`/`password_1`; a human creates the real line on the panel and types creds into the CRM. So an "approved" trial only creates the customer row + notifies the admin; it cannot mint working credentials. Same human-in-the-loop as the existing `/api/contact` trial path.
 
-**Owner actions to go live (code is ready, these are NOT done):**
-1. Run `supabase/migrations/004_trial_abuse.sql` in the Supabase SQL editor (the `trials` table does NOT exist yet — verified via PostgREST). Until then, every trial fails SAFE to `review`.
-2. Add `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` (= the `pk_live_...` value) to Vercel (Production + Preview/Dev) — without it Stripe Elements never mounts and `/trial` shows a "payments not configured" message.
-3. (Optional) Set `TWILIO_LOOKUP_ENABLED=true` only after confirming the Lookup line-type-intelligence add-on is provisioned on the Twilio account.
-4. Link `/trial` from the landing page CTA(s) when ready to launch.
+**Owner actions to go live (status as of 2026-06-15):**
+1. ⬜ **Run `supabase/migrations/004_trial_abuse.sql`** in the Supabase SQL editor — the `trials` table does NOT exist yet (verified via PostgREST). Until then, every trial fails SAFE to `review` (no crash). This is the one true blocker.
+2. ✅ **`NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` set on Vercel Production + Development** (= the `pk_live_...` value, via `vercel env add`). ⬜ **Preview still pending** — the Claude Vercel plugin won't take the "all Preview branches" form non-interactively; add it from a real terminal: `vercel env add NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY preview` → choose "all Preview branches". Preview only affects PR-deploy testing of `/trial`.
+3. ⬜ (Optional) Set `TWILIO_LOOKUP_ENABLED=true` only after confirming the Lookup line-type-intelligence add-on is provisioned on the Twilio account.
+4. ⬜ Link `/trial` from the landing page CTA(s) when ready to launch (the page is live but intentionally unlinked).
 
 ## Webhook URL must be the apex domain (no `www`, no trailing slash)
 Register the Stripe webhook at **`https://ooustream.com/api/webhooks/stripe`** — bare apex, no `www`, no trailing slash. The `www.ooustream.com` host **307-redirects** to the apex, the trailing-slash form **308-redirects**, and `http://` likewise. **Stripe does not follow 3xx redirects** — it marks the delivery failed and the handler never runs (symptom: payment succeeds in Stripe but NO `customers` row, NO `audit_logs` entry, NO welcome/admin email). Diagnose by checking the failed delivery's HTTP status in Stripe → Webhooks: `307`/`308` = wrong URL (redirect), `400` = signing-secret mismatch, `500` = handler threw. A bare `curl -X POST` to the correct apex URL should return **400 "No signature"** (proves it reaches the handler). Root-caused 2026-06-08: webhook had been registered with `www.`, silently dropping every payment.
@@ -274,7 +279,7 @@ Where canonicals are declared per-page:
 ## Database (shared with CRM)
 Uses same Supabase instance as CRM:
 - customers (with expiry_date, billing fields, custom prices, `sms_consent` boolean + `sms_consent_at` timestamptz for A2P opt-in tracking)
-- trials (free-trial anti-abuse — one row per signup ATTEMPT incl. denials; columns: name, email/email_normalized, phone/phone_normalized, device, card_fingerprint, browser_visitor_id, ip_address, ip_asn, is_vpn, user_agent, risk_score, status, denial_reason, match_reasons, matched_trial_id, expires_at, customer_id — see migration `004_trial_abuse.sql`)
+- trials (free-trial anti-abuse — one row per signup ATTEMPT incl. denials; columns: name, email/email_normalized, phone/phone_normalized, device, card_fingerprint, browser_visitor_id, setup_intent_id, ip_address, ip_asn, is_vpn, user_agent, risk_score, status, denial_reason, match_reasons, matched_trial_id, expires_at, customer_id. Partial unique indexes on card_fingerprint/email_normalized (live statuses) + unique setup_intent_id enforce dedup. See migration `004_trial_abuse.sql`)
 - payments (Stripe payment records)
 - magic_links
 - support_tickets
