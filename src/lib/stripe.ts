@@ -110,6 +110,61 @@ export async function createCheckoutSession({
   return session;
 }
 
+// --- Free-trial card-on-file (anti-abuse) ---------------------------------
+// We require a card to start a free trial purely to read its stable
+// card.fingerprint (same across emails/names) so one card can't farm trials.
+// A SetupIntent saves the card WITHOUT charging. No customer is attached at
+// this stage — the fingerprint is all we need for abuse detection, and a real
+// Stripe customer is created later (getOrCreateStripeCustomer) if they convert.
+
+export async function createTrialSetupIntent(): Promise<{
+  clientSecret: string;
+  setupIntentId: string;
+}> {
+  const stripe = getStripe();
+  const setupIntent = await stripe.setupIntents.create({
+    payment_method_types: ['card'],
+    usage: 'off_session',
+    metadata: { purpose: 'free_trial_verification' },
+  });
+  if (!setupIntent.client_secret) {
+    throw new Error('SetupIntent created without a client_secret');
+  }
+  return { clientSecret: setupIntent.client_secret, setupIntentId: setupIntent.id };
+}
+
+/**
+ * Read the card fingerprint for a confirmed SetupIntent — SERVER-SIDE and
+ * authoritative. Never trust a fingerprint sent from the browser. Returns null
+ * if the SetupIntent isn't confirmed / has no card (caller decides how strict).
+ */
+export async function getTrialCardFingerprint(setupIntentId: string): Promise<{
+  fingerprint: string | null;
+  brand: string | null;
+  last4: string | null;
+  status: string;
+} | null> {
+  const stripe = getStripe();
+  try {
+    const si = await stripe.setupIntents.retrieve(setupIntentId, {
+      expand: ['payment_method'],
+    });
+    const pm = si.payment_method;
+    if (!pm || typeof pm === 'string' || !pm.card) {
+      return { fingerprint: null, brand: null, last4: null, status: si.status };
+    }
+    return {
+      fingerprint: pm.card.fingerprint ?? null,
+      brand: pm.card.brand ?? null,
+      last4: pm.card.last4 ?? null,
+      status: si.status,
+    };
+  } catch (err) {
+    console.error('getTrialCardFingerprint failed:', err);
+    return null;
+  }
+}
+
 // Verify webhook signature
 export function constructWebhookEvent(
   payload: string | Buffer,

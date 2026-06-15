@@ -63,12 +63,20 @@ export function checkRateLimit(key: string, config: RateLimitConfig): RateLimitR
 
 /**
  * Extract client IP from Next.js request headers.
- * Works with Vercel, Cloudflare, and standard proxies.
+ *
+ * Prefer the platform-set headers (`x-vercel-forwarded-for`, then `x-real-ip`)
+ * over the LEFT-most `x-forwarded-for` token, which a client can forge — the
+ * left-most XFF value is attacker-controlled on Vercel (the edge appends the
+ * real IP, it does not strip a spoofed leading value). Using the forgeable
+ * value as a rate-limit key or stored abuse signal lets an attacker rotate it
+ * to evade limits or poison another user's IP. `x-vercel-forwarded-for` is set
+ * by the Vercel edge and is reserved (inbound copies are overwritten).
  */
 export function getClientIp(request: Request): string {
   return (
+    request.headers.get('x-vercel-forwarded-for')?.split(',')[0]?.trim() ||
+    request.headers.get('x-real-ip')?.trim() ||
     request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-    request.headers.get('x-real-ip') ||
     'unknown'
   );
 }

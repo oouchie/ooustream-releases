@@ -5,7 +5,8 @@ Customer-facing portal, landing page, and reseller management system.
 ## Tech Stack
 - Next.js 16 (App Router)
 - Supabase (shared with CRM)
-- Stripe (payments)
+- Stripe (payments) — server SDK `stripe`; client `@stripe/stripe-js` + `@stripe/react-stripe-js` (Elements, used by `/trial`)
+- `@fingerprintjs/fingerprintjs` (OSS browser fingerprint — trial anti-abuse `visitorId`)
 - SendGrid (email)
 - Anthropic Claude API (AI support chat)
 - JWT (customer sessions)
@@ -96,6 +97,29 @@ Public-facing marketing page with:
 - **Required fields for billing**: `plan_type` (standard/pro), `billing_period` (monthly/6month/yearly), `billing_type` (manual/auto). Optional: `custom_price_monthly`, `custom_price_6month`, `custom_price_yearly` (integer cents, overrides default pricing). `stripe_customer_id` auto-populates on first payment.
 - **Stored `stripe_customer_id` is self-healing**: `getOrCreateStripeCustomer` (`src/lib/stripe.ts`) verifies the stored ID via `stripe.customers.retrieve()` before reuse. On `resource_missing` (stale ID from a prior Stripe account) or soft-deleted customer, it creates a fresh one and the checkout route persists the new ID back to Supabase. Rotating Stripe accounts no longer bricks existing customers.
 
+## Free Trial & Anti-Abuse (24-hour trial)
+Public `/trial` page grants a 24-hour free trial, gated by a layered anti-abuse engine so people can't farm multiple trials by changing name/email/phone.
+
+**Flow:** `/trial` (client, Stripe Elements + FingerprintJS) → `POST /api/trial/setup-intent` (creates a no-charge Stripe **SetupIntent**, returns `clientSecret`) → user enters card → `stripe.confirmSetup` (verifies card, **no charge**) → `POST /api/trial` with `{name,email,phone,device,setupIntentId,browserVisitorId}`.
+
+**Signals collected & scored** (`src/lib/trial-abuse.ts`, pure/dependency-free):
+- **Card fingerprint** (Stripe `payment_method.card.fingerprint`, read SERVER-SIDE via `getTrialCardFingerprint` in `src/lib/stripe.ts` — never trust the client) → **hard deny** if reused.
+- **Normalized email** (Gmail dot/`+tag` collapse) → **hard deny** if reused.
+- **Phone** (E.164) reuse 50 · **browser visitorId** (FingerprintJS) reuse 40 · **IP** reuse 15 · **disposable email** 30 · **VOIP/VPN** 25. Score ≥45 → `review`, ≥70 → `denied`. Fails SAFE to `review` on DB error.
+- **VOIP detection**: `src/lib/twilio-lookup.ts` (`lookupPhoneLineType`) hits Twilio Lookup v2 line-type-intelligence — reuses `TWILIO_ACCOUNT_SID`/`TWILIO_AUTH_TOKEN`, **NOT** gated by `SMS_ENABLED` (it's a read, not a send), gated by `TWILIO_LOOKUP_ENABLED` (default off — the Lookup add-on is paid). Fail-open.
+
+**Decisions:** `denied` → 403, attempt still recorded (becomes a future signal). `review` → recorded + admin emailed, NOT provisioned until approved. `active` → `provisionTrialCustomer` (`src/lib/trial-provision.ts`) creates the 24h `customers` row (`reseller:null`, empty creds) + admin emailed to set up credentials.
+
+**Admin review queue:** `/admin/trials` (+ `GET/PATCH /api/admin/trials[/[id]]`) — approve (provisions) / deny. Filter tabs: review / denied / active / all.
+
+**Provisioning reality (IMPORTANT):** there is **NO IPTV-panel integration** anywhere in this codebase — every trial/customer path stores EMPTY `username_1`/`password_1`; a human creates the real line on the panel and types creds into the CRM. So an "approved" trial only creates the customer row + notifies the admin; it cannot mint working credentials. Same human-in-the-loop as the existing `/api/contact` trial path.
+
+**Owner actions to go live (code is ready, these are NOT done):**
+1. Run `supabase/migrations/004_trial_abuse.sql` in the Supabase SQL editor (the `trials` table does NOT exist yet — verified via PostgREST). Until then, every trial fails SAFE to `review`.
+2. Add `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` (= the `pk_live_...` value) to Vercel (Production + Preview/Dev) — without it Stripe Elements never mounts and `/trial` shows a "payments not configured" message.
+3. (Optional) Set `TWILIO_LOOKUP_ENABLED=true` only after confirming the Lookup line-type-intelligence add-on is provisioned on the Twilio account.
+4. Link `/trial` from the landing page CTA(s) when ready to launch.
+
 ## Webhook URL must be the apex domain (no `www`, no trailing slash)
 Register the Stripe webhook at **`https://ooustream.com/api/webhooks/stripe`** — bare apex, no `www`, no trailing slash. The `www.ooustream.com` host **307-redirects** to the apex, the trailing-slash form **308-redirects**, and `http://` likewise. **Stripe does not follow 3xx redirects** — it marks the delivery failed and the handler never runs (symptom: payment succeeds in Stripe but NO `customers` row, NO `audit_logs` entry, NO welcome/admin email). Diagnose by checking the failed delivery's HTTP status in Stripe → Webhooks: `307`/`308` = wrong URL (redirect), `400` = signing-secret mismatch, `500` = handler threw. A bare `curl -X POST` to the correct apex URL should return **400 "No signature"** (proves it reaches the handler). Root-caused 2026-06-08: webhook had been registered with `www.`, silently dropping every payment.
 
@@ -132,10 +156,12 @@ TWILIO_ACCOUNT_SID=AC...
 TWILIO_AUTH_TOKEN=...
 TWILIO_PHONE_NUMBER=+1...
 TWILIO_MESSAGING_SERVICE_SID=MG...   # A2P campaign is attached here; send routes through this
+TWILIO_LOOKUP_ENABLED=false          # gates the /trial VOIP line-type check (paid Lookup add-on); reuses ACCOUNT_SID/AUTH_TOKEN
 
 # Stripe
 STRIPE_SECRET_KEY=sk_live_...
 STRIPE_PUBLISHABLE_KEY=pk_live_...
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...   # REQUIRED for /trial Stripe Elements (browser). Same value as STRIPE_PUBLISHABLE_KEY but NEXT_PUBLIC_-prefixed so it reaches the client.
 STRIPE_WEBHOOK_SECRET=whsec_...
 ```
 
@@ -147,6 +173,7 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 - `/blog` — Blog index (list of all posts)
 - `/blog/[slug]` — Individual blog post
 - `/subscribe/pro` — Direct Pro plan checkout (for in-app links)
+- `/trial` — 24-hour free-trial signup (card-verified via Stripe SetupIntent, no charge; runs the anti-abuse engine — see "Free Trial & Anti-Abuse")
 - `/privacy` — Privacy policy
 - `/terms` — Terms of service
 - `/sms` — SMS messaging terms & opt-in page (A2P 10DLC CTA proof; login-text program only)
@@ -178,6 +205,7 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 - `/admin/tickets` — All support tickets
 - `/admin/tickets/[id]` — Ticket detail
 - `/admin/announcements` — Manage announcements
+- `/admin/trials` — Trial review queue (approve/deny flagged signups & view denied abuse attempts)
 
 ### Reseller (protected)
 - `/reseller` — Dashboard with stats
@@ -187,7 +215,7 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 - `/reseller/customers/[id]/edit` — Edit customer
 
 ## SEO
-- Sitemap at `/sitemap.xml` (homepage, best-iptv-service, blog, blog posts, subscribe/pro, login, sms, sms-alerts, privacy, terms)
+- Sitemap at `/sitemap.xml` (homepage, best-iptv-service, blog, blog posts, subscribe/pro, trial, login, sms, sms-alerts, privacy, terms)
 - Robots at `/robots.txt` (disallows /api/, /admin/, /reseller/)
 - Metadata with canonical URLs on all public pages
 - OpenGraph + Twitter cards
@@ -202,6 +230,7 @@ Where canonicals are declared per-page:
 - `/blog` → metadata exported directly from `src/app/blog/page.tsx`
 - `/blog/[slug]` → `generateMetadata` in `src/app/blog/[slug]/page.tsx`
 - `/subscribe/pro` → `src/app/subscribe/pro/layout.tsx`
+- `/trial` → `src/app/trial/layout.tsx` (page is `"use client"`, so layout owns metadata)
 - `/login` → `src/app/(auth)/login/layout.tsx` (page is `"use client"`, so layout owns metadata)
 - `/privacy` → metadata exported directly from `src/app/privacy/page.tsx`
 - `/terms` → metadata exported directly from `src/app/terms/page.tsx`
@@ -221,8 +250,9 @@ Where canonicals are declared per-page:
 - **Footer link**: `/blog` is linked from the homepage footer Quick Links so it's crawlable from the index page
 
 ## Download Code
-- **Current**: `1853282`
-- **Android link**: `http://aftv.news/1853282`
+- **Current (Firestick/Android TV)**: `1853282`
+- **TV link**: `http://aftv.news/1853282`
+- **Android phone/tablet link**: `http://aftv.news/4006995` (separate APK link, phones only — referenced in `src/lib/ai.ts` and the help page's Android Phone/Tablet guide + setup FAQ)
 - Referenced in: `src/lib/ai.ts`, `src/app/best-iptv-service/page.tsx`, `src/app/(portal)/help/page.tsx`, `src/content/blog/how-to-set-up-iptv-fire-stick.tsx`
 
 ## Mobile Performance Notes
@@ -244,6 +274,7 @@ Where canonicals are declared per-page:
 ## Database (shared with CRM)
 Uses same Supabase instance as CRM:
 - customers (with expiry_date, billing fields, custom prices, `sms_consent` boolean + `sms_consent_at` timestamptz for A2P opt-in tracking)
+- trials (free-trial anti-abuse — one row per signup ATTEMPT incl. denials; columns: name, email/email_normalized, phone/phone_normalized, device, card_fingerprint, browser_visitor_id, ip_address, ip_asn, is_vpn, user_agent, risk_score, status, denial_reason, match_reasons, matched_trial_id, expires_at, customer_id — see migration `004_trial_abuse.sql`)
 - payments (Stripe payment records)
 - magic_links
 - support_tickets

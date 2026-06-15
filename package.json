@@ -10,8 +10,11 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.75.0",
+    "@fingerprintjs/fingerprintjs": "^5.2.0",
     "@gsap/react": "^2.1.2",
     "@sendgrid/mail": "^8.1.6",
+    "@stripe/react-stripe-js": "^6.6.0",
+    "@stripe/stripe-js": "^9.8.0",
     "@supabase/supabase-js": "^2.90.1",
     "framer-motion": "^12.34.3",
     "gsap": "^3.15.0",
