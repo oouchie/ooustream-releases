@@ -129,7 +129,7 @@ export default function ResellerNewCustomerPage() {
                 className="mt-1 h-4 w-4 rounded border-[#334155] bg-[#0f172a] text-[#00d4ff] focus:ring-[#00d4ff]"
               />
               <label htmlFor="sms_consent" className="text-sm text-[#94a3b8] leading-snug">
-                Customer agrees to receive account notification SMS from OOUStream — renewal &amp; payment reminders, service notifications (outages, maintenance), and account updates. Message frequency varies. Message and data rates may apply. Reply STOP to opt out, HELP for help. OOUStream never sends login credentials by SMS.
+                Customer agrees to receive account notification SMS from OOUStream — renewal &amp; payment reminders, service notifications (outages, maintenance), and account updates. Message frequency varies. Message and data rates may apply. Reply STOP to opt out, HELP for help. OOUStream never sends login credentials by SMS. Consent is not a condition of purchase.
               </label>
             </div>
             <div>

@@ -64,8 +64,9 @@ export default function SmsConsentToggle({
             )}
           </p>
           <p className="text-xs text-[#64748b] mt-2 leading-snug">
-            Up to a few messages per billing cycle. Msg &amp; data rates may apply.
-            Reply STOP to opt out, HELP for help. See{" "}
+            Optional — leaving this off does not affect your service. Up to a few
+            messages per billing cycle. Msg &amp; data rates may apply. Reply STOP to opt
+            out, HELP for help. See{" "}
             <Link href="/sms-alerts" className="text-[#00d4ff] hover:underline">
               SMS terms
             </Link>

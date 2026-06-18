@@ -109,24 +109,57 @@ export default function SmsAlertsPage() {
             2. How You Opt In (Consent)
           </h2>
           <p className="text-gray-300">
+            Opting in is <strong>entirely optional and is never a condition of purchase,
+            service, or any transaction</strong>. You can buy, use, renew, and keep your
+            OOUStream subscription fully active without ever enabling SMS. The toggle is{" "}
+            <strong>off by default</strong> — no account texts are ever sent unless you
+            choose to turn it on, and you can turn it back off at any time.
+          </p>
+          <p className="text-gray-300">
             Opt in is <strong>self-service</strong> from your customer portal. After you
             log in, open your{" "}
             <Link href="/dashboard" className="text-cyan-400 underline hover:text-cyan-300">
               Dashboard
             </Link>{" "}
-            and turn on the <em>&quot;Text me account updates&quot;</em> toggle. The
-            disclosure shown next to the toggle reads:
+            and turn on the <em>&quot;Text me account updates&quot;</em> toggle. This is
+            exactly what that opt-in control looks like inside your portal, shown in its
+            default <strong>off</strong> state:
           </p>
-          <blockquote className="border-l-2 border-cyan-500/50 pl-4 text-gray-300 italic">
-            &quot;Get account texts from OOUStream — renewal &amp; payment reminders,
-            service notifications (outages, maintenance), and account updates. Message
-            frequency varies. Msg &amp; data rates may apply. Reply STOP to opt out, HELP
-            for help. Consent is not a condition of purchase.&quot;
-          </blockquote>
+
+          {/* Public, non-interactive replica of the in-portal SmsConsentToggle so the
+              opt-in UI is verifiable without logging in (see SmsConsentToggle.tsx) */}
+          <div className="not-prose rounded-xl border border-[#1e293b] bg-[#12121a] p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1">
+                <h3 className="font-medium text-[#f1f5f9]">Text me account updates</h3>
+                <p className="text-sm text-[#94a3b8] mt-1 leading-snug">
+                  Get account texts from OOUStream — renewal &amp; payment reminders,
+                  service notifications (outages, maintenance), and account updates.
+                </p>
+                <p className="text-xs text-[#64748b] mt-2 leading-snug">
+                  Optional — leaving this off does not affect your service. Up to a few
+                  messages per billing cycle. Msg &amp; data rates may apply. Reply STOP
+                  to opt out, HELP for help. Consent is not a condition of purchase.
+                </p>
+              </div>
+              <div
+                role="img"
+                aria-label="Account updates SMS toggle, shown in its default off state"
+                className="relative inline-flex h-7 w-12 shrink-0 items-center rounded-full bg-[#334155]"
+              >
+                <span className="inline-block h-5 w-5 translate-x-1 transform rounded-full bg-white" />
+              </div>
+            </div>
+            <p className="mt-3 text-[11px] text-[#64748b]">
+              Preview of the in-portal control — off by default. Consent is recorded only
+              when a customer turns it on.
+            </p>
+          </div>
+
           <p className="text-gray-300">
             Turning the toggle on constitutes your express consent to receive the account
-            notification texts described above at the mobile number on your account.
-            Consent is not a condition of purchase.
+            notification texts described above at the mobile number on your account. You
+            can turn it off at any time, and consent is not a condition of purchase.
           </p>
 
           {/* Sample */}
