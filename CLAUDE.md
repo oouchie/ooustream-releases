@@ -26,8 +26,8 @@ Customer-facing portal, landing page, and reseller management system.
 
 ### Landing Page (`src/app/page.tsx`)
 Public-facing marketing page with:
-- **Channel Wall** — 70 real channel names in scroll-parallax grid behind hero (RAF-driven, no React re-renders)
-- **Channel Marquee** — two-row infinite CSS scroll of channel pills with live dots, pause-on-hover
+- **Channel Wall** — 70 **generic genre/region/quality labels** (e.g. "Live Sports", "World News", "Latino TV", "4K Ultra HD") in scroll-parallax grid behind hero (RAF-driven, no React re-renders). **Deliberately NOT real brand-channel names** — switched 2026-06-18 to reduce AdSense intellectual-property-abuse signal (see AdSense note below). `WALL_ROWS` in `page.tsx`.
+- **Channel Marquee** — two-row infinite CSS scroll of category pills (`CHANNEL_ROW_1/2`, same generic labels) with live dots, pause-on-hover
 - **Hero** — "10,000 Live Channels. One App. Every Device." with word-by-word reveal, trust pills
 - **Magnetic Nav** — pointer-tracked spring-pull nav links (desktop only, degrades gracefully on touch)
 - **Scroll Progress Bar** — cyan→purple gradient at header bottom (desktop only)
@@ -312,6 +312,7 @@ All emails include logo and use brand gradient (#00d4ff to #7c3aed):
 ## Analytics & Ads (root layout `src/app/layout.tsx`)
 - **Meta Pixel** (`438320842295241`) — `next/script` `afterInteractive` + `<noscript>` fallback img in `<head>`.
 - **Google AdSense** (publisher `ca-pub-0330206908249817`) — raw `<script async ... crossOrigin="anonymous">` rendered **directly inside `<head>`** (not `next/script`), so the loader appears in server-rendered HTML for AdSense site verification. Loads site-wide on every page. **Auto Ads** are toggled on in the AdSense dashboard (no extra code; the deprecated `enable_page_level_ads` push snippet is intentionally NOT used). Verify live tag via `view-source:https://ooustream.com` → search `ca-pub-0330206908249817`.
+- **AdSense "Low value content" rejection — remediation (2026-06-18):** AdSense flagged the site with **"Low value content"** (thin content). Root cause: the only publicly-crawlable content was the marketing homepage + `/best-iptv-service` + 3 short blog posts (everything else is behind login + `Disallow`-ed in `robots.ts`). Fix shipped: **8 new in-depth (1,100–1,500 word) original blog posts** (Batch 1 device-setup guides: smart-tv, apple-tv, android-phone-tablet, iphone-ipad, windows-mac; Batch 2 troubleshooting: why-is-my-iptv-buffering, iptv-app-wont-load-troubleshooting, fix-iptv-epg-tv-guide-not-loading) — blog now 11 posts. Also softened the homepage channel wall/marquee from real brand-channel names to generic category labels to lower the **intellectual-property-abuse** risk (a separate AdSense policy that thin-content fixes don't address). **Still TODO before resubmitting for review:** (a) add `/about` + `/contact` pages (AdSense wants them) + footer links + sitemap; (b) add `public/ads.txt` (token from AdSense dashboard); (c) Batch 3 educational posts (optional); (d) let pages index ~1–2 weeks, then request review. Plan in `tasks/todo.md`.
 
 ## CSS Architecture (`globals.css`)
 - CSS variables for all design tokens (colors, fonts, borders)

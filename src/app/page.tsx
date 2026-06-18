@@ -229,14 +229,17 @@ const STEPS = [
 // ─── Channel directory (marquee placeholders) ────────────────────────────────
 
 const CHANNEL_ROW_1 = [
-  "ESPN", "HBO", "CNN", "Fox Sports", "NBC", "ABC", "CBS", "Discovery",
-  "Hallmark", "TNT", "TBS", "Disney", "Bravo", "USA", "Syfy", "FX", "AMC",
+  "Live Sports", "Sports HD", "World News", "Movies HD", "Cinema 4K",
+  "Kids & Family", "Cartoons", "Documentaries", "Entertainment", "Comedy TV",
+  "Drama Series", "Reality TV", "Music Hits", "Lifestyle", "Food & Home",
+  "Nature & Wildlife", "History & Culture",
 ];
 
 const CHANNEL_ROW_2 = [
-  "MTV", "VH1", "Lifetime", "Comedy Central", "MSNBC", "Food Network",
-  "Nat Geo", "Paramount", "Showtime", "Starz", "Cinemax", "BET",
-  "History", "TLC", "A&E", "Oxygen", "HGTV",
+  "News 24/7", "Breaking News", "Business News", "Travel & Adventure",
+  "Science & Tech", "Faith & Family", "Classic TV", "Local Channels",
+  "International", "Latino TV", "UK & Ireland", "Europe", "Asia Pacific",
+  "Caribbean", "Africa", "4K Ultra HD", "On-Demand",
 ];
 
 function SpotlightCard({
@@ -866,13 +869,13 @@ function ContactForm() {
 // ─── Channel Wall — the signature hero backdrop ──────────────────────────────
 
 const WALL_ROWS = [
-  ["ESPN", "HBO", "CNN", "Fox Sports", "NBC", "ABC", "CBS", "Discovery", "Hallmark", "TNT"],
-  ["TBS", "Disney", "Bravo", "USA", "Syfy", "FX", "AMC", "BET", "MTV", "VH1"],
-  ["Lifetime", "Comedy Central", "MSNBC", "Food Network", "Nat Geo", "Paramount", "Showtime", "Starz", "Cinemax", "History"],
-  ["TLC", "A&E", "Oxygen", "HGTV", "Cartoon Network", "Nickelodeon", "BBC", "Sky Sports", "beIN Sports", "ESPN+"],
-  ["HBO Max", "Fox News", "CNBC", "PBS", "Animal Planet", "Travel", "Sci-Fi", "truTV", "Freeform", "OWN"],
-  ["Telemundo", "Univision", "MLB Network", "NFL Network", "NBA TV", "NHL Network", "Golf", "Tennis Channel", "FS1", "ESPN2"],
-  ["VICE", "Reelz", "Pop TV", "BET+", "WE tv", "Court TV", "ION", "Newsmax", "One America", "Revolt"],
+  ["Live Sports", "Sports HD", "World News", "Movies HD", "Cinema 4K", "Kids & Family", "Cartoons", "Documentaries", "Entertainment", "Comedy TV"],
+  ["Drama Series", "Reality TV", "Music Hits", "Lifestyle", "Food & Home", "Travel & Adventure", "Nature & Wildlife", "Science & Tech", "History & Culture", "News 24/7"],
+  ["Breaking News", "Business News", "Local Channels", "Classic TV", "Faith & Family", "Outdoors", "Auto & Motors", "Gaming", "Fashion & Style", "Home & Garden"],
+  ["International", "Latino TV", "UK & Ireland", "Europe", "Asia Pacific", "Caribbean", "Africa", "Middle East", "Canada", "Australia"],
+  ["4K Ultra HD", "HD Live", "On-Demand Movies", "TV Series", "Live Events", "24/7 Channels", "Sports Highlights", "Match Replays", "Family Movies", "Kids Shows"],
+  ["Action Movies", "Thrillers", "Romance", "Sci-Fi & Fantasy", "Horror", "Westerns", "Indie Films", "Anime", "Stand-Up Comedy", "Game Shows"],
+  ["Cooking", "Travel Guides", "Fitness", "Kids Learning", "Wildlife", "Space & Science", "True Crime", "Talk Shows", "Award Shows", "Concerts"],
 ];
 
 function ChannelWall() {

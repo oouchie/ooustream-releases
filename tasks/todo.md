@@ -1,51 +1,78 @@
-# SMS Billing/Renewal Reminders — Second A2P Campaign
+# AdSense "Low value content" Remediation Plan
 
-Goal: send subscription renewal/expiry reminders by SMS, compliantly, WITHOUT
-touching the approved login-only campaign (MGee134cc169169e8ed8e9eb45c3a762ba).
+**Status:** AWAITING APPROVAL — do not implement until owner confirms.
+**Flag (confirmed in dashboard):** "Low value content" on AdSense (pub `ca-pub-0330206908249817`).
+**Root cause:** publicly-crawlable content is thin — homepage (marketing), `/best-iptv-service` (1 SEO page), and only **3 short blog posts** (~300–500 readable words each). Everything substantial is behind login and `Disallow`-ed in `robots.ts`, so Google never sees it. AdSense judged there isn't enough original, valuable content to justify ads.
 
-## Hard constraints (verified)
-- A2P: 1 Messaging Service = 1 campaign; 1 phone number = 1 Messaging Service.
-  → Second campaign REQUIRES a second Messaging Service + a second phone number.
-  → Cannot reuse +16786806598 (bound to the login service).
-- TCR vetting checks a LIVE, end-user-initiated opt-in (CTA) on the public site
-  + a sample message that matches the registered use case.
-- Use case = Account Notification (NOT Marketing/Mixed).
+**Goal:** turn the public site into a genuine content destination — enough in-depth, original articles + standard trust pages that a reviewer sees a real publisher, then reapply.
 
-## Phase 1 — Code that must be LIVE before vetting  (DONE — build passes)
-- [x] Customer opt-in toggle `SmsConsentToggle` on /dashboard → POST
-      /api/customer/sms-consent → writes sms_consent + sms_consent_at (requires phone).
-- [x] Dedicated public terms page /sms-alerts (separate from login-only /sms) covering
-      renewal reminders + service notifications; cross-linked from /sms, /privacy, sitemap.
-- [x] Fixed reseller sms_consent label (new + [id]/edit): removed "login credentials".
-- [x] Privacy §3 rewritten: two programs, removed "login credentials delivery".
-- [x] Added /sms-alerts to sitemap + CLAUDE.md (routes, SEO, canonical list).
-- [x] Drafted TCR campaign-2 copy (description/CTA/samples) in CLAUDE.md.
+---
 
-## Phase 2 — Manual in Twilio Console + TCR  (you)
-- [ ] Provision a 2nd phone number.
-- [ ] Create a 2nd Messaging Service; add the new number to its sender pool.
-- [ ] Register a 2nd A2P campaign (Account Notification) under the existing brand.
-- [ ] Attach campaign to the 2nd Messaging Service. Await approval.
-- [ ] Capture 2nd Messaging Service SID → env TWILIO_BILLING_MESSAGING_SERVICE_SID.
+## Part A — Blog build-out (the main lever)
 
-## Phase 3 — Code after approval
-- [ ] `sendBillingReminderSMS` routed via TWILIO_BILLING_MESSAGING_SERVICE_SID.
-- [ ] Daily cron (vercel.json) → customers with expiry_date in {7d, 1d} window
-      AND sms_consent=true; send once per window (dedupe via sent-marker).
-- [ ] Gate behind SMS_BILLING_REMINDERS_ENABLED flag (default off).
-- [ ] Update CLAUDE.md: second campaign, env vars, cron, scope notes.
+Go from 3 → ~13 posts. Each new post: **original, 1,000–1,500 words**, genuinely useful (not AI-spun/templated — the same "replicated content / little added value" rule rejects thin filler). Follow existing conventions exactly:
+- One file per post in `src/content/blog/<slug>.tsx` exporting `meta: BlogPostMeta` + default component (see `iptv-vs-cable-tv.tsx` as the template — plain `<h2>/<p>/<ul>`, internal `<Link>`s, no per-file styling; `.blog-content` in `globals.css` handles type).
+- Register each in `src/lib/blog.ts` (add import + `POSTS` entry).
+- Sitemap (`sitemap.ts`) and canonical/OG/Article-JSON-LD auto-generate via the registry — no per-post SEO wiring needed.
 
-## Open decisions (need answers before building Phase 1)
-1. Opt-in toggle location: /dashboard vs a new /account preferences page?
-2. Reminder schedule: 7-day + 1-day before expiry? other cadence?
-3. Draft the TCR registration copy (description/sample/CTA) now?
+### Batch 1 — Device setup guides (highest search value, clearly useful) ✅ DONE
+- [x] `how-to-set-up-iptv-on-smart-tv` — Samsung (Tizen) & LG (webOS) — ~1,390 words
+- [x] `how-to-set-up-iptv-on-apple-tv` — Apple TV 4K, player apps — ~1,180 words
+- [x] `how-to-set-up-iptv-on-android-phone-tablet` — phone APK link `aftv.news/4006995` — ~1,190 words
+- [x] `how-to-set-up-iptv-on-iphone-ipad` — iOS player options — ~1,175 words
+- [x] `how-to-set-up-iptv-on-windows-mac` — VLC + desktop players — ~1,180 words
+- [x] (existing) Fire Stick guide — left as-is, cross-linked
+
+### Batch 2 — Troubleshooting (original, high retention) ✅ DONE
+- [x] `why-is-my-iptv-buffering` — 9 concrete fixes — ~1,479 words
+- [x] `iptv-app-wont-load-troubleshooting` — checklist — ~1,180 words
+- [x] `fix-iptv-epg-tv-guide-not-loading` — EPG/timezone — ~1,180 words
+
+> All 8 registered in `src/lib/blog.ts`; `npm run build` generates 11 blog routes; sitemap auto-includes them.
+
+### Batch 3 — Educational / informational
+- [ ] `what-is-iptv-how-does-it-work` — beginner's guide (2026)
+- [ ] `iptv-vs-streaming-apps` — vs Netflix/Hulu/YouTube TV (distinct from the existing IPTV-vs-cable post)
+- [ ] `best-iptv-player-apps-compared` — how to choose a player
+- [ ] `internet-speed-for-iptv` — how much bandwidth you really need
+
+> **Recommended first push for resubmission: Batch 1 + 2 (8 posts).** That ~doubles+ the content depth and covers the highest-intent searches. Batch 3 can follow.
+
+Each post must internal-link to 2–3 others + a relevant product page (`/best-iptv-service`, `/help`, `/trial`) — builds topical depth, which is what "added value" means to the reviewer.
+
+## Part B — Standard trust pages (AdSense explicitly wants these)
+- [ ] `/about` — `src/app/about/page.tsx` (server component) — who OOUStream is, what the service does, support commitment. Add `metadata` export with `alternates.canonical: https://ooustream.com/about` (per the canonical rule in CLAUDE.md).
+- [ ] `/contact` — `src/app/contact/page.tsx` (server component) — support email (`oouchie@ooustream.com`), response times, link to `/support/new`. Own canonical.
+- [ ] Add **About** + **Contact** to the homepage footer Quick Links (`page.tsx` ~line 2056) so they're crawlable from the index.
+- [ ] Add both to `sitemap.ts`.
+
+## Part C — AdSense hygiene
+- [ ] Add `public/ads.txt` → `google.com, pub-0330206908249817, DIRECT, <token>`. **VERIFY the exact line in AdSense → Account → "Get your ads.txt" before committing — do not assume the token.**
+- [ ] Confirm Auto Ads won't render on thin utility pages (`/login`, `/privacy`, `/terms`) once approved — "more ads than content" is its own violation.
+
+## Part D — Intellectual-property-abuse risk (SEPARATE flag) — ✅ DONE (channel names)
+- [x] Replaced the **70 real brand channel names** in the homepage Channel Wall (`WALL_ROWS`) + Channel Marquee (`CHANNEL_ROW_1/2`) with generic genre/region/quality labels (Live Sports, World News, Latino TV, 4K Ultra HD, etc.). Lowers the intellectual-property-abuse signal.
+- [ ] (Optional, not done) Further soften hero copy ("10,000 Live Channels") if desired — left as-is for now.
+
+---
+
+## Sequencing
+1. Owner approves this plan (and decides on Part D).
+2. Write Batch 1 + 2 posts (8) + About/Contact + footer links + sitemap + ads.txt.
+3. Typecheck + build, commit, push (auto-deploys from `main`).
+4. Wait ~1–2 weeks for indexing; verify pages crawlable (`site:ooustream.com` + Search Console).
+5. Request AdSense review again.
+
+## Open question for owner
+- Part D: reframe the homepage now, or leave it and risk an IP-abuse flag after the content fix? (Recommend: at least soften the named-channel wall.)
+
+---
 
 ## Review
-Phase 1 shipped & build-verified (npm run build clean, tsc clean):
-- New: src/app/api/customer/sms-consent/route.ts, src/components/portal/SmsConsentToggle.tsx,
-  src/app/sms-alerts/page.tsx
-- Edited: dashboard/page.tsx, sms/page.tsx, privacy/page.tsx, sitemap.ts,
-  reseller/customers/new + [id]/edit, CLAUDE.md, .env.local, src/lib/magic-link.ts
-- NOT done (blocked on approval): Phase 2 (manual Twilio/TCR), Phase 3 (send fn + cron).
-- NOT verified live: the toggle's write path against the real DB (no logged-in session
-  tested this session); recommend a manual smoke test after deploy.
+**Done 2026-06-18:** Batch 1 + 2 (8 new original posts, 1,175–1,479 words each) written, registered in `src/lib/blog.ts`, build-verified (11 blog routes generate, sitemap auto-includes). Homepage channel wall + marquee de-branded to generic category labels. `npx tsc --noEmit` + `npm run build` both pass. Docs updated (CLAUDE.md landing-page + AdSense sections, this file).
+
+**Still TODO before requesting AdSense re-review:**
+- [ ] Part B — `/about` + `/contact` pages + footer links + sitemap
+- [ ] Part C — `public/ads.txt` (verify exact token in AdSense dashboard first)
+- [ ] (Optional) Batch 3 educational posts
+- [ ] Wait ~1–2 weeks for indexing (check Search Console), then request review in AdSense
