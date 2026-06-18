@@ -40,11 +40,11 @@ Go from 3 → ~13 posts. Each new post: **original, 1,000–1,500 words**, genui
 
 Each post must internal-link to 2–3 others + a relevant product page (`/best-iptv-service`, `/help`, `/trial`) — builds topical depth, which is what "added value" means to the reviewer.
 
-## Part B — Standard trust pages (AdSense explicitly wants these)
-- [ ] `/about` — `src/app/about/page.tsx` (server component) — who OOUStream is, what the service does, support commitment. Add `metadata` export with `alternates.canonical: https://ooustream.com/about` (per the canonical rule in CLAUDE.md).
-- [ ] `/contact` — `src/app/contact/page.tsx` (server component) — support email (`oouchie@ooustream.com`), response times, link to `/support/new`. Own canonical.
-- [ ] Add **About** + **Contact** to the homepage footer Quick Links (`page.tsx` ~line 2056) so they're crawlable from the index.
-- [ ] Add both to `sitemap.ts`.
+## Part B — Standard trust pages (AdSense explicitly wants these) ✅ DONE
+- [x] `/about` — `src/app/about/page.tsx` (server component, own canonical, OG/Twitter) — service overview, devices, pricing, support, who-we-are.
+- [x] `/contact` — `src/app/contact/page.tsx` (server component, own canonical) — support email, ticket link, response times, help-guide links.
+- [x] Added **About** + **Contact** to homepage footer Quick Links (replaced the old scroll-to-form "Contact" button with real `/contact` link).
+- [x] Added both to `sitemap.ts`. Build prerenders both as static.
 
 ## Part C — AdSense hygiene
 - [ ] Add `public/ads.txt` → `google.com, pub-0330206908249817, DIRECT, <token>`. **VERIFY the exact line in AdSense → Account → "Get your ads.txt" before committing — do not assume the token.**
@@ -71,8 +71,9 @@ Each post must internal-link to 2–3 others + a relevant product page (`/best-i
 ## Review
 **Done 2026-06-18:** Batch 1 + 2 (8 new original posts, 1,175–1,479 words each) written, registered in `src/lib/blog.ts`, build-verified (11 blog routes generate, sitemap auto-includes). Homepage channel wall + marquee de-branded to generic category labels. `npx tsc --noEmit` + `npm run build` both pass. Docs updated (CLAUDE.md landing-page + AdSense sections, this file).
 
+**Update 2026-06-18 (part 2):** Part B done — `/about` + `/contact` shipped (server components, own canonical, footer links, sitemap; build prerenders both static).
+
 **Still TODO before requesting AdSense re-review:**
-- [ ] Part B — `/about` + `/contact` pages + footer links + sitemap
-- [ ] Part C — `public/ads.txt` (verify exact token in AdSense dashboard first)
+- [ ] Part C — `public/ads.txt` (verify exact token in AdSense → Account → "Get your ads.txt" first)
 - [ ] (Optional) Batch 3 educational posts
 - [ ] Wait ~1–2 weeks for indexing (check Search Console), then request review in AdSense

@@ -177,6 +177,8 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 - `/best-iptv-service` — SEO landing page
 - `/blog` — Blog index (list of all posts)
 - `/blog/[slug]` — Individual blog post
+- `/about` — About OOUStream (company/service overview; AdSense content-completeness page)
+- `/contact` — Contact / support page (email, ticket link, response times; AdSense content-completeness page)
 - `/subscribe/pro` — Direct Pro plan checkout (for in-app links)
 - `/trial` — 24-hour free-trial signup (card-verified via Stripe SetupIntent, no charge; runs the anti-abuse engine — see "Free Trial & Anti-Abuse")
 - `/privacy` — Privacy policy
@@ -220,7 +222,7 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 - `/reseller/customers/[id]/edit` — Edit customer
 
 ## SEO
-- Sitemap at `/sitemap.xml` (homepage, best-iptv-service, blog, blog posts, subscribe/pro, trial, login, sms, sms-alerts, privacy, terms)
+- Sitemap at `/sitemap.xml` (homepage, best-iptv-service, blog, blog posts, about, contact, subscribe/pro, trial, login, sms, sms-alerts, privacy, terms)
 - Robots at `/robots.txt` (disallows /api/, /admin/, /reseller/)
 - Metadata with canonical URLs on all public pages
 - OpenGraph + Twitter cards
@@ -231,6 +233,8 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 The root `src/app/layout.tsx` declares `alternates.canonical: "https://ooustream.com"` for the homepage. In Next.js App Router, child pages **inherit** the parent canonical unless they declare their own. **Every public, indexable page MUST declare its own `alternates.canonical`** — otherwise it tells Google the homepage is its canonical and Google skips indexing it ("Discovered – currently not indexed").
 
 Where canonicals are declared per-page:
+- `/about` → metadata exported directly from `src/app/about/page.tsx`
+- `/contact` → metadata exported directly from `src/app/contact/page.tsx`
 - `/best-iptv-service` → `src/app/best-iptv-service/layout.tsx`
 - `/blog` → metadata exported directly from `src/app/blog/page.tsx`
 - `/blog/[slug]` → `generateMetadata` in `src/app/blog/[slug]/page.tsx`
@@ -312,7 +316,7 @@ All emails include logo and use brand gradient (#00d4ff to #7c3aed):
 ## Analytics & Ads (root layout `src/app/layout.tsx`)
 - **Meta Pixel** (`438320842295241`) — `next/script` `afterInteractive` + `<noscript>` fallback img in `<head>`.
 - **Google AdSense** (publisher `ca-pub-0330206908249817`) — raw `<script async ... crossOrigin="anonymous">` rendered **directly inside `<head>`** (not `next/script`), so the loader appears in server-rendered HTML for AdSense site verification. Loads site-wide on every page. **Auto Ads** are toggled on in the AdSense dashboard (no extra code; the deprecated `enable_page_level_ads` push snippet is intentionally NOT used). Verify live tag via `view-source:https://ooustream.com` → search `ca-pub-0330206908249817`.
-- **AdSense "Low value content" rejection — remediation (2026-06-18):** AdSense flagged the site with **"Low value content"** (thin content). Root cause: the only publicly-crawlable content was the marketing homepage + `/best-iptv-service` + 3 short blog posts (everything else is behind login + `Disallow`-ed in `robots.ts`). Fix shipped: **8 new in-depth (1,100–1,500 word) original blog posts** (Batch 1 device-setup guides: smart-tv, apple-tv, android-phone-tablet, iphone-ipad, windows-mac; Batch 2 troubleshooting: why-is-my-iptv-buffering, iptv-app-wont-load-troubleshooting, fix-iptv-epg-tv-guide-not-loading) — blog now 11 posts. Also softened the homepage channel wall/marquee from real brand-channel names to generic category labels to lower the **intellectual-property-abuse** risk (a separate AdSense policy that thin-content fixes don't address). **Still TODO before resubmitting for review:** (a) add `/about` + `/contact` pages (AdSense wants them) + footer links + sitemap; (b) add `public/ads.txt` (token from AdSense dashboard); (c) Batch 3 educational posts (optional); (d) let pages index ~1–2 weeks, then request review. Plan in `tasks/todo.md`.
+- **AdSense "Low value content" rejection — remediation (2026-06-18):** AdSense flagged the site with **"Low value content"** (thin content). Root cause: the only publicly-crawlable content was the marketing homepage + `/best-iptv-service` + 3 short blog posts (everything else is behind login + `Disallow`-ed in `robots.ts`). Fix shipped: **8 new in-depth (1,100–1,500 word) original blog posts** (Batch 1 device-setup guides: smart-tv, apple-tv, android-phone-tablet, iphone-ipad, windows-mac; Batch 2 troubleshooting: why-is-my-iptv-buffering, iptv-app-wont-load-troubleshooting, fix-iptv-epg-tv-guide-not-loading) — blog now 11 posts. Also softened the homepage channel wall/marquee from real brand-channel names to generic category labels to lower the **intellectual-property-abuse** risk (a separate AdSense policy that thin-content fixes don't address). ✅ Added `/about` + `/contact` pages (server components w/ own canonical, in footer Quick Links + sitemap). **Still TODO before resubmitting for review:** (a) add `public/ads.txt` (token from AdSense → Account → "Get your ads.txt"); (b) Batch 3 educational posts (optional); (c) let pages index ~1–2 weeks (check Search Console), then request review. Plan in `tasks/todo.md`.
 
 ## CSS Architecture (`globals.css`)
 - CSS variables for all design tokens (colors, fonts, borders)

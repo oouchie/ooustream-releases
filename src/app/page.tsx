@@ -2061,7 +2061,6 @@ export default function LandingPage() {
                 {[
                   { label: "Features", id: "features" },
                   { label: "Pricing", id: "pricing" },
-                  { label: "Contact", id: "contact" },
                 ].map((link) => (
                   <li key={link.id}>
                     <button
@@ -2086,6 +2085,22 @@ export default function LandingPage() {
                     className="text-sm text-[#64748b] hover:text-[#00d4ff] transition-colors"
                   >
                     Blog
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/about"
+                    className="text-sm text-[#64748b] hover:text-[#00d4ff] transition-colors"
+                  >
+                    About
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/contact"
+                    className="text-sm text-[#64748b] hover:text-[#00d4ff] transition-colors"
+                  >
+                    Contact
                   </Link>
                 </li>
                 <li>
