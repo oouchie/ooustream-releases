@@ -64,3 +64,29 @@ export async function sendSmsConsentConfirmation(phone: string): Promise<SendRes
     "OOUStream: you're opted in to account notification texts (renewal/payment reminders, service & account updates). Msg frequency varies. Msg&data rates may apply. Reply STOP to opt out, HELP for help."
   );
 }
+
+export type ReminderWindow = "7day" | "1day";
+
+// Renewal/expiration reminder (A2P campaign 2). Copy mirrors the approved TCR
+// sample: transactional, points to /billing, STOP/HELP. Routes through the
+// campaign-2 Messaging Service via sendAccountNotificationSMS (safe no-op until
+// TWILIO_BILLING_MESSAGING_SERVICE_SID is set).
+export async function sendBillingReminderSMS(
+  phone: string,
+  expiryDate: string,
+  reminderWindow: ReminderWindow
+): Promise<SendResult> {
+  // Format the date in ET to match what the customer sees in the portal.
+  const when = new Date(`${expiryDate}T00:00:00-05:00`).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+  const lead =
+    reminderWindow === "1day"
+      ? `your subscription expires tomorrow (${when})`
+      : `your subscription expires on ${when}`;
+  return sendAccountNotificationSMS(
+    phone,
+    `OOUStream: ${lead}. Manage your account: https://ooustream.com/billing Reply STOP to opt out, HELP for help.`
+  );
+}
