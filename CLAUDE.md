@@ -338,6 +338,7 @@ All emails include logo and use brand gradient (#00d4ff to #7c3aed):
 
 ## AI Support System (`src/lib/ai.ts`)
 - Claude API integration for customer support chat
+- **Model: `claude-sonnet-4-6`** with `thinking: {type:"disabled"}` + `output_config:{effort:"low"}` (fast/cheap, preserves the timeout budget). **LESSON (2026-06-20):** the previous model `claude-sonnet-4-20250514` (Sonnet 4) was RETIRED 2026-06-15 → the API returned `404 not_found` → every chat showed "Something went wrong on our end." When the assistant breaks site-wide, FIRST check the model ID isn't retired (test it: `curl …/v1/messages -d '{"model":"<id>",...}'`). Use exact alias `claude-sonnet-4-6` — never a date-suffixed variant.
 - System prompt loaded with service knowledge, setup guides, troubleshooting
 - Pulls customer context from Supabase (account data, credentials, subscription)
 - Pre-ticket chatbot on `/support` page

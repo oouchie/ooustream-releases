@@ -547,8 +547,15 @@ export async function generateAIResponse(
     try {
       const response = await anthropic.messages.create(
         {
-          model: "claude-sonnet-4-20250514",
+          // Sonnet 4 (claude-sonnet-4-20250514) was RETIRED 2026-06-15 and now 404s.
+          // claude-sonnet-4-6 is the documented drop-in replacement. thinking is
+          // disabled and effort pinned to "low" to preserve Sonnet 4's fast, cheap,
+          // no-thinking behavior — 4.6 defaults effort to "high", which would add
+          // latency and regress this timeout-hardened path (15s per-call budget).
+          model: "claude-sonnet-4-6",
           max_tokens: 1024,
+          thinking: { type: "disabled" },
+          output_config: { effort: "low" },
           system: buildSystemPrompt(customerContext),
           messages: apiMessages,
         },
